@@ -1,0 +1,40 @@
+import 'package:al_mobdea_admin/core/connection/network/network_info.dart';
+import 'package:al_mobdea_admin/features/dashboard/data/data_sources/cache/dashboard_local_data_source.dart';
+import 'package:al_mobdea_admin/features/dashboard/data/data_sources/cache/shared_preferences_dashboard_local_data_source.dart';
+import 'package:al_mobdea_admin/features/dashboard/data/data_sources/remote/dashboard_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/dashboard/data/data_sources/remote/firebase_dashboard_remote_data_source_impl.dart';
+import 'package:al_mobdea_admin/features/dashboard/data/repositories/dashboard_repository_impl.dart';
+import 'package:al_mobdea_admin/features/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:al_mobdea_admin/features/dashboard/domain/use_cases/get_dashboard_students_summary_use_case.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get_it/get_it.dart';
+
+void registerDashboardDependencies(GetIt getIt) {
+  // Data Sources
+  getIt.registerLazySingleton<DashboardRemoteDataSource>(
+    () => FirebaseDashboardRemoteDataSourceImpl(
+      firestore: getIt<FirebaseFirestore>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<DashboardLocalDataSource>(
+    () => const SharedPreferencesDashboardLocalDataSource(),
+  );
+
+  // Repository
+  getIt.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(
+      remoteDataSource: getIt<DashboardRemoteDataSource>(),
+      cacheDataSource: getIt<DashboardLocalDataSource>(),
+      networkInfo: getIt<NetworkInfo>(),
+    ),
+  );
+
+  // Use Cases
+  getIt
+      .registerLazySingleton<GetDashboardStudentsSummaryUseCase>(
+        () => GetDashboardStudentsSummaryUseCase(
+          dashboardRepository: getIt<DashboardRepository>(),
+        ),
+      );
+}
