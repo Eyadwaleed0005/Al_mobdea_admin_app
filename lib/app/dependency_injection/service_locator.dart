@@ -3,6 +3,7 @@ import 'package:al_mobdea_admin/app/dependency_injection/app_dependencies/core_d
 import 'package:al_mobdea_admin/app/dependency_injection/features/dashboard_injection.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/lessons_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/students_dependencies.dart';
+import 'package:al_mobdea_admin/app/dependency_injection/features/study_notes_dependencies.dart';
 import 'package:get_it/get_it.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -14,4 +15,5 @@ void setupServiceLocator() {
   registerStudentsDependencies(getIt);
   registerDashboardDependencies(getIt);
   registerLessonsDependencies(getIt);
+  registerStudyNotesDependencies(getIt);
 }

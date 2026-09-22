@@ -13,6 +13,14 @@ import 'package:al_mobdea_admin/features/lessons/domain/use_cases/get_lesson_by_
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/get_lessons_use_case.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/stream_lessons_use_case.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/update_lesson_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/data/data_sources/study_notes_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/repositories/study_notes_repository.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/create_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/delete_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/get_study_note_by_id_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/get_study_notes_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/stream_study_notes_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/update_study_note_use_case.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/auth/student_auth_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/firestore/students_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/students/domain/repositories/student_auth_repository.dart';
@@ -41,8 +49,7 @@ class MockStudentAuthRemoteDataSource extends Mock
 
 class MockStudentsRepository extends Mock implements StudentsRepository {}
 
-class MockStudentAuthRepository extends Mock
-    implements StudentAuthRepository {}
+class MockStudentAuthRepository extends Mock implements StudentAuthRepository {}
 
 // Lessons feature mocks
 class MockLessonsRemoteDataSource extends Mock
@@ -63,6 +70,29 @@ class MockCreateLessonUseCase extends Mock implements CreateLessonUseCase {}
 class MockUpdateLessonUseCase extends Mock implements UpdateLessonUseCase {}
 
 class MockDeleteLessonUseCase extends Mock implements DeleteLessonUseCase {}
+
+// Study notes feature mocks
+class MockStudyNotesRemoteDataSource extends Mock
+    implements StudyNotesRemoteDataSource {}
+
+class MockStudyNotesRepository extends Mock implements StudyNotesRepository {}
+
+class MockGetStudyNotesUseCase extends Mock implements GetStudyNotesUseCase {}
+
+class MockGetStudyNoteByIdUseCase extends Mock
+    implements GetStudyNoteByIdUseCase {}
+
+class MockStreamStudyNotesUseCase extends Mock
+    implements StreamStudyNotesUseCase {}
+
+class MockCreateStudyNoteUseCase extends Mock
+    implements CreateStudyNoteUseCase {}
+
+class MockUpdateStudyNoteUseCase extends Mock
+    implements UpdateStudyNoteUseCase {}
+
+class MockDeleteStudyNoteUseCase extends Mock
+    implements DeleteStudyNoteUseCase {}
 
 // Dashboard feature mocks
 class MockDashboardRemoteDataSource extends Mock
