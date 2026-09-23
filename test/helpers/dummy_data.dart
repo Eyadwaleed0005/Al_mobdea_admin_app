@@ -18,6 +18,8 @@ import 'package:al_mobdea_admin/features/live_session/data/models/live_session_m
 import 'package:al_mobdea_admin/features/live_session/domain/entities/live_session_entity.dart';
 import 'package:al_mobdea_admin/features/live_session/domain/entities/meeting_type.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
+import 'package:al_mobdea_admin/features/grades/data/models/grade_model.dart';
+import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
 import 'package:al_mobdea_admin/features/study_notes/data/models/study_note_model.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
 import 'package:al_mobdea_admin/features/students/data/models/student_model.dart';
@@ -791,5 +793,65 @@ Map<String, dynamic> tLiveSessionJson({String gradeId = tLiveSessionGradeId}) {
     FirestoreFields.gradeId: gradeId,
     FirestoreFields.platformType: MeetingType.zoom.value,
     FirestoreFields.meetingUrl: tMeetingUrl,
+  };
+}
+
+// Grades feature dummy data
+
+const String tGradeName = 'Grade 1';
+const int tGradeDisplayOrder = 1;
+
+final GradeEntity tGradeEntity = GradeEntity(
+  gradeId: tGradeId,
+  name: tGradeName,
+  displayOrder: tGradeDisplayOrder,
+  isActive: true,
+);
+
+final GradeEntity tSecondGradeEntity = GradeEntity(
+  gradeId: 'grade-2',
+  name: 'Grade 2',
+  displayOrder: 2,
+  isActive: false,
+);
+
+final GradeModel tGradeModel = GradeModel(
+  gradeId: tGradeId,
+  name: tGradeName,
+  displayOrder: tGradeDisplayOrder,
+  isActive: true,
+);
+
+final GradeModel tSecondGradeModel = GradeModel(
+  gradeId: 'grade-2',
+  name: 'Grade 2',
+  displayOrder: 2,
+  isActive: false,
+);
+
+Map<String, dynamic> tGradeJson({String gradeId = tGradeId}) {
+  return {
+    FirestoreFields.gradeId: gradeId,
+    FirestoreFields.name: tGradeName,
+    FirestoreFields.displayOrder: tGradeDisplayOrder,
+    FirestoreFields.isActive: true,
+  };
+}
+
+Map<String, dynamic> tSecondGradeJson({String gradeId = 'grade-2'}) {
+  return {
+    FirestoreFields.gradeId: gradeId,
+    FirestoreFields.name: 'Grade 2',
+    FirestoreFields.displayOrder: 2,
+    FirestoreFields.isActive: false,
+  };
+}
+
+Map<String, dynamic> tThirdGradeJson({String gradeId = 'grade-3'}) {
+  return {
+    FirestoreFields.gradeId: gradeId,
+    FirestoreFields.name: 'Grade 3',
+    FirestoreFields.displayOrder: 0,
+    FirestoreFields.isActive: true,
   };
 }

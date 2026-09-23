@@ -26,6 +26,8 @@ import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exam_resul
 import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exams_use_case.dart';
 import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_question_use_case.dart';
 import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_use_case.dart';
+import 'package:al_mobdea_admin/features/grades/data/data_sources/grades_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/grades/domain/repositories/grades_repository.dart';
 import 'package:al_mobdea_admin/features/lessons/data/data_sources/lessons_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_repository.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/create_lesson_use_case.dart';
@@ -244,3 +246,10 @@ class MockLiveSessionsRemoteDataSource extends Mock
 
 class MockLiveSessionsRepository extends Mock
     implements LiveSessionsRepository {}
+
+// Grades feature mocks
+class MockGradesRemoteDataSource extends Mock
+    implements GradesRemoteDataSource {}
+
+class MockGradesRepository extends Mock
+    implements GradesRepository {}
