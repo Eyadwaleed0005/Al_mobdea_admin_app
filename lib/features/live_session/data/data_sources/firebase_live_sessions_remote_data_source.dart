@@ -31,21 +31,10 @@ class FirebaseLiveSessionsRemoteDataSource
       final isConnected = await _hasInternetConnection();
 
       if (!isConnected) {
-        /*
-         * While offline, use the first cached snapshot immediately.
-         * If a cached live session exists, it will be displayed.
-         * If the cache is empty, the result will be null.
-         */
         final cachedSnapshot = await stream.first;
 
         return _mapLiveSession(cachedSnapshot);
       }
-
-      /*
-       * While online:
-       * - Return immediately if a cached live session exists.
-       * - Otherwise wait for the first confirmed server response.
-       */
       final snapshot = await stream.firstWhere((snapshot) {
         final hasCachedLiveSession = snapshot.docs.isNotEmpty;
 
@@ -59,7 +48,9 @@ class FirebaseLiveSessionsRemoteDataSource
   }
 
   @override
-  Future<void> saveLiveSession({required LiveSessionModel liveSession}) {
+  Future<void> saveLiveSession({
+    required LiveSessionModel liveSession,
+  }) {
     return _execute(() async {
       await _firestoreService.postData(
         collectionPath: FirestoreCollections.liveSessions,

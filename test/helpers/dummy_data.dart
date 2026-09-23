@@ -14,6 +14,9 @@ import 'package:al_mobdea_admin/features/lesson_exams/domain/entities/lesson_exa
 import 'package:al_mobdea_admin/features/lesson_exams/domain/entities/lesson_exam_question_entity.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/lesson_exam_question_image_file.dart';
 import 'package:al_mobdea_admin/features/lessons/data/models/lesson_model.dart';
+import 'package:al_mobdea_admin/features/live_session/data/models/live_session_model.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/entities/live_session_entity.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/entities/meeting_type.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:al_mobdea_admin/features/study_notes/data/models/study_note_model.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
@@ -756,5 +759,37 @@ Map<String, dynamic> tExamResultJson({String examId = tExamId}) {
     FirestoreFields.submittedAt: Timestamp.fromDate(
       tExamResultSubmittedAt,
     ),
+  };
+}
+
+// Live session feature dummy data
+
+const String tLiveSessionGradeId = tGradeId;
+const String tMeetingUrl = 'https://zoom.us/j/1234567890';
+const String tGoogleMeetUrl = 'https://meet.google.com/abc-defg-hij';
+
+final LiveSessionEntity tLiveSessionEntity = LiveSessionEntity(
+  gradeId: tLiveSessionGradeId,
+  platformType: MeetingType.zoom,
+  meetingUrl: tMeetingUrl,
+);
+
+final LiveSessionEntity tGoogleMeetLiveSessionEntity = LiveSessionEntity(
+  gradeId: tLiveSessionGradeId,
+  platformType: MeetingType.googleMeet,
+  meetingUrl: tGoogleMeetUrl,
+);
+
+final LiveSessionModel tLiveSessionModel = LiveSessionModel(
+  gradeId: tLiveSessionGradeId,
+  platformType: MeetingType.zoom.value,
+  meetingUrl: tMeetingUrl,
+);
+
+Map<String, dynamic> tLiveSessionJson({String gradeId = tLiveSessionGradeId}) {
+  return {
+    FirestoreFields.gradeId: gradeId,
+    FirestoreFields.platformType: MeetingType.zoom.value,
+    FirestoreFields.meetingUrl: tMeetingUrl,
   };
 }

@@ -4,10 +4,11 @@ import 'package:dartz/dartz.dart';
 
 import '../../domain/entities/live_session_entity.dart';
 import '../../domain/repository/live_sessions_repository.dart';
-import '../data_source/live_sessions_remote_data_source.dart';
+import '../data_sources/live_sessions_remote_data_source.dart';
 import '../models/live_session_model.dart';
 
-class LiveSessionsRepositoryImpl implements LiveSessionsRepository {
+class LiveSessionsRepositoryImpl
+    implements LiveSessionsRepository {
   const LiveSessionsRepositoryImpl({
     required LiveSessionsRemoteDataSource remoteDataSource,
   }) : _remoteDataSource = remoteDataSource;
@@ -15,7 +16,8 @@ class LiveSessionsRepositoryImpl implements LiveSessionsRepository {
   final LiveSessionsRemoteDataSource _remoteDataSource;
 
   @override
-  Future<Either<AppErrorModel, LiveSessionEntity?>> getLiveSession() {
+  Future<Either<AppErrorModel, LiveSessionEntity?>>
+  getLiveSession() {
     return _execute<LiveSessionEntity?>(() async {
       final model = await _remoteDataSource.getLiveSession();
 
@@ -30,7 +32,9 @@ class LiveSessionsRepositoryImpl implements LiveSessionsRepository {
     return _execute<Unit>(() async {
       final model = LiveSessionModel.fromEntity(liveSession);
 
-      await _remoteDataSource.saveLiveSession(liveSession: model);
+      await _remoteDataSource.saveLiveSession(
+        liveSession: model,
+      );
 
       return unit;
     });
@@ -41,7 +45,9 @@ class LiveSessionsRepositoryImpl implements LiveSessionsRepository {
     required String gradeId,
   }) {
     return _execute<Unit>(() async {
-      await _remoteDataSource.deleteLiveSession(gradeId: gradeId);
+      await _remoteDataSource.deleteLiveSession(
+        gradeId: gradeId,
+      );
 
       return unit;
     });

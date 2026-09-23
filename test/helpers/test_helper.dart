@@ -35,6 +35,8 @@ import 'package:al_mobdea_admin/features/lessons/domain/use_cases/get_lessons_us
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/stream_lessons_use_case.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/update_lesson_use_case.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/data/data_sources/lesson_exams_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/live_session/data/data_sources/live_sessions_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/repository/live_sessions_repository.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/repositories/lesson_exam_repository.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/use_cases/create_lesson_exam_question_use_case.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/use_cases/delete_lesson_exam_question_use_case.dart';
@@ -235,3 +237,10 @@ class MockDeleteExamUseCase extends Mock
 
 class MockDeleteExamQuestionUseCase extends Mock
     implements DeleteExamQuestionUseCase {}
+
+// Live session feature mocks
+class MockLiveSessionsRemoteDataSource extends Mock
+    implements LiveSessionsRemoteDataSource {}
+
+class MockLiveSessionsRepository extends Mock
+    implements LiveSessionsRepository {}
