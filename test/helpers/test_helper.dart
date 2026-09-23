@@ -5,6 +5,27 @@ import 'package:al_mobdea_admin/features/dashboard/data/data_sources/cache/dashb
 import 'package:al_mobdea_admin/features/dashboard/data/data_sources/remote/dashboard_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:al_mobdea_admin/features/dashboard/domain/use_cases/get_dashboard_students_summary_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/data/data_sources/exams_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/exams/data/services/exam_creation_service.dart';
+import 'package:al_mobdea_admin/features/exams/data/services/exam_deletion_service.dart';
+import 'package:al_mobdea_admin/features/exams/data/services/exam_query_service.dart';
+import 'package:al_mobdea_admin/features/exams/data/services/exam_question_image_service.dart';
+import 'package:al_mobdea_admin/features/exams/data/services/exam_results_query_service.dart';
+import 'package:al_mobdea_admin/features/exams/data/services/exam_update_service.dart';
+import 'package:al_mobdea_admin/features/exams/data/validation/exams_data_validator.dart';
+import 'package:al_mobdea_admin/features/exams/data/validation/policy/exam_editing_policy.dart';
+import 'package:al_mobdea_admin/features/exams/domain/repositories/exams_repository.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/create_exam_question_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/create_exam_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/delete_exam_question_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/delete_exam_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/get_exam_by_id_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/get_exam_results_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/get_exams_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exam_results_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exams_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_question_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_use_case.dart';
 import 'package:al_mobdea_admin/features/lessons/data/data_sources/lessons_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_repository.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/create_lesson_use_case.dart';
@@ -41,6 +62,37 @@ class MockFirestoreService extends Mock
 
 class MockFirebaseFunctions extends Mock
     implements FirebaseFunctions {}
+
+// Exams feature mocks
+class MockExamsRemoteDataSource extends Mock
+    implements ExamsRemoteDataSource {}
+
+class MockExamsRepository extends Mock
+    implements ExamsRepository {}
+
+class MockExamQueryService extends Mock
+    implements ExamQueryService {}
+
+class MockExamResultsQueryService extends Mock
+    implements ExamResultsQueryService {}
+
+class MockExamCreationService extends Mock
+    implements ExamCreationService {}
+
+class MockExamUpdateService extends Mock
+    implements ExamUpdateService {}
+
+class MockExamDeletionService extends Mock
+    implements ExamDeletionService {}
+
+class MockExamQuestionImageService extends Mock
+    implements ExamQuestionImageService {}
+
+class MockExamsDataValidator extends Mock
+    implements ExamsDataValidator {}
+
+class MockExamEditingPolicy extends Mock
+    implements ExamEditingPolicy {}
 
 class MockHttpsCallable extends Mock implements HttpsCallable {}
 
@@ -149,3 +201,37 @@ class MockDashboardRepository extends Mock
 
 class MockGetDashboardStudentsSummaryUseCase extends Mock
     implements GetDashboardStudentsSummaryUseCase {}
+
+// Exams feature use case mocks
+class MockGetExamsUseCase extends Mock
+    implements GetExamsUseCase {}
+
+class MockStreamExamsUseCase extends Mock
+    implements StreamExamsUseCase {}
+
+class MockGetExamByIdUseCase extends Mock
+    implements GetExamByIdUseCase {}
+
+class MockGetExamResultsUseCase extends Mock
+    implements GetExamResultsUseCase {}
+
+class MockStreamExamResultsUseCase extends Mock
+    implements StreamExamResultsUseCase {}
+
+class MockCreateExamUseCase extends Mock
+    implements CreateExamUseCase {}
+
+class MockCreateExamQuestionUseCase extends Mock
+    implements CreateExamQuestionUseCase {}
+
+class MockUpdateExamUseCase extends Mock
+    implements UpdateExamUseCase {}
+
+class MockUpdateExamQuestionUseCase extends Mock
+    implements UpdateExamQuestionUseCase {}
+
+class MockDeleteExamUseCase extends Mock
+    implements DeleteExamUseCase {}
+
+class MockDeleteExamQuestionUseCase extends Mock
+    implements DeleteExamQuestionUseCase {}
