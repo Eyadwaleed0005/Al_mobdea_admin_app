@@ -7,6 +7,7 @@ import 'package:al_mobdea_admin/app/dependency_injection/features/lesson_exams_d
 import 'package:al_mobdea_admin/app/dependency_injection/features/live_session_injection.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/lessons_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/students_dependencies.dart';
+import 'package:al_mobdea_admin/app/dependency_injection/features/student_exam_results_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/study_notes_dependencies.dart';
 import 'package:get_it/get_it.dart';
 
@@ -24,4 +25,5 @@ void setupServiceLocator() {
   registerExamsDependencies(getIt);
   registerLiveSessionDependencies(getIt);
   registerGradesDependencies(getIt);
+  registerStudentExamResultsDependencies(getIt);
 }
