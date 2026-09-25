@@ -28,6 +28,8 @@ import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_quest
 import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_use_case.dart';
 import 'package:al_mobdea_admin/features/grades/data/data_sources/grades_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/grades/domain/repositories/grades_repository.dart';
+import 'package:al_mobdea_admin/features/result_student/data/data_sources/student_exam_results_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/result_student/domain/repository/student_exam_results_repository.dart';
 import 'package:al_mobdea_admin/features/lessons/data/data_sources/lessons_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_repository.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/create_lesson_use_case.dart';
@@ -253,3 +255,10 @@ class MockGradesRemoteDataSource extends Mock
 
 class MockGradesRepository extends Mock
     implements GradesRepository {}
+
+// Result student feature mocks
+class MockStudentExamResultsRemoteDataSource extends Mock
+    implements StudentExamResultsRemoteDataSource {}
+
+class MockStudentExamResultsRepository extends Mock
+    implements StudentExamResultsRepository {}
