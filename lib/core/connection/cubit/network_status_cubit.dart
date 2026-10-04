@@ -1,13 +1,14 @@
 import 'dart:async';
 
-import 'package:al_mobdea_admin/core/connection/cubit/network_status_state.dart';
 import 'package:al_mobdea_admin/core/connection/network/network_info.dart';
+import 'package:al_mobdea_admin/core/connection/cubit/network_status_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NetworkStatusCubit extends Cubit<NetworkStatusState> {
-  NetworkStatusCubit({required NetworkInfo networkInfo})
-    : _networkInfo = networkInfo,
-      super(const NetworkStatusInitial());
+  NetworkStatusCubit({
+    required NetworkInfo networkInfo,
+  }) : _networkInfo = networkInfo,
+       super(const NetworkStatusInitial());
 
   final NetworkInfo _networkInfo;
 
@@ -36,11 +37,11 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
         return;
       }
 
-      _connectionSubscription = _networkInfo.onConnectionChanged
-          .listen(
-            _handleConnectionChanged,
-            onError: _handleConnectionError,
-          );
+      _connectionSubscription =
+          _networkInfo.onConnectionChanged.listen(
+        _handleConnectionChanged,
+        onError: _handleConnectionError,
+      );
     } finally {
       _isStartingMonitoring = false;
     }
@@ -54,7 +55,8 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
     }
 
     try {
-      final bool isConnected = await _networkInfo.isConnected;
+      final bool isConnected =
+          await _networkInfo.isConnected;
 
       if (isClosed) {
         return;
@@ -62,7 +64,8 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
 
       _emitConnectionStatus(
         isConnected,
-        forceShowOfflineBanner: forceShowOfflineBanner,
+        forceShowOfflineBanner:
+            forceShowOfflineBanner,
       );
     } catch (_) {
       if (isClosed) {
@@ -70,7 +73,8 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
       }
 
       _emitDisconnectedStatus(
-        forceShowOfflineBanner: forceShowOfflineBanner,
+        forceShowOfflineBanner:
+            forceShowOfflineBanner,
       );
     }
   }
@@ -88,7 +92,9 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
     }
 
     emit(
-      const NetworkStatusDisconnected(showOfflineBanner: false),
+      const NetworkStatusDisconnected(
+        showOfflineBanner: false,
+      ),
     );
   }
 
@@ -129,7 +135,8 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
     }
 
     _emitDisconnectedStatus(
-      forceShowOfflineBanner: forceShowOfflineBanner,
+      forceShowOfflineBanner:
+          forceShowOfflineBanner,
     );
   }
 
@@ -149,14 +156,18 @@ class NetworkStatusCubit extends Cubit<NetworkStatusState> {
       }
 
       emit(
-        const NetworkStatusDisconnected(showOfflineBanner: true),
+        const NetworkStatusDisconnected(
+          showOfflineBanner: true,
+        ),
       );
 
       return;
     }
 
     emit(
-      const NetworkStatusDisconnected(showOfflineBanner: true),
+      const NetworkStatusDisconnected(
+        showOfflineBanner: true,
+      ),
     );
   }
 

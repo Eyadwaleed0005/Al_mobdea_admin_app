@@ -1,4 +1,3 @@
-import 'package:al_mobdea_admin/core/connection/network/network_info.dart';
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
 import 'package:al_mobdea_admin/core/errors/exceptions/firebase_remote_exception.dart';
 import 'package:al_mobdea_admin/features/dashboard/data/data_sources/cache/dashboard_local_data_source.dart';
@@ -9,44 +8,36 @@ import 'package:al_mobdea_admin/features/dashboard/domain/repositories/dashboard
 import 'package:dartz/dartz.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
-  final DashboardRemoteDataSource _remoteDataSource;
-  final DashboardLocalDataSource _cacheDataSource;
-
   const DashboardRepositoryImpl({
     required DashboardRemoteDataSource remoteDataSource,
-    required DashboardLocalDataSource cacheDataSource,
-    required NetworkInfo networkInfo,
-  }) : _remoteDataSource = remoteDataSource,
-       _cacheDataSource = cacheDataSource;
+    required DashboardLocalDataSource localDataSource,
+  })  : _remoteDataSource = remoteDataSource,
+        _localDataSource = localDataSource;
+
+  final DashboardRemoteDataSource _remoteDataSource;
+  final DashboardLocalDataSource _localDataSource;
 
   @override
   Future<Either<AppErrorModel, DashboardStudentsSummaryEntity>>
-  getStudentsSummary() async {
+      getStudentsSummary() async {
     try {
-      final remoteModel = await _remoteDataSource
-          .getStudentsSummary();
+      final remoteModel = await _remoteDataSource.getStudentsSummary();
 
       await _cacheSummarySafely(remoteModel);
 
-      return Right<
-        AppErrorModel,
-        DashboardStudentsSummaryEntity
-      >(_mapToEntity(remoteModel));
+      return Right<AppErrorModel, DashboardStudentsSummaryEntity>(
+        _mapToEntity(remoteModel),
+      );
     } on FirebaseRemoteException {
       final cachedModel = await _getCachedSummarySafely();
 
       if (cachedModel != null) {
-        return Right<
-          AppErrorModel,
-          DashboardStudentsSummaryEntity
-        >(_mapToEntity(cachedModel));
+        return Right<AppErrorModel, DashboardStudentsSummaryEntity>(
+          _mapToEntity(cachedModel),
+        );
       }
-
-      return Right<
-        AppErrorModel,
-        DashboardStudentsSummaryEntity
-      >(
-        const DashboardStudentsSummaryEntity(
+      return const Right<AppErrorModel, DashboardStudentsSummaryEntity>(
+        DashboardStudentsSummaryEntity(
           totalStudents: 0,
           expiredSubscriptions: 0,
         ),
@@ -67,16 +58,13 @@ class DashboardRepositoryImpl implements DashboardRepository {
     DashboardStudentsSummaryModel summary,
   ) async {
     try {
-      await _cacheDataSource.cacheStudentsSummary(
-        summary: summary,
-      );
+      await _localDataSource.cacheStudentsSummary(summary: summary);
     } catch (_) {}
   }
 
-  Future<DashboardStudentsSummaryModel?>
-  _getCachedSummarySafely() async {
+  Future<DashboardStudentsSummaryModel?> _getCachedSummarySafely() async {
     try {
-      return await _cacheDataSource.getCachedStudentsSummary();
+      return await _localDataSource.getCachedStudentsSummary();
     } catch (_) {
       return null;
     }

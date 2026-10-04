@@ -8,18 +8,46 @@ abstract final class AppAnimations {
     return child
         .animate(delay: 100.ms)
         .fadeIn(duration: 700.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.25,
-          end: 0,
-          duration: 750.ms,
-          curve: Curves.easeOutCubic,
-        )
+        .slideY(begin: 0.25, end: 0, duration: 750.ms, curve: Curves.easeOutCubic)
         .scale(
           begin: const Offset(0.88, 0.88),
           end: const Offset(1, 1),
           duration: 850.ms,
           curve: Curves.easeOutBack,
         );
+  }
+
+  static Widget logoZoomInEntrance({required Widget child}) {
+    return child
+        .animate(delay: 150.ms)
+        .fadeIn(duration: 1000.ms, curve: Curves.easeOut)
+        .scale(
+          begin: const Offset(0.4, 0.4),
+          end: const Offset(1, 1),
+          duration: 1400.ms,
+          curve: Curves.easeOutCubic,
+        );
+  }
+
+  static Widget splashSubtitle({required Widget child}) {
+    return child
+        .animate(delay: 2600.ms)
+        .fadeIn(duration: 700.ms, curve: Curves.easeOut)
+        .slideY(begin: 0.30, end: 0, duration: 700.ms, curve: Curves.easeOutCubic);
+  }
+
+  static Widget splashLoadingBar({required Widget child}) {
+    return child
+        .animate(delay: 3100.ms)
+        .fadeIn(duration: 600.ms, curve: Curves.easeOut)
+        .slideY(begin: 0.25, end: 0, duration: 600.ms, curve: Curves.easeOutCubic);
+  }
+
+  static Widget splashLoadingText({required Widget child}) {
+    return child
+        .animate(delay: 3300.ms)
+        .fadeIn(duration: 650.ms, curve: Curves.easeOut)
+        .slideY(begin: 0.20, end: 0, duration: 650.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget logoFloating({required Widget child}) {
@@ -29,24 +57,14 @@ abstract final class AppAnimations {
             controller.repeat(reverse: true);
           },
         )
-        .slideY(
-          begin: 0,
-          end: -0.018,
-          duration: 1600.ms,
-          curve: Curves.easeInOut,
-        );
+        .slideY(begin: 0, end: -0.018, duration: 1600.ms, curve: Curves.easeInOut);
   }
 
   static Widget shadowEntrance({required Widget child}) {
     return child
         .animate(delay: 450.ms)
         .fadeIn(duration: 650.ms, curve: Curves.easeOut)
-        .scaleX(
-          begin: 0.65,
-          end: 1,
-          duration: 750.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .scaleX(begin: 0.65, end: 1, duration: 750.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget shadowPulse({required Widget child}) {
@@ -56,12 +74,7 @@ abstract final class AppAnimations {
             controller.repeat(reverse: true);
           },
         )
-        .scaleX(
-          begin: 0.92,
-          end: 1.04,
-          duration: 1600.ms,
-          curve: Curves.easeInOut,
-        )
+        .scaleX(begin: 0.92, end: 1.04, duration: 1600.ms, curve: Curves.easeInOut)
         .fade(begin: 0.70, end: 1, duration: 1600.ms, curve: Curves.easeInOut);
   }
 
@@ -69,60 +82,35 @@ abstract final class AppAnimations {
     return child
         .animate(delay: 550.ms)
         .fadeIn(duration: 600.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.45,
-          end: 0,
-          duration: 650.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.45, end: 0, duration: 650.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget secondaryTitle({required Widget child}) {
     return child
         .animate(delay: 800.ms)
         .fadeIn(duration: 650.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.35,
-          end: 0,
-          duration: 650.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.35, end: 0, duration: 650.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget loadingBar({required Widget child}) {
     return child
         .animate(delay: 1000.ms)
         .fadeIn(duration: 500.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.50,
-          end: 0,
-          duration: 550.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.50, end: 0, duration: 550.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget loadingText({required Widget child}) {
     return child
         .animate(delay: 1150.ms)
         .fadeIn(duration: 550.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.35,
-          end: 0,
-          duration: 550.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.35, end: 0, duration: 550.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget screenSection({required Widget child, int delay = 0}) {
     return child
         .animate(delay: delay.ms)
         .fadeIn(duration: 450.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.12,
-          end: 0,
-          duration: 500.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.12, end: 0, duration: 500.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget formFieldEntrance({required Widget child, required int order}) {
@@ -131,18 +119,8 @@ abstract final class AppAnimations {
     return child
         .animate(delay: delay.ms)
         .fadeIn(duration: 420.ms, curve: Curves.easeOut)
-        .slideX(
-          begin: 0.08,
-          end: 0,
-          duration: 480.ms,
-          curve: Curves.easeOutCubic,
-        )
-        .slideY(
-          begin: 0.035,
-          end: 0,
-          duration: 480.ms,
-          curve: Curves.easeOutCubic,
-        )
+        .slideX(begin: 0.08, end: 0, duration: 480.ms, curve: Curves.easeOutCubic)
+        .slideY(begin: 0.035, end: 0, duration: 480.ms, curve: Curves.easeOutCubic)
         .scale(
           begin: const Offset(0.985, 0.985),
           end: const Offset(1, 1),
@@ -155,12 +133,7 @@ abstract final class AppAnimations {
     return child
         .animate()
         .fadeIn(duration: 280.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.08,
-          end: 0,
-          duration: 420.ms,
-          curve: Curves.easeOutCubic,
-        )
+        .slideY(begin: 0.08, end: 0, duration: 420.ms, curve: Curves.easeOutCubic)
         .scale(
           begin: const Offset(0.90, 0.90),
           end: const Offset(1, 1),
@@ -169,10 +142,7 @@ abstract final class AppAnimations {
         );
   }
 
-  static Widget bottomNavItem({
-    required Widget child,
-    required bool isSelected,
-  }) {
+  static Widget bottomNavItem({required Widget child, required bool isSelected}) {
     return child
         .animate(target: isSelected ? 1 : 0)
         .scale(
@@ -181,12 +151,7 @@ abstract final class AppAnimations {
           duration: 260.ms,
           curve: Curves.easeOutBack,
         )
-        .slideY(
-          begin: 0.06,
-          end: 0,
-          duration: 240.ms,
-          curve: Curves.easeOutCubic,
-        );
+        .slideY(begin: 0.06, end: 0, duration: 240.ms, curve: Curves.easeOutCubic);
   }
 
   static Widget bottomNavBarEntrance({required Widget child}) {
@@ -206,12 +171,7 @@ abstract final class AppAnimations {
     return child
         .animate()
         .fadeIn(duration: 450.ms, curve: Curves.easeOut)
-        .slideY(
-          begin: 0.10,
-          end: 0,
-          duration: 550.ms,
-          curve: Curves.easeOutCubic,
-        )
+        .slideY(begin: 0.10, end: 0, duration: 550.ms, curve: Curves.easeOutCubic)
         .scale(
           begin: const Offset(0.96, 0.96),
           end: const Offset(1, 1),

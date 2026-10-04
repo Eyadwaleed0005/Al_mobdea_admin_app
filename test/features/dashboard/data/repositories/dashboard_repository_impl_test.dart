@@ -12,17 +12,14 @@ void main() {
   late DashboardRepositoryImpl repository;
   late MockDashboardRemoteDataSource mockRemoteDataSource;
   late MockDashboardLocalDataSource mockLocalDataSource;
-  late MockNetworkInfo mockNetworkInfo;
 
   setUp(() {
     mockRemoteDataSource = MockDashboardRemoteDataSource();
     mockLocalDataSource = MockDashboardLocalDataSource();
-    mockNetworkInfo = MockNetworkInfo();
 
     repository = DashboardRepositoryImpl(
       remoteDataSource: mockRemoteDataSource,
-      cacheDataSource: mockLocalDataSource,
-      networkInfo: mockNetworkInfo,
+      localDataSource: mockLocalDataSource,
     );
   });
 

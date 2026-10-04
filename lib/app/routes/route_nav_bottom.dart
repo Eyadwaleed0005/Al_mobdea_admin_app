@@ -1,38 +1,26 @@
-// import 'package:al_mobdea_admin/app/routes/app_images_routes.dart';
-// import 'package:flutter/material.dart';
+import 'package:al_mobdea_admin/app/routes/app_images_routes.dart';
+import 'package:flutter/material.dart';
 
-// class RouteNavBottom {
-//   RouteNavBottom._();
+class RouteNavBottom {
+  RouteNavBottom._();
 
-//   static List<String> get icons => [
-//     AppImage().home,
-//     AppImage().students,
-//     AppImage().bookOpen,
-//     AppImage().exams,
-//     AppImage().liveSession,
-//   ];
+  static List<String> get icons => [
+    AppImage().home,
+    AppImage().students,
+    AppImage().bookOpen,
+    AppImage().exams,
+    AppImage().liveSession,
+  ];
 
-//   static const List<String> titles = [
-//     'الرئيسية',
-//     'الطلاب',
-//     'المحتوى',
-//     'الامتحانات',
-//     'الحصة',
-//   ];
+  static const List<String> titles = ['الرئيسية', 'الطلاب', 'المحتوى', 'الامتحانات', 'الحصة'];
 
-//   static List<Widget> screens({
-//     required Widget homeScreen,
-//     required Widget students,
-//     required Widget studyNotesScreen,
-//     required Widget examsScreen,
-//     required Widget liveSessionScreen,
-//   }) {
-//     return [
-//       homeScreen,
-//       students,
-//       studyNotesScreen,
-//       examsScreen,
-//       liveSessionScreen,
-//     ];
-//   }
-// }
+  static List<Widget> screens({
+    required Widget homeScreen,
+    required Widget studentsScreen,
+    required Widget lessonsScreen,
+    required Widget examsScreen,
+    required Widget liveSessionScreen,
+  }) {
+    return [homeScreen, studentsScreen, lessonsScreen, examsScreen, liveSessionScreen];
+  }
+}

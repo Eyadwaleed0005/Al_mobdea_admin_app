@@ -14,17 +14,27 @@ class AppImage {
   final String baseIcons = 'assets/icons/';
 
   // ===== images =====
-  late final String alwaleedImg = '${baseImages}alwaleed_img.png';
+  late final String alMobdea = '${baseImages}al_mobdea.png';
+  late final String splashLogo = '${baseImages}splash_logo.png';
+  late final String splashBackground = '${baseImages}splash_background.png';
+  late final String alwaleedImg = '${baseImages}al_mobdea.png';
 
   // ===== icons =====
-  late final String profileIcon = '${baseIcons}profile.png';
-  late final String bookOpen = '${baseIcons}book_open.png';
-  late final String exams = '${baseIcons}exams.png';
-  late final String home = '${baseIcons}home.png';
-  late final String liveSession = '${baseIcons}live_session.png';
-  late final String studyNotes = '${baseIcons}study_notes.png';
-  late final String students = '${baseIcons}students.png';
-  late final String search = '${baseIcons}search.png';
+  late final String homeIcon = '${baseIcons}home.svg';
+  late final String search = '${baseIcons}Search.svg';
+  late final String exam = '${baseIcons}exam.svg';
+  late final String lessons = '${baseIcons}lessons.svg';
+  late final String studyNotes = '${baseIcons}study_notes.svg';
+  late final String profile = '${baseIcons}profile.svg';
+
+  // Legacy/Fallback aliases
+  late final String profileIcon = '${baseIcons}profile.svg';
+  late final String bookOpen = '${baseIcons}lessons.svg';
+  late final String exams = '${baseIcons}exam.svg';
+  late final String home = '${baseIcons}home.svg';
+  late final String liveSession = '${baseIcons}live.svg';
+  late final String students = '${baseIcons}students.svg';
+  late final String profilee = '${baseIcons}profile.svg';
 
   // ===== animations =====
 }

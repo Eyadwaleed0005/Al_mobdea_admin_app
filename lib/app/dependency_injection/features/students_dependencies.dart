@@ -1,5 +1,3 @@
-import 'package:get_it/get_it.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_service.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/auth/firebase_student_auth_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/auth/student_auth_remote_data_source.dart';
@@ -19,32 +17,26 @@ import 'package:al_mobdea_admin/features/students/domain/use_cases/update_studen
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_profile_use_case.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_status_use_case.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_subscription_use_case.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:get_it/get_it.dart';
 
 void registerStudentsDependencies(GetIt getIt) {
   // Data sources
   getIt.registerLazySingleton<StudentsRemoteDataSource>(
-    () => FirebaseStudentsRemoteDataSource(
-      firestoreService: getIt<FirestoreService>(),
-    ),
+    () => FirebaseStudentsRemoteDataSource(firestoreService: getIt<FirestoreService>()),
   );
 
   getIt.registerLazySingleton<StudentAuthRemoteDataSource>(
-    () => FirebaseStudentAuthRemoteDataSource(
-      firebaseFunctions: getIt<FirebaseFunctions>(),
-    ),
+    () => FirebaseStudentAuthRemoteDataSource(firebaseFunctions: getIt<FirebaseFunctions>()),
   );
 
   // Repositories
   getIt.registerLazySingleton<StudentsRepository>(
-    () => StudentsRepositoryImpl(
-      remoteDataSource: getIt<StudentsRemoteDataSource>(),
-    ),
+    () => StudentsRepositoryImpl(remoteDataSource: getIt<StudentsRemoteDataSource>()),
   );
 
   getIt.registerLazySingleton<StudentAuthRepository>(
-    () => StudentAuthRepositoryImpl(
-      remoteDataSource: getIt<StudentAuthRemoteDataSource>(),
-    ),
+    () => StudentAuthRepositoryImpl(remoteDataSource: getIt<StudentAuthRemoteDataSource>()),
   );
 
   // Use cases
@@ -56,27 +48,19 @@ void registerStudentsDependencies(GetIt getIt) {
   );
 
   getIt.registerLazySingleton<GetStudentsUseCase>(
-    () => GetStudentsUseCase(
-      studentsRepository: getIt<StudentsRepository>(),
-    ),
+    () => GetStudentsUseCase(studentsRepository: getIt<StudentsRepository>()),
   );
 
   getIt.registerLazySingleton<GetStudentByIdUseCase>(
-    () => GetStudentByIdUseCase(
-      studentsRepository: getIt<StudentsRepository>(),
-    ),
+    () => GetStudentByIdUseCase(studentsRepository: getIt<StudentsRepository>()),
   );
 
   getIt.registerLazySingleton<StreamStudentsUseCase>(
-    () => StreamStudentsUseCase(
-      studentsRepository: getIt<StudentsRepository>(),
-    ),
+    () => StreamStudentsUseCase(studentsRepository: getIt<StudentsRepository>()),
   );
 
   getIt.registerLazySingleton<UpdateStudentProfileUseCase>(
-    () => UpdateStudentProfileUseCase(
-      studentsRepository: getIt<StudentsRepository>(),
-    ),
+    () => UpdateStudentProfileUseCase(studentsRepository: getIt<StudentsRepository>()),
   );
 
   getIt.registerLazySingleton<UpdateStudentEmailUseCase>(
@@ -87,9 +71,7 @@ void registerStudentsDependencies(GetIt getIt) {
   );
 
   getIt.registerLazySingleton<UpdateStudentPasswordUseCase>(
-    () => UpdateStudentPasswordUseCase(
-      studentAuthRepository: getIt<StudentAuthRepository>(),
-    ),
+    () => UpdateStudentPasswordUseCase(studentAuthRepository: getIt<StudentAuthRepository>()),
   );
 
   getIt.registerLazySingleton<UpdateStudentStatusUseCase>(
@@ -107,8 +89,6 @@ void registerStudentsDependencies(GetIt getIt) {
   );
 
   getIt.registerLazySingleton<DeleteStudentUseCase>(
-    () => DeleteStudentUseCase(
-      studentAuthRepository: getIt<StudentAuthRepository>(),
-    ),
+    () => DeleteStudentUseCase(studentAuthRepository: getIt<StudentAuthRepository>()),
   );
 }

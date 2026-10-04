@@ -1,3 +1,4 @@
+import 'package:al_mobdea_admin/core/connection/cubit/network_status_cubit.dart';
 import 'package:al_mobdea_admin/core/connection/network/network_info.dart';
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_service.dart';
 import 'package:al_mobdea_admin/core/firebase/storage/storage_service.dart';
@@ -106,6 +107,9 @@ class MockHttpsCallableResult extends Mock
     implements HttpsCallableResult<Map<String, dynamic>> {}
 
 class MockNetworkInfo extends Mock implements NetworkInfo {}
+
+class MockNetworkStatusCubit extends Mock implements NetworkStatusCubit {}
+
 
 // Students feature mocks
 class MockStudentsRemoteDataSource extends Mock
