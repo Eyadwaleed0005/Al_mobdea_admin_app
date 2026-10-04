@@ -33,7 +33,7 @@ class CustomSearchBar extends StatelessWidget {
         ),
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: ColorPalette.primary,
-          selectionColor: ColorPalette.accent.withOpacity(0.45),
+          selectionColor: ColorPalette.accent.withValues(alpha: 0.45),
           selectionHandleColor: ColorPalette.primary,
         ),
       ),
@@ -49,30 +49,24 @@ class CustomSearchBar extends StatelessWidget {
           contextMenuBuilder: (context, editableTextState) {
             return Theme(
               data: Theme.of(context).copyWith(
-                colorScheme: Theme.of(context).colorScheme
-                    .copyWith(
-                      primary: ColorPalette.primary,
-                      surface: ColorPalette.surface,
-                      onSurface: ColorPalette.textPrimary,
-                    ),
+                colorScheme: Theme.of(context).colorScheme.copyWith(
+                  primary: ColorPalette.primary,
+                  surface: ColorPalette.surface,
+                  onSurface: ColorPalette.textPrimary,
+                ),
               ),
               child: AdaptiveTextSelectionToolbar.buttonItems(
                 anchors: editableTextState.contextMenuAnchors,
-                buttonItems:
-                    editableTextState.contextMenuButtonItems,
+                buttonItems: editableTextState.contextMenuButtonItems,
               ),
             );
           },
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle:
-                AppTextStyle.font15TextMutedRegularTajawal(),
+            hintStyle: AppTextStyle.font15TextMutedRegularTajawal(),
             filled: true,
             fillColor: ColorPalette.surface,
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 20.w,
-              vertical: 17.h,
-            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 17.h),
             suffixIcon: InkWell(
               onTap: onSearchTap,
               borderRadius: BorderRadius.circular(18.r),
@@ -96,24 +90,15 @@ class CustomSearchBar extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18.r),
-              borderSide: BorderSide(
-                color: ColorPalette.border,
-                width: 1.w,
-              ),
+              borderSide: BorderSide(color: ColorPalette.border, width: 1.w),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18.r),
-              borderSide: BorderSide(
-                color: ColorPalette.primary,
-                width: 1.3.w,
-              ),
+              borderSide: BorderSide(color: ColorPalette.primary, width: 1.3.w),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18.r),
-              borderSide: BorderSide(
-                color: ColorPalette.divider,
-                width: 1.w,
-              ),
+              borderSide: BorderSide(color: ColorPalette.divider, width: 1.w),
             ),
           ),
         ),

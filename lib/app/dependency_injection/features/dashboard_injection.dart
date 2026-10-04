@@ -1,4 +1,3 @@
-import 'package:al_mobdea_admin/core/connection/network/network_info.dart';
 import 'package:al_mobdea_admin/features/dashboard/data/data_sources/cache/dashboard_local_data_source.dart';
 import 'package:al_mobdea_admin/features/dashboard/data/data_sources/cache/shared_preferences_dashboard_local_data_source.dart';
 import 'package:al_mobdea_admin/features/dashboard/data/data_sources/remote/dashboard_remote_data_source.dart';
@@ -12,9 +11,7 @@ import 'package:get_it/get_it.dart';
 void registerDashboardDependencies(GetIt getIt) {
   // Data Sources
   getIt.registerLazySingleton<DashboardRemoteDataSource>(
-    () => FirebaseDashboardRemoteDataSourceImpl(
-      firestore: getIt<FirebaseFirestore>(),
-    ),
+    () => FirebaseDashboardRemoteDataSourceImpl(firestore: getIt<FirebaseFirestore>()),
   );
 
   getIt.registerLazySingleton<DashboardLocalDataSource>(
@@ -25,16 +22,12 @@ void registerDashboardDependencies(GetIt getIt) {
   getIt.registerLazySingleton<DashboardRepository>(
     () => DashboardRepositoryImpl(
       remoteDataSource: getIt<DashboardRemoteDataSource>(),
-      cacheDataSource: getIt<DashboardLocalDataSource>(),
-      networkInfo: getIt<NetworkInfo>(),
+      localDataSource: getIt<DashboardLocalDataSource>(),
     ),
   );
 
   // Use Cases
-  getIt
-      .registerLazySingleton<GetDashboardStudentsSummaryUseCase>(
-        () => GetDashboardStudentsSummaryUseCase(
-          dashboardRepository: getIt<DashboardRepository>(),
-        ),
-      );
+  getIt.registerLazySingleton<GetDashboardStudentsSummaryUseCase>(
+    () => GetDashboardStudentsSummaryUseCase(dashboardRepository: getIt<DashboardRepository>()),
+  );
 }
