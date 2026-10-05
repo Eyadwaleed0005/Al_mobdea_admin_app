@@ -73,16 +73,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   textDirection: TextDirection.ltr,
                   children: [
                     _buildLeading(context, shouldShowBack: shouldShowBack),
-
-                    const Spacer(),
-                    ...?actions,
-
+                    // ...?actions,
                     Flexible(
                       child: Padding(
-                        padding: EdgeInsets.only(right: 8.w, left: 12.w),
+                        padding: EdgeInsets.only(right: 16.w),
                         child: Text(
                           title,
                           textDirection: TextDirection.rtl,
@@ -116,7 +114,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     if (shouldShowBack) {
       return Padding(
-        padding: EdgeInsets.only(left: 14.w),
+        padding: EdgeInsets.only(left: 16.w),
         child: Material(
           color: Colors.transparent,
           shape: const CircleBorder(),
@@ -124,7 +122,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             onTap: onBack ?? () => Navigator.of(context).maybePop(),
             customBorder: const CircleBorder(),
             child: Padding(
-              padding: EdgeInsets.all(8.r),
+              padding: EdgeInsets.only(left: 14.w, top: 16.h),
               child: Icon(
                 Icons.arrow_back_ios_new_rounded,
                 color: ColorPalette.textPrimary,

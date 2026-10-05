@@ -1,0 +1,115 @@
+import 'package:al_mobdea_admin/app/routes/route_names.dart';
+import 'package:al_mobdea_admin/core/helper/spacer.dart';
+import 'package:al_mobdea_admin/core/style/app_animations.dart';
+import 'package:al_mobdea_admin/core/widgets/custom_button.dart';
+import 'package:al_mobdea_admin/core/widgets/custom_delete_button.dart';
+import 'package:al_mobdea_admin/core/widgets/custom_delete_confirmation_bottom_sheet.dart';
+import 'package:al_mobdea_admin/core/widgets/custom_secondary_button.dart';
+import 'package:al_mobdea_admin/features/students/presentation/cubit/update_student_cubit.dart';
+import 'package:al_mobdea_admin/features/students/presentation/cubit/update_student_state.dart';
+import 'package:al_mobdea_admin/features/students/presentation/widgets/update_student_screen_widgets/view_student_exams_button.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class UpdateStudentActions extends StatelessWidget {
+  const UpdateStudentActions({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<UpdateStudentCubit, UpdateStudentState>(
+      buildWhen: (previous, current) {
+        return previous.status != current.status ||
+            previous.hasChanges != current.hasChanges;
+      },
+      builder: (context, state) {
+        final UpdateStudentCubit cubit = context.read<UpdateStudentCubit>();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            AppAnimations.formFieldEntrance(
+              order: 6,
+              child: Row(
+                textDirection: TextDirection.rtl,
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      text: 'حفظ التعديلات',
+                      onPressed: cubit.submit,
+                      isLoading: state.isSubmitting,
+                      isEnabled: !state.isBusy && state.hasChanges,
+                    ),
+                  ),
+                  horizontalSpace(12),
+                  Expanded(
+                    child: CustomSecondaryButton(
+                      text: 'فصل الجهاز',
+                      icon: Icons.phonelink_erase_rounded,
+                      onPressed: cubit.disconnectDevice,
+                      isLoading: state.isDisconnectingDevice,
+                      isEnabled: !state.isBusy,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            verticalSpace(14),
+            AppAnimations.formFieldEntrance(
+              order: 7,
+              child: CustomSecondaryButton(
+                text: 'تجديد اشتراك الطالب',
+                icon: Icons.autorenew_rounded,
+                onPressed: cubit.renewSubscription,
+                isLoading: state.isRenewingSubscription,
+                isEnabled: !state.isBusy,
+              ),
+            ),
+            verticalSpace(14),
+            AppAnimations.formFieldEntrance(
+              order: 8,
+              child: Row(
+                textDirection: TextDirection.rtl,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ViewStudentExamsButton(
+                    isEnabled: !state.isBusy,
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        RouteNames.studentExamResultsScreen,
+                        arguments: cubit.studentId,
+                      );
+                    },
+                  ),
+                  horizontalSpace(12),
+                  Expanded(
+                    child: CustomDeleteButton(
+                      text: 'حذف الطالب',
+                      isLoading: state.isDeleting,
+                      isEnabled: !state.isBusy,
+                      onPressed: () async {
+                        final confirmed =
+                            await showCustomDeleteConfirmationBottomSheet(
+                          context,
+                          title: 'حذف الطالب؟',
+                          message:
+                              'هل أنت متأكد من حذف حساب الطالب؟ لا يمكن التراجع عن هذه العملية.',
+                          confirmText: 'حذف الطالب',
+                          cancelText: 'إلغاء',
+                        );
+                        if (!confirmed || !context.mounted) {
+                          return;
+                        }
+                        await cubit.deleteStudent();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            verticalSpace(16),
+          ],
+        );
+      },
+    );
+  }
+}

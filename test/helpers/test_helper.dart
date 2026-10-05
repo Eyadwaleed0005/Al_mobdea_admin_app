@@ -60,6 +60,17 @@ import 'package:al_mobdea_admin/features/students/data/data_sources/auth/student
 import 'package:al_mobdea_admin/features/students/data/data_sources/firestore/students_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/students/domain/repositories/student_auth_repository.dart';
 import 'package:al_mobdea_admin/features/students/domain/repositories/students_repository.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/create_student_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/delete_student_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/get_student_by_id_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/get_students_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/stream_students_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_email_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_password_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_profile_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_status_use_case.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_subscription_use_case.dart';
+import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -123,6 +134,39 @@ class MockStudentsRepository extends Mock
 
 class MockStudentAuthRepository extends Mock
     implements StudentAuthRepository {}
+
+class MockStreamStudentsUseCase extends Mock
+    implements StreamStudentsUseCase {}
+
+class MockGetStudentsUseCase extends Mock
+    implements GetStudentsUseCase {}
+
+class MockGetStudentByIdUseCase extends Mock
+    implements GetStudentByIdUseCase {}
+
+class MockCreateStudentUseCase extends Mock
+    implements CreateStudentUseCase {}
+
+class MockUpdateStudentProfileUseCase extends Mock
+    implements UpdateStudentProfileUseCase {}
+
+class MockUpdateStudentEmailUseCase extends Mock
+    implements UpdateStudentEmailUseCase {}
+
+class MockUpdateStudentPasswordUseCase extends Mock
+    implements UpdateStudentPasswordUseCase {}
+
+class MockUpdateStudentStatusUseCase extends Mock
+    implements UpdateStudentStatusUseCase {}
+
+class MockUpdateStudentSubscriptionUseCase extends Mock
+    implements UpdateStudentSubscriptionUseCase {}
+
+class MockDeleteStudentUseCase extends Mock
+    implements DeleteStudentUseCase {}
+
+class MockStreamGradesUseCase extends Mock
+    implements StreamGradesUseCase {}
 
 // Lessons feature mocks
 class MockLessonsRemoteDataSource extends Mock

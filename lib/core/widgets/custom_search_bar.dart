@@ -3,6 +3,7 @@ import 'package:al_mobdea_admin/core/style/app_color.dart';
 import 'package:al_mobdea_admin/core/style/textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 
 class CustomSearchBar extends StatelessWidget {
   const CustomSearchBar({
@@ -74,11 +75,12 @@ class CustomSearchBar extends StatelessWidget {
               highlightColor: ColorPalette.primarySoftBackground,
               child: Padding(
                 padding: EdgeInsets.all(16.r),
-                child: Image.asset(
+                child: SvgPicture.asset(
                   AppImage().search,
                   width: 24.w,
                   height: 24.h,
                   fit: BoxFit.contain,
+                  color: ColorPalette.textSecondary,
                 ),
               ),
             ),
