@@ -5,8 +5,7 @@ import 'package:al_mobdea_admin/features/result_student/domain/entities/student_
 import 'package:al_mobdea_admin/features/result_student/domain/repository/student_exam_results_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class StudentExamResultsRepositoryImpl
-    implements StudentExamResultsRepository {
+class StudentExamResultsRepositoryImpl implements StudentExamResultsRepository {
   final StudentExamResultsRemoteDataSource studentExamResultsRemoteDataSource;
 
   const StudentExamResultsRepositoryImpl({

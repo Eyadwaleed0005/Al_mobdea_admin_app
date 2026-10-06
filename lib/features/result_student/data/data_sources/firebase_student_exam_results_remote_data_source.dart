@@ -69,8 +69,7 @@ class FirebaseStudentExamResultsRemoteDataSource
       final QuerySnapshot<Map<String, dynamic>> studentGradeExamsSnapshot =
           await studentGradeExamsSnapshotFuture;
 
-      if (!studentGradeDocument.exists ||
-          studentGradeDocument.data() == null) {
+      if (!studentGradeDocument.exists || studentGradeDocument.data() == null) {
         FirebaseErrorHandler.throwFirestoreCode('not-found');
       }
 
@@ -83,8 +82,7 @@ class FirebaseStudentExamResultsRemoteDataSource
       submittedExamResultDocuments = studentExamResultsSnapshot.docs
           .where(
             (resultDocument) =>
-                resultDocument.data()[FirestoreFields.submittedAt]
-                    is Timestamp,
+                resultDocument.data()[FirestoreFields.submittedAt] is Timestamp,
           )
           .toList();
 

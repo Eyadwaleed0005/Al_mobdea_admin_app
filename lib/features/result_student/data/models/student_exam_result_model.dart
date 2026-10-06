@@ -24,14 +24,13 @@ class StudentExamResultModel extends StudentExamResultEntity {
 
     return StudentExamResultModel(
       resultId:
-          resultData[FirestoreFields.resultId] as String? ??
-          resultDocument.id,
+          resultData[FirestoreFields.resultId] as String? ?? resultDocument.id,
       examId: resultData[FirestoreFields.examId] as String,
       examName: examName,
-      studentObtainedScore:
-          (resultData[FirestoreFields.score] as num).toDouble(),
-      examTotalScore:
-          (resultData[FirestoreFields.totalScore] as num).toDouble(),
+      studentObtainedScore: (resultData[FirestoreFields.score] as num)
+          .toDouble(),
+      examTotalScore: (resultData[FirestoreFields.totalScore] as num)
+          .toDouble(),
       examSubmittedAt: examSubmittedAtTimestamp.toDate(),
     );
   }
