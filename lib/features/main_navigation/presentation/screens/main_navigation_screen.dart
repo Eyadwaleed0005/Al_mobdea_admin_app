@@ -9,6 +9,7 @@ import 'package:al_mobdea_admin/features/main_navigation/presentation/widgets/cu
 import 'package:al_mobdea_admin/features/students/domain/use_cases/stream_students_use_case.dart';
 import 'package:al_mobdea_admin/features/students/presentation/cubit/student_management_cubit.dart';
 import 'package:al_mobdea_admin/features/students/presentation/screens/student_management_screen.dart';
+import 'package:al_mobdea_admin/features/study_notes/presentation/screens/content_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -64,11 +65,7 @@ class MainNavigationView extends StatelessWidget {
           child: const StudentManagementScreen(),
         );
       case 2:
-        return const _PlaceholderScreen(
-          title: 'المحتوى',
-          description: 'ستظهر إدارة المحتوى هنا.',
-          icon: Icons.menu_book_outlined,
-        );
+        return const ContentManagementScreen();
       case 3:
         return const _PlaceholderScreen(
           title: 'الامتحانات',
