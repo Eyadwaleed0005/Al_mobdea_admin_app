@@ -1,4 +1,4 @@
-package com.example.al_mobdea_admin
+package com.famex.alMobdea.admin
 
 import io.flutter.embedding.android.FlutterActivity
 
