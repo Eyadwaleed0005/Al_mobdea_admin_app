@@ -690,7 +690,7 @@ class AppTextStyle {
       fontSize: 20.sp,
       fontWeight: FontWeightHelper.semiBold,
       fontFamily: kufam,
-      color: ColorPalette.primary,
+      color: ColorPalette.surface,
     );
   }
 
