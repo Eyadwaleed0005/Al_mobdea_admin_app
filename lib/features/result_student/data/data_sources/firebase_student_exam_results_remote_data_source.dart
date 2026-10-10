@@ -6,13 +6,10 @@ import 'package:al_mobdea_admin/features/result_student/data/models/student_exam
 import 'package:al_mobdea_admin/features/result_student/data/models/student_exam_results_overview_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FirebaseStudentExamResultsRemoteDataSource
-    implements StudentExamResultsRemoteDataSource {
+class FirebaseStudentExamResultsRemoteDataSource implements StudentExamResultsRemoteDataSource {
   final FirebaseFirestore firebaseFirestore;
 
-  const FirebaseStudentExamResultsRemoteDataSource({
-    required this.firebaseFirestore,
-  });
+  const FirebaseStudentExamResultsRemoteDataSource({required this.firebaseFirestore});
 
   @override
   Future<StudentExamResultsOverviewModel> getStudentExamResultsByStudentId({
@@ -25,11 +22,10 @@ class FirebaseStudentExamResultsRemoteDataSource
         FirebaseErrorHandler.throwFirestoreCode('invalid-argument');
       }
 
-      final DocumentSnapshot<Map<String, dynamic>> studentDocument =
-          await firebaseFirestore
-              .collection(FirestoreCollections.students)
-              .doc(normalizedStudentId)
-              .get();
+      final DocumentSnapshot<Map<String, dynamic>> studentDocument = await firebaseFirestore
+          .collection(FirestoreCollections.students)
+          .doc(normalizedStudentId)
+          .get();
 
       if (!studentDocument.exists || studentDocument.data() == null) {
         FirebaseErrorHandler.throwFirestoreCode('not-found');
@@ -42,23 +38,20 @@ class FirebaseStudentExamResultsRemoteDataSource
         fieldName: FirestoreFields.gradeId,
       );
 
-      final Future<DocumentSnapshot<Map<String, dynamic>>>
-      studentGradeDocumentFuture = firebaseFirestore
-          .collection(FirestoreCollections.grades)
-          .doc(studentGradeId)
-          .get();
+      final Future<DocumentSnapshot<Map<String, dynamic>>> studentGradeDocumentFuture =
+          firebaseFirestore.collection(FirestoreCollections.grades).doc(studentGradeId).get();
 
-      final Future<QuerySnapshot<Map<String, dynamic>>>
-      studentExamResultsSnapshotFuture = firebaseFirestore
-          .collection(FirestoreCollections.examResults)
-          .where(FirestoreFields.studentId, isEqualTo: normalizedStudentId)
-          .get();
+      final Future<QuerySnapshot<Map<String, dynamic>>> studentExamResultsSnapshotFuture =
+          firebaseFirestore
+              .collection(FirestoreCollections.examResults)
+              .where(FirestoreFields.studentId, isEqualTo: normalizedStudentId)
+              .get();
 
-      final Future<QuerySnapshot<Map<String, dynamic>>>
-      studentGradeExamsSnapshotFuture = firebaseFirestore
-          .collection(FirestoreCollections.exams)
-          .where(FirestoreFields.gradeId, isEqualTo: studentGradeId)
-          .get();
+      final Future<QuerySnapshot<Map<String, dynamic>>> studentGradeExamsSnapshotFuture =
+          firebaseFirestore
+              .collection(FirestoreCollections.exams)
+              .where(FirestoreFields.gradeId, isEqualTo: studentGradeId)
+              .get();
 
       final DocumentSnapshot<Map<String, dynamic>> studentGradeDocument =
           await studentGradeDocumentFuture;
@@ -78,20 +71,17 @@ class FirebaseStudentExamResultsRemoteDataSource
         fieldName: FirestoreFields.name,
       );
 
-      final List<QueryDocumentSnapshot<Map<String, dynamic>>>
-      submittedExamResultDocuments = studentExamResultsSnapshot.docs
-          .where(
-            (resultDocument) =>
-                resultDocument.data()[FirestoreFields.submittedAt] is Timestamp,
-          )
-          .toList();
+      final List<QueryDocumentSnapshot<Map<String, dynamic>>> submittedExamResultDocuments =
+          studentExamResultsSnapshot.docs
+              .where(
+                (resultDocument) => resultDocument.data()[FirestoreFields.submittedAt] is Timestamp,
+              )
+              .toList();
 
       final Set<String> submittedExamIds = submittedExamResultDocuments
           .map(
-            (resultDocument) => _readRequiredString(
-              data: resultDocument.data(),
-              fieldName: FirestoreFields.examId,
-            ),
+            (resultDocument) =>
+                _readRequiredString(data: resultDocument.data(), fieldName: FirestoreFields.examId),
           )
           .toSet();
 
@@ -101,26 +91,21 @@ class FirebaseStudentExamResultsRemoteDataSource
 
       final int totalExamsCount = studentGradeExamIds.length;
 
-      final int completedExamsCount = submittedExamIds
-          .intersection(studentGradeExamIds)
-          .length;
+      final int completedExamsCount = submittedExamIds.intersection(studentGradeExamIds).length;
 
-      final List<DocumentSnapshot<Map<String, dynamic>>> examDocuments =
-          await Future.wait(
-            submittedExamIds.map((examId) {
-              return firebaseFirestore
-                  .collection(FirestoreCollections.exams)
-                  .doc(examId)
-                  .get();
-            }),
-          );
+      final List<DocumentSnapshot<Map<String, dynamic>>> examDocuments = await Future.wait(
+        submittedExamIds.map((examId) {
+          return firebaseFirestore.collection(FirestoreCollections.exams).doc(examId).get();
+        }),
+      );
 
       final Map<String, String> examNamesByExamId = {};
+      final Set<String> deletedExamIds = {};
 
-      for (final DocumentSnapshot<Map<String, dynamic>> examDocument
-          in examDocuments) {
+      for (final DocumentSnapshot<Map<String, dynamic>> examDocument in examDocuments) {
         if (!examDocument.exists || examDocument.data() == null) {
-          FirebaseErrorHandler.throwFirestoreCode('not-found');
+          deletedExamIds.add(examDocument.id);
+          continue;
         }
 
         examNamesByExamId[examDocument.id] = _readRequiredString(
@@ -129,8 +114,15 @@ class FirebaseStudentExamResultsRemoteDataSource
         );
       }
 
-      final List<StudentExamResultModel> studentExamResultModels =
-          submittedExamResultDocuments.map((resultDocument) {
+      final List<StudentExamResultModel> studentExamResultModels = submittedExamResultDocuments
+          .where((resultDocument) {
+            final String examId = _readRequiredString(
+              data: resultDocument.data(),
+              fieldName: FirestoreFields.examId,
+            );
+            return !deletedExamIds.contains(examId);
+          })
+          .map((resultDocument) {
             final String examId = _readRequiredString(
               data: resultDocument.data(),
               fieldName: FirestoreFields.examId,
@@ -143,15 +135,14 @@ class FirebaseStudentExamResultsRemoteDataSource
             }
 
             return StudentExamResultModel.fromFirestoreDocument(
-              resultDocument: resultDocument,
-              examName: examName,
-            );
-          }).toList();
+            resultDocument: resultDocument,
+            examName: examName,
+          );
+        },
+      ).toList();
 
       studentExamResultModels.sort((firstResult, secondResult) {
-        return secondResult.examSubmittedAt.compareTo(
-          firstResult.examSubmittedAt,
-        );
+        return secondResult.examSubmittedAt.compareTo(firstResult.examSubmittedAt);
       });
 
       return StudentExamResultsOverviewModel.fromFirestoreStudentDocument(
@@ -164,10 +155,7 @@ class FirebaseStudentExamResultsRemoteDataSource
     });
   }
 
-  String _readRequiredString({
-    required Map<String, dynamic> data,
-    required String fieldName,
-  }) {
+  String _readRequiredString({required Map<String, dynamic> data, required String fieldName}) {
     final Object? fieldValue = data[fieldName];
 
     if (fieldValue is! String || fieldValue.trim().isEmpty) {
