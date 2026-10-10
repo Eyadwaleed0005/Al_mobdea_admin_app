@@ -23,45 +23,31 @@ void registerStudyNotesDependencies(GetIt getIt) {
 
   // Repository
   getIt.registerLazySingleton<StudyNotesRepository>(
-    () => StudyNotesRepositoryImpl(
-      remoteDataSource: getIt<StudyNotesRemoteDataSource>(),
-    ),
+    () => StudyNotesRepositoryImpl(remoteDataSource: getIt<StudyNotesRemoteDataSource>()),
   );
 
   // Use Cases
   getIt.registerLazySingleton<GetStudyNotesUseCase>(
-    () => GetStudyNotesUseCase(
-      repository: getIt<StudyNotesRepository>(),
-    ),
+    () => GetStudyNotesUseCase(repository: getIt<StudyNotesRepository>()),
   );
 
   getIt.registerLazySingleton<GetStudyNoteByIdUseCase>(
-    () => GetStudyNoteByIdUseCase(
-      repository: getIt<StudyNotesRepository>(),
-    ),
+    () => GetStudyNoteByIdUseCase(repository: getIt<StudyNotesRepository>()),
   );
 
   getIt.registerLazySingleton<StreamStudyNotesUseCase>(
-    () => StreamStudyNotesUseCase(
-      repository: getIt<StudyNotesRepository>(),
-    ),
+    () => StreamStudyNotesUseCase(repository: getIt<StudyNotesRepository>()),
   );
 
   getIt.registerLazySingleton<CreateStudyNoteUseCase>(
-    () => CreateStudyNoteUseCase(
-      repository: getIt<StudyNotesRepository>(),
-    ),
+    () => CreateStudyNoteUseCase(repository: getIt<StudyNotesRepository>()),
   );
 
   getIt.registerLazySingleton<UpdateStudyNoteUseCase>(
-    () => UpdateStudyNoteUseCase(
-      repository: getIt<StudyNotesRepository>(),
-    ),
+    () => UpdateStudyNoteUseCase(repository: getIt<StudyNotesRepository>()),
   );
 
   getIt.registerLazySingleton<DeleteStudyNoteUseCase>(
-    () => DeleteStudyNoteUseCase(
-      repository: getIt<StudyNotesRepository>(),
-    ),
+    () => DeleteStudyNoteUseCase(repository: getIt<StudyNotesRepository>()),
   );
 }

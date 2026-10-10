@@ -57,11 +57,7 @@ class MainNavigationView extends StatelessWidget {
           icon: Icons.group_outlined,
         );
       case 2:
-        return const _PlaceholderScreen(
-          title: 'المحتوى',
-          description: 'ستظهر إدارة المحتوى هنا.',
-          icon: Icons.menu_book_outlined,
-        );
+        return const ContentManagementScreen();
       case 3:
         return const _PlaceholderScreen(
           title: 'الامتحانات',
