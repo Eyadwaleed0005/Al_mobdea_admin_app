@@ -415,12 +415,12 @@ class AppTextStyle {
     );
   }
 
-  static TextStyle font12TextPrimaryBoldTajawal() {
+  static TextStyle font18TextPrimaryBoldTajawal() {
     return TextStyle(
-      fontSize: 12.sp,
+      fontSize: 18.sp,
       fontWeight: FontWeightHelper.bold,
       fontFamily: tajawal,
-      color: ColorPalette.textPrimary,
+      color: ColorPalette.primary,
     );
   }
 
