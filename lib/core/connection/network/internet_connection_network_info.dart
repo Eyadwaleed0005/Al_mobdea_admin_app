@@ -2,21 +2,15 @@ import 'package:al_mobdea_admin/core/connection/network/network_info.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
 class InternetConnectionNetworkInfo implements NetworkInfo {
-  InternetConnectionNetworkInfo({
-    InternetConnection? internetConnection,
-  }) : _ownsInternetConnection = internetConnection == null,
-       _internetConnection =
-           internetConnection ?? _createInternetConnection();
+  InternetConnectionNetworkInfo({InternetConnection? internetConnection})
+    : _ownsInternetConnection = internetConnection == null,
+      _internetConnection = internetConnection ?? _createInternetConnection();
 
   static const int _maximumCheckAttempts = 2;
 
-  static const Duration _retryDelay = Duration(
-    milliseconds: 600,
-  );
+  static const Duration _retryDelay = Duration(milliseconds: 600);
 
-  static const Duration _offlineConfirmationDelay = Duration(
-    seconds: 2,
-  );
+  static const Duration _offlineConfirmationDelay = Duration(seconds: 2);
 
   final InternetConnection _internetConnection;
   final bool _ownsInternetConnection;
@@ -35,8 +29,7 @@ class InternetConnectionNetworkInfo implements NetworkInfo {
           uri: Uri.parse('https://firestore.googleapis.com/'),
           timeout: const Duration(seconds: 4),
           responseStatusFn: (response) {
-            return response.statusCode >= 200 &&
-                response.statusCode < 500;
+            return response.statusCode >= 200 && response.statusCode < 500;
           },
         ),
         InternetCheckOption(
@@ -76,11 +69,7 @@ class InternetConnectionNetworkInfo implements NetworkInfo {
   }
 
   Future<bool> _performConnectionCheck() async {
-    for (
-      int attempt = 0;
-      attempt < _maximumCheckAttempts;
-      attempt++
-    ) {
+    for (int attempt = 0; attempt < _maximumCheckAttempts; attempt++) {
       if (_isDisposed) {
         return false;
       }

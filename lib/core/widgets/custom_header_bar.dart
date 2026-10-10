@@ -1,36 +1,35 @@
-import 'package:al_mobdea_admin/core/style/textstyles.dart';
+import 'package:al_mobdea_admin/core/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CustomHeaderBar extends StatelessWidget {
+class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomHeaderBar({
     super.key,
     required this.title,
-    required this.iconPath,
+    this.iconPath,
+    this.showProfileIcon = false,
+    this.showBackButton,
+    this.onBack,
+    this.onProfileTap,
   });
 
   final String title;
-  final String iconPath;
+  final String? iconPath;
+  final bool showProfileIcon;
+  final bool? showBackButton;
+  final VoidCallback? onBack;
+  final VoidCallback? onProfileTap;
+
+  @override
+  Size get preferredSize => const CustomAppBar(title: '').preferredSize;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      textDirection: TextDirection.ltr,
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            textAlign: TextAlign.left,
-            style: AppTextStyle.font18TextPrimarySemiBoldKufam(),
-          ),
-        ),
-        Image.asset(
-          iconPath,
-          width: 24.w,
-          height: 24.h,
-          fit: BoxFit.contain,
-        ),
-      ],
+    return CustomAppBar(
+      title: title,
+      showProfileIcon: showProfileIcon,
+      showBackButton: showBackButton,
+      onBack: onBack,
+      onProfileTap: onProfileTap,
     );
   }
 }
