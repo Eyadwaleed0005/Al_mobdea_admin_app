@@ -1,4 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_fields.dart';
+import 'package:al_mobdea_admin/features/lesson_exams/data/models/lesson_exam_question_model.dart';
+import 'package:al_mobdea_admin/features/lesson_exams/domain/entities/lesson_exam_entity.dart';
+import 'package:al_mobdea_admin/features/lesson_exams/domain/entities/lesson_exam_question_entity.dart';
+import 'package:al_mobdea_admin/features/lesson_exams/domain/lesson_exam_question_image_file.dart';
 import 'package:al_mobdea_admin/features/lessons/data/models/lesson_model.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:al_mobdea_admin/features/study_notes/data/models/study_note_model.dart';
@@ -155,6 +161,135 @@ Map<String, dynamic> tLessonJsonWithoutPdf() {
     FirestoreFields.isPublished: true,
     FirestoreFields.createdAt: Timestamp.fromDate(tLessonCreatedAt),
     FirestoreFields.updatedAt: Timestamp.fromDate(tLessonUpdatedAt),
+  };
+}
+
+// Lesson exams feature dummy data
+
+const String tLessonExamQuestionId = 'question-123';
+const String tSecondLessonExamQuestionId = 'question-456';
+const String tLessonExamQuestionText = 'What is velocity?';
+const int tLessonExamQuestionDegree = 5;
+const int tLessonExamCorrectChoiceIndex = 1;
+const List<String> tLessonExamChoices = [
+  'Distance only',
+  'Displacement over time',
+  'Mass over volume',
+  'Force over area',
+];
+const String tQuestionImageUrl =
+    'https://storage.example.com/question.jpg';
+const String tQuestionImageStoragePath =
+    'lesson_question_images/lesson-123/1.jpg';
+const String tReplacementQuestionImageStoragePath =
+    'lesson_question_images/lesson-123/2.jpg';
+const String tQuestionImageName = 'question.jpg';
+const String tQuestionImageDownloadUrl =
+    'https://storage.example.com/new-question.jpg';
+
+final DateTime tLessonExamQuestionCreatedAt =
+    DateTime.utc(2024, 7, 1, 10);
+final DateTime tLessonExamQuestionUpdatedAt =
+    DateTime.utc(2024, 7, 2, 12);
+
+final LessonExamQuestionEntity tLessonExamQuestionEntity =
+    LessonExamQuestionEntity(
+      questionId: tLessonExamQuestionId,
+      lessonId: tLessonId,
+      questionText: tLessonExamQuestionText,
+      degree: tLessonExamQuestionDegree,
+      choices: tLessonExamChoices,
+      correctChoiceIndex: tLessonExamCorrectChoiceIndex,
+      imageUrl: tQuestionImageUrl,
+      imageStoragePath: tQuestionImageStoragePath,
+      createdAt: tLessonExamQuestionCreatedAt,
+      updatedAt: tLessonExamQuestionUpdatedAt,
+    );
+
+final LessonExamQuestionEntity tLessonExamQuestionEntityWithoutImage =
+    tLessonExamQuestionEntity.copyWith(clearImage: true);
+
+final LessonExamQuestionModel tLessonExamQuestionModel =
+    LessonExamQuestionModel(
+      questionId: tLessonExamQuestionId,
+      lessonId: tLessonId,
+      questionText: tLessonExamQuestionText,
+      degree: tLessonExamQuestionDegree,
+      choices: tLessonExamChoices,
+      correctChoiceIndex: tLessonExamCorrectChoiceIndex,
+      imageUrl: tQuestionImageUrl,
+      imageStoragePath: tQuestionImageStoragePath,
+      createdAt: tLessonExamQuestionCreatedAt,
+      updatedAt: tLessonExamQuestionUpdatedAt,
+    );
+
+final LessonExamQuestionModel tSecondLessonExamQuestionModel =
+    LessonExamQuestionModel(
+      questionId: tSecondLessonExamQuestionId,
+      lessonId: tLessonId,
+      questionText: 'What is acceleration?',
+      degree: 10,
+      choices: const [
+        'Velocity over time',
+        'Mass over time',
+        'Distance only',
+        'Energy over force',
+      ],
+      createdAt: tLessonExamQuestionCreatedAt.add(
+        const Duration(minutes: 1),
+      ),
+      updatedAt: tLessonExamQuestionUpdatedAt,
+    );
+
+final LessonExamEntity tLessonExamEntity = LessonExamEntity(
+  lessonId: tLessonId,
+  questions: [tLessonExamQuestionEntity],
+);
+
+final LessonExamQuestionImageFile tLessonExamQuestionImageFile =
+    LessonExamQuestionImageFile(
+      name: tQuestionImageName,
+      sizeInBytes: 4,
+      bytes: Uint8List.fromList(const [1, 2, 3, 4]),
+    );
+
+Map<String, dynamic> tLessonExamQuestionJson() {
+  return {
+    FirestoreFields.lessonId: tLessonId,
+    FirestoreFields.questionText: tLessonExamQuestionText,
+    FirestoreFields.questionScore: tLessonExamQuestionDegree,
+    FirestoreFields.option1: tLessonExamChoices[0],
+    FirestoreFields.option2: tLessonExamChoices[1],
+    FirestoreFields.option3: tLessonExamChoices[2],
+    FirestoreFields.option4: tLessonExamChoices[3],
+    FirestoreFields.correctOption: tLessonExamCorrectChoiceIndex,
+    FirestoreFields.questionImageUrl: tQuestionImageUrl,
+    FirestoreFields.questionImageStoragePath: tQuestionImageStoragePath,
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tLessonExamQuestionCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tLessonExamQuestionUpdatedAt,
+    ),
+  };
+}
+
+Map<String, dynamic> tLessonExamQuestionJsonWithoutImage() {
+  return {
+    FirestoreFields.lessonId: tLessonId,
+    FirestoreFields.questionText: tLessonExamQuestionText,
+    FirestoreFields.questionScore: tLessonExamQuestionDegree,
+    FirestoreFields.option1: tLessonExamChoices[0],
+    FirestoreFields.option2: tLessonExamChoices[1],
+    FirestoreFields.option3: tLessonExamChoices[2],
+    FirestoreFields.option4: tLessonExamChoices[3],
+    FirestoreFields.correctOption: null,
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tLessonExamQuestionCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tLessonExamQuestionUpdatedAt,
+    ),
   };
 }
 
