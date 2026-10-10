@@ -20,16 +20,21 @@ class AppImage {
   late final String alwaleedImg = '${baseImages}al_mobdea.png';
 
   // ===== icons =====
+  late final String homeIcon = '${baseIcons}home.svg';
   late final String search = '${baseIcons}Search.svg';
   late final String exam = '${baseIcons}exam.svg';
   late final String lessons = '${baseIcons}lessons.svg';
   late final String studyNotes = '${baseIcons}study_notes.svg';
   late final String profile = '${baseIcons}profile.svg';
+
+  // Legacy/Fallback aliases
+  late final String profileIcon = '${baseIcons}profile.svg';
+  late final String bookOpen = '${baseIcons}lessons.svg';
+  late final String exams = '${baseIcons}exam.svg';
   late final String home = '${baseIcons}home.svg';
   late final String liveSession = '${baseIcons}live.svg';
   late final String students = '${baseIcons}students.svg';
-  late final String bookOpen = '${baseIcons}lessons.svg';
-  late final String exams = '${baseIcons}exam.svg';
+  late final String profilee = '${baseIcons}profile.svg';
 
   // ===== animations =====
 }
