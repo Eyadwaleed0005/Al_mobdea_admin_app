@@ -1,6 +1,8 @@
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_fields.dart';
 import 'package:al_mobdea_admin/features/lessons/data/models/lesson_model.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
+import 'package:al_mobdea_admin/features/study_notes/data/models/study_note_model.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
 import 'package:al_mobdea_admin/features/students/data/models/student_model.dart';
 import 'package:al_mobdea_admin/features/students/domain/entities/student_entity.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -58,9 +60,7 @@ Map<String, dynamic> tStudentJson() {
     FirestoreFields.subscriptionStartAt: Timestamp.fromDate(
       tSubscriptionStartAt,
     ),
-    FirestoreFields.subscriptionEndAt: Timestamp.fromDate(
-      tSubscriptionEndAt,
-    ),
+    FirestoreFields.subscriptionEndAt: Timestamp.fromDate(tSubscriptionEndAt),
     FirestoreFields.isActive: true,
     FirestoreFields.isLoggedIn: false,
     FirestoreFields.createdAt: Timestamp.fromDate(tCreatedAt),
@@ -155,5 +155,85 @@ Map<String, dynamic> tLessonJsonWithoutPdf() {
     FirestoreFields.isPublished: true,
     FirestoreFields.createdAt: Timestamp.fromDate(tLessonCreatedAt),
     FirestoreFields.updatedAt: Timestamp.fromDate(tLessonUpdatedAt),
+  };
+}
+
+// Study notes feature dummy data
+
+const String tStudyNoteId = 'note-123';
+const String tStudyNoteName = 'Physics summary';
+const String tStudyNoteDescription = 'Compact notes for chapter one';
+const String tStudyNotePdfFileName = 'physics-summary.pdf';
+const int tStudyNotePdfFileSize = 4096;
+const String tStudyNotePdfStoragePath = 'study_notes/note-123/1.pdf';
+const String tStudyNoteLocalPdfFilePath = '/tmp/physics-summary.pdf';
+
+final DateTime tStudyNoteCreatedAt = DateTime.utc(2024, 6, 1, 10);
+final DateTime tStudyNoteUpdatedAt = DateTime.utc(2024, 6, 2, 12);
+
+final StudyNoteEntity tStudyNoteEntity = StudyNoteEntity(
+  noteId: tStudyNoteId,
+  name: tStudyNoteName,
+  description: tStudyNoteDescription,
+  gradeId: tGradeId,
+  isPublished: true,
+  pdfFileName: tStudyNotePdfFileName,
+  pdfFileSize: tStudyNotePdfFileSize,
+  pdfStoragePath: tStudyNotePdfStoragePath,
+);
+
+final StudyNoteEntity tStudyNoteEntityWithoutPdf = StudyNoteEntity(
+  noteId: tStudyNoteId,
+  name: tStudyNoteName,
+  description: tStudyNoteDescription,
+  gradeId: tGradeId,
+  isPublished: true,
+);
+
+final StudyNoteModel tStudyNoteModel = StudyNoteModel(
+  noteId: tStudyNoteId,
+  name: tStudyNoteName,
+  description: tStudyNoteDescription,
+  gradeId: tGradeId,
+  isPublished: true,
+  pdfFileName: tStudyNotePdfFileName,
+  pdfFileSize: tStudyNotePdfFileSize,
+  pdfStoragePath: tStudyNotePdfStoragePath,
+  createdAt: tStudyNoteCreatedAt,
+  updatedAt: tStudyNoteUpdatedAt,
+);
+
+final StudyNoteModel tSecondStudyNoteModel = StudyNoteModel(
+  noteId: 'note-456',
+  name: 'Chemistry summary',
+  description: 'Compact notes for chapter two',
+  gradeId: tGradeId,
+  isPublished: false,
+  createdAt: tStudyNoteCreatedAt.subtract(const Duration(days: 1)),
+  updatedAt: tStudyNoteUpdatedAt,
+);
+
+Map<String, dynamic> tStudyNoteJson() {
+  return {
+    FirestoreFields.name: tStudyNoteName,
+    FirestoreFields.description: tStudyNoteDescription,
+    FirestoreFields.gradeId: tGradeId,
+    FirestoreFields.isPublished: true,
+    FirestoreFields.pdfFileName: tStudyNotePdfFileName,
+    FirestoreFields.pdfFileSize: tStudyNotePdfFileSize,
+    FirestoreFields.pdfStoragePath: tStudyNotePdfStoragePath,
+    FirestoreFields.createdAt: Timestamp.fromDate(tStudyNoteCreatedAt),
+    FirestoreFields.updatedAt: Timestamp.fromDate(tStudyNoteUpdatedAt),
+  };
+}
+
+Map<String, dynamic> tStudyNoteJsonWithoutPdf() {
+  return {
+    FirestoreFields.name: tStudyNoteName,
+    FirestoreFields.description: tStudyNoteDescription,
+    FirestoreFields.gradeId: tGradeId,
+    FirestoreFields.isPublished: true,
+    FirestoreFields.createdAt: Timestamp.fromDate(tStudyNoteCreatedAt),
+    FirestoreFields.updatedAt: Timestamp.fromDate(tStudyNoteUpdatedAt),
   };
 }
