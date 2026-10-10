@@ -7,7 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
-  const CustomBottomNavBar({super.key, this.currentIndex, this.onItemSelected, this.onTap});
+  const CustomBottomNavBar({
+    super.key,
+    this.currentIndex,
+    this.onItemSelected,
+    this.onTap,
+  });
 
   final int? currentIndex;
   final ValueChanged<int>? onItemSelected;
@@ -16,14 +21,27 @@ class CustomBottomNavBar extends StatelessWidget {
   static List<BottomNavItemData> get items => [
     BottomNavItemData(index: 0, label: 'الرئيسية', iconPath: AppImage().home),
     BottomNavItemData(index: 1, label: 'الطلاب', iconPath: AppImage().students),
-    BottomNavItemData(index: 2, label: 'المحتوى', iconPath: AppImage().bookOpen),
-    BottomNavItemData(index: 3, label: 'الامتحانات', iconPath: AppImage().exams),
-    BottomNavItemData(index: 4, label: 'الحصة', iconPath: AppImage().liveSession),
+    BottomNavItemData(
+      index: 2,
+      label: 'المحتوى',
+      iconPath: AppImage().bookOpen,
+    ),
+    BottomNavItemData(
+      index: 3,
+      label: 'الامتحانات',
+      iconPath: AppImage().exams,
+    ),
+    BottomNavItemData(
+      index: 4,
+      label: 'الحصة',
+      iconPath: AppImage().liveSession,
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final selectedIndex = currentIndex ?? context.watch<BottomNavigationCubit>().state;
+    final selectedIndex =
+        currentIndex ?? context.watch<BottomNavigationCubit>().state;
 
     void handleTap(int index) {
       if (onTap != null) {
@@ -73,10 +91,14 @@ class CustomBottomNavBar extends StatelessWidget {
                           onTap: () => handleTap(item.index),
                         ),
                       );
-                      rightOffset += unitWidth * (item.index == selectedIndex ? 2 : 1);
+                      rightOffset +=
+                          unitWidth * (item.index == selectedIndex ? 2 : 1);
                     }
 
-                    return Stack(clipBehavior: Clip.none, children: positionedItems);
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: positionedItems,
+                    );
                   },
                 ),
               ),

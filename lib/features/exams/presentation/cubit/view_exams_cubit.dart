@@ -1,0 +1,240 @@
+import 'dart:async';
+
+import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
+import 'package:al_mobdea_admin/features/exams/domain/entities/exam_entity.dart';
+import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exams_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/presentation/cubit/view_exams_state.dart';
+import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
+import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class ViewExamsCubit extends Cubit<ViewExamsState> {
+  ViewExamsCubit({
+    required StreamExamsUseCase streamExamsUseCase,
+    required StreamGradesUseCase streamGradesUseCase,
+  }) : _streamExamsUseCase = streamExamsUseCase,
+       _streamGradesUseCase = streamGradesUseCase,
+       super(const ViewExamsLoading());
+
+  final StreamExamsUseCase _streamExamsUseCase;
+  final StreamGradesUseCase _streamGradesUseCase;
+
+  StreamSubscription<Either<AppErrorModel, List<ExamEntity>>>?
+  _examsSubscription;
+
+  StreamSubscription<Either<AppErrorModel, List<GradeEntity>>>?
+  _gradesSubscription;
+
+  List<ExamEntity> _allExams = const <ExamEntity>[];
+  List<GradeEntity> _grades = const <GradeEntity>[];
+
+  AppErrorModel? _examsError;
+  AppErrorModel? _gradesError;
+
+  bool _examsLoaded = false;
+  bool _gradesLoaded = false;
+  bool _isRestartingStreams = false;
+
+  String _searchQuery = '';
+  String _selectedGradeId = '';
+  ExamStatus? _selectedStatus;
+
+  String get searchQuery {
+    return _searchQuery;
+  }
+
+  String get selectedGradeId {
+    return _selectedGradeId;
+  }
+
+  ExamStatus? get selectedStatus {
+    return _selectedStatus;
+  }
+
+  Future<void> loadData() {
+    return _restartStreams(showLoading: true);
+  }
+
+  Future<void> refreshData() {
+    return _restartStreams(showLoading: false);
+  }
+
+  Future<void> retry() {
+    return loadData();
+  }
+
+  Future<void> _restartStreams({required bool showLoading}) async {
+    if (isClosed || _isRestartingStreams) {
+      return;
+    }
+
+    _isRestartingStreams = true;
+
+    try {
+      await Future.wait<void>([
+        _examsSubscription?.cancel() ?? Future<void>.value(),
+        _gradesSubscription?.cancel() ?? Future<void>.value(),
+      ]);
+
+      _examsSubscription = null;
+      _gradesSubscription = null;
+
+      if (isClosed) {
+        return;
+      }
+
+      _examsLoaded = false;
+      _gradesLoaded = false;
+
+      _examsError = null;
+      _gradesError = null;
+
+      if (showLoading) {
+        emit(const ViewExamsLoading());
+      }
+
+      _examsSubscription = _streamExamsUseCase().listen(_handleExamsResult);
+
+      _gradesSubscription = _streamGradesUseCase().listen(_handleGradesResult);
+    } finally {
+      _isRestartingStreams = false;
+    }
+  }
+
+  void searchExams(String value) {
+    if (isClosed) {
+      return;
+    }
+
+    _searchQuery = value.trim().toLowerCase();
+
+    _emitCurrentState();
+  }
+
+  void selectGrade(String gradeId) {
+    if (isClosed) {
+      return;
+    }
+
+    _selectedGradeId = gradeId.trim();
+
+    _emitCurrentState();
+  }
+
+  void selectStatus(ExamStatus? status) {
+    if (isClosed) {
+      return;
+    }
+
+    _selectedStatus = status;
+
+    _emitCurrentState();
+  }
+
+  void _handleExamsResult(Either<AppErrorModel, List<ExamEntity>> result) {
+    if (isClosed) {
+      return;
+    }
+
+    result.fold(
+      (AppErrorModel error) {
+        _examsError = error;
+        _examsLoaded = true;
+
+        _emitCurrentState();
+      },
+      (List<ExamEntity> exams) {
+        _examsError = null;
+        _examsLoaded = true;
+
+        _allExams = List<ExamEntity>.unmodifiable(exams);
+
+        _emitCurrentState();
+      },
+    );
+  }
+
+  void _handleGradesResult(Either<AppErrorModel, List<GradeEntity>> result) {
+    if (isClosed) {
+      return;
+    }
+
+    result.fold(
+      (AppErrorModel error) {
+        _gradesError = error;
+        _gradesLoaded = true;
+
+        _emitCurrentState();
+      },
+      (List<GradeEntity> grades) {
+        _gradesError = null;
+        _gradesLoaded = true;
+
+        _grades = List<GradeEntity>.unmodifiable(grades);
+
+        _emitCurrentState();
+      },
+    );
+  }
+
+  void _emitCurrentState() {
+    if (isClosed) {
+      return;
+    }
+
+    final AppErrorModel? error = _examsError ?? _gradesError;
+
+    if (error != null) {
+      emit(ViewExamsError(error: error));
+
+      return;
+    }
+
+    if (!_examsLoaded || !_gradesLoaded) {
+      return;
+    }
+
+    if (_allExams.isEmpty) {
+      emit(ViewExamsEmpty(grades: _grades));
+
+      return;
+    }
+
+    final List<ExamEntity> filteredExams = _allExams
+        .where((ExamEntity exam) {
+          final bool matchesSearch =
+              _searchQuery.isEmpty ||
+              exam.examName.toLowerCase().contains(_searchQuery);
+
+          final bool matchesGrade =
+              _selectedGradeId.isEmpty || exam.gradeId == _selectedGradeId;
+
+          final bool matchesStatus =
+              _selectedStatus == null || exam.status == _selectedStatus;
+
+          return matchesSearch && matchesGrade && matchesStatus;
+        })
+        .toList(growable: false);
+
+    emit(
+      ViewExamsSuccess(
+        exams: List<ExamEntity>.unmodifiable(filteredExams),
+        grades: _grades,
+      ),
+    );
+  }
+
+  @override
+  Future<void> close() async {
+    await Future.wait<void>([
+      _examsSubscription?.cancel() ?? Future<void>.value(),
+      _gradesSubscription?.cancel() ?? Future<void>.value(),
+    ]);
+
+    _examsSubscription = null;
+    _gradesSubscription = null;
+
+    return super.close();
+  }
+}

@@ -11,41 +11,31 @@ class AppNetworkAwareContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<
-      NetworkStatusCubit,
-      NetworkStatusState,
-      bool
-    >(
+    return BlocSelector<NetworkStatusCubit, NetworkStatusState, bool>(
       selector: (NetworkStatusState state) {
-        return state is NetworkStatusDisconnected &&
-            state.showOfflineBanner;
+        return state is NetworkStatusDisconnected && state.showOfflineBanner;
       },
-      builder:
-          (BuildContext context, bool shouldShowOfflineBanner) {
-            return Stack(
-              fit: StackFit.expand,
-              clipBehavior: Clip.none,
-              children: [
-                child,
-                if (shouldShowOfflineBanner)
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    left: 0,
-                    child: AppOfflineBanner(
-                      key: const ValueKey<String>(
-                        'app-offline-banner',
-                      ),
-                      onHidden: () {
-                        context
-                            .read<NetworkStatusCubit>()
-                            .hideOfflineBanner();
-                      },
-                    ),
-                  ),
-              ],
-            );
-          },
+      builder: (BuildContext context, bool shouldShowOfflineBanner) {
+        return Stack(
+          fit: StackFit.expand,
+          clipBehavior: Clip.none,
+          children: [
+            child,
+            if (shouldShowOfflineBanner)
+              Positioned(
+                top: 0,
+                right: 0,
+                left: 0,
+                child: AppOfflineBanner(
+                  key: const ValueKey<String>('app-offline-banner'),
+                  onHidden: () {
+                    context.read<NetworkStatusCubit>().hideOfflineBanner();
+                  },
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

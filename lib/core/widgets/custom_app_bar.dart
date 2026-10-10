@@ -80,7 +80,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     // ...?actions,
                     Flexible(
                       child: Padding(
-                        padding: EdgeInsets.only(right: 16.w),
+                        padding: EdgeInsets.only(right: 10.w),
                         child: Text(
                           title,
                           textDirection: TextDirection.rtl,

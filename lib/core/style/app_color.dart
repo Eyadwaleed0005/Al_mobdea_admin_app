@@ -39,6 +39,7 @@ class ColorPalette {
   static const Color background = canvas;
 
   static const Color primary = wine500;
+  static const Color primaryDark = wine600;
   static const Color primaryHover = wine400;
   static const Color primaryPressed = wine600;
   static const Color primarySoftBackground = wine50;
@@ -46,6 +47,7 @@ class ColorPalette {
 
   static const Color accent = gold300;
   static const Color highlight = gold400;
+  static const Color highlightShadow = Color(0x1FDDA735);
   static const Color goldHighlight = gold400;
   static const Color goldLight = gold300;
   static const Color goldPale = gold50;
@@ -74,6 +76,7 @@ class ColorPalette {
 
   // Secondary & Navigation & State
   static const Color secondary = Color(0xFF28729F);
+  static const Color infoSoftBg = Color(0xFFE3EFF6);
   static const Color oceanBlue = Color(0xFF28729F);
   static const Color textOceanBlue = oceanBlue;
   static const Color warning = gold500;

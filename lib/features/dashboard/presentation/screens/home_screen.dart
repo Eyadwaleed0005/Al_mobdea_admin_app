@@ -81,7 +81,7 @@ class HomeScreen extends StatelessWidget {
                               Navigator.of(context).pushNamed(RouteNames.addExamScreen);
                             },
                             onNotesTap: () {
-                              Navigator.of(context).pushNamed(RouteNames.addNoteScreen);
+                              Navigator.of(context).pushNamed(RouteNames.liveSession);
                             },
                           ),
                         ),
