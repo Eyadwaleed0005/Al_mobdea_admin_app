@@ -730,6 +730,15 @@ class AppTextStyle {
     );
   }
 
+  static TextStyle font13SurfaceRegularTajawal() {
+    return TextStyle(
+      fontSize: 13.sp,
+      fontWeight: FontWeightHelper.regular,
+      fontFamily: tajawal,
+      color: ColorPalette.surface,
+    );
+  }
+
   static TextStyle font15SurfaceBoldTajawal() {
     return TextStyle(
       fontSize: 15.sp,

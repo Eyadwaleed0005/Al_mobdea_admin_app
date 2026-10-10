@@ -1,9 +1,15 @@
 import 'package:al_mobdea_admin/app/dependency_injection/service_locator.dart';
+import 'package:al_mobdea_admin/core/connection/cubit/network_status_cubit.dart';
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
 import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/features/dashboard/presentation/screens/home_screen.dart';
 import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/delete_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/get_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/save_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/presentation/cubit/live_session_cubit.dart';
+import 'package:al_mobdea_admin/features/live_session/presentation/screens/live_session_screen.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/cubit/bottom_navigation_cubit.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/widgets/custom_bottom_nav_bar.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/stream_students_use_case.dart';
@@ -73,10 +79,15 @@ class MainNavigationView extends StatelessWidget {
           icon: Icons.assignment_outlined,
         );
       case 4:
-        return const _PlaceholderScreen(
-          title: 'الحصة',
-          description: 'ستظهر الحصة المباشرة هنا.',
-          icon: Icons.videocam_outlined,
+        return BlocProvider<LiveSessionCubit>(
+          create: (_) => LiveSessionCubit(
+            streamGradesUseCase: getIt<StreamGradesUseCase>(),
+            getLiveSessionUseCase: getIt<GetLiveSessionUseCase>(),
+            saveLiveSessionUseCase: getIt<SaveLiveSessionUseCase>(),
+            deleteLiveSessionUseCase: getIt<DeleteLiveSessionUseCase>(),
+            networkStatusCubit: getIt<NetworkStatusCubit>(),
+          )..initialize(),
+          child: const LiveSessionScreen(),
         );
       default:
         return const HomeScreen();
