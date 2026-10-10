@@ -1,6 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_fields.dart';
+import 'package:al_mobdea_admin/features/exams/data/models/exam_model.dart';
+import 'package:al_mobdea_admin/features/exams/data/models/exam_question_model.dart';
+import 'package:al_mobdea_admin/features/exams/data/models/exam_result_model.dart';
+import 'package:al_mobdea_admin/features/exams/domain/entities/exam_attempt_status.dart';
+import 'package:al_mobdea_admin/features/exams/domain/entities/exam_entity.dart';
+import 'package:al_mobdea_admin/features/exams/domain/entities/exam_question_entity.dart';
+import 'package:al_mobdea_admin/features/exams/domain/entities/exam_result_entity.dart';
+import 'package:al_mobdea_admin/features/exams/domain/exam_question_image_file.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/data/models/lesson_exam_question_model.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/entities/lesson_exam_entity.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/entities/lesson_exam_question_entity.dart';
@@ -66,7 +74,9 @@ Map<String, dynamic> tStudentJson() {
     FirestoreFields.subscriptionStartAt: Timestamp.fromDate(
       tSubscriptionStartAt,
     ),
-    FirestoreFields.subscriptionEndAt: Timestamp.fromDate(tSubscriptionEndAt),
+    FirestoreFields.subscriptionEndAt: Timestamp.fromDate(
+      tSubscriptionEndAt,
+    ),
     FirestoreFields.isActive: true,
     FirestoreFields.isLoggedIn: false,
     FirestoreFields.createdAt: Timestamp.fromDate(tCreatedAt),
@@ -146,8 +156,12 @@ Map<String, dynamic> tLessonJson() {
     FirestoreFields.pdfFileSize: tPdfFileSize,
     FirestoreFields.pdfStoragePath: tPdfStoragePath,
     FirestoreFields.isPublished: true,
-    FirestoreFields.createdAt: Timestamp.fromDate(tLessonCreatedAt),
-    FirestoreFields.updatedAt: Timestamp.fromDate(tLessonUpdatedAt),
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tLessonCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tLessonUpdatedAt,
+    ),
   };
 }
 
@@ -159,8 +173,12 @@ Map<String, dynamic> tLessonJsonWithoutPdf() {
     FirestoreFields.description: tLessonSubtitle,
     FirestoreFields.youtubeUrl: tYoutubeUrl,
     FirestoreFields.isPublished: true,
-    FirestoreFields.createdAt: Timestamp.fromDate(tLessonCreatedAt),
-    FirestoreFields.updatedAt: Timestamp.fromDate(tLessonUpdatedAt),
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tLessonCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tLessonUpdatedAt,
+    ),
   };
 }
 
@@ -187,10 +205,18 @@ const String tQuestionImageName = 'question.jpg';
 const String tQuestionImageDownloadUrl =
     'https://storage.example.com/new-question.jpg';
 
-final DateTime tLessonExamQuestionCreatedAt =
-    DateTime.utc(2024, 7, 1, 10);
-final DateTime tLessonExamQuestionUpdatedAt =
-    DateTime.utc(2024, 7, 2, 12);
+final DateTime tLessonExamQuestionCreatedAt = DateTime.utc(
+  2024,
+  7,
+  1,
+  10,
+);
+final DateTime tLessonExamQuestionUpdatedAt = DateTime.utc(
+  2024,
+  7,
+  2,
+  12,
+);
 
 final LessonExamQuestionEntity tLessonExamQuestionEntity =
     LessonExamQuestionEntity(
@@ -206,8 +232,9 @@ final LessonExamQuestionEntity tLessonExamQuestionEntity =
       updatedAt: tLessonExamQuestionUpdatedAt,
     );
 
-final LessonExamQuestionEntity tLessonExamQuestionEntityWithoutImage =
-    tLessonExamQuestionEntity.copyWith(clearImage: true);
+final LessonExamQuestionEntity
+tLessonExamQuestionEntityWithoutImage = tLessonExamQuestionEntity
+    .copyWith(clearImage: true);
 
 final LessonExamQuestionModel tLessonExamQuestionModel =
     LessonExamQuestionModel(
@@ -264,7 +291,8 @@ Map<String, dynamic> tLessonExamQuestionJson() {
     FirestoreFields.option4: tLessonExamChoices[3],
     FirestoreFields.correctOption: tLessonExamCorrectChoiceIndex,
     FirestoreFields.questionImageUrl: tQuestionImageUrl,
-    FirestoreFields.questionImageStoragePath: tQuestionImageStoragePath,
+    FirestoreFields.questionImageStoragePath:
+        tQuestionImageStoragePath,
     FirestoreFields.createdAt: Timestamp.fromDate(
       tLessonExamQuestionCreatedAt,
     ),
@@ -297,14 +325,27 @@ Map<String, dynamic> tLessonExamQuestionJsonWithoutImage() {
 
 const String tStudyNoteId = 'note-123';
 const String tStudyNoteName = 'Physics summary';
-const String tStudyNoteDescription = 'Compact notes for chapter one';
+const String tStudyNoteDescription =
+    'Compact notes for chapter one';
 const String tStudyNotePdfFileName = 'physics-summary.pdf';
 const int tStudyNotePdfFileSize = 4096;
-const String tStudyNotePdfStoragePath = 'study_notes/note-123/1.pdf';
-const String tStudyNoteLocalPdfFilePath = '/tmp/physics-summary.pdf';
+const String tStudyNotePdfStoragePath =
+    'study_notes/note-123/1.pdf';
+const String tStudyNoteLocalPdfFilePath =
+    '/tmp/physics-summary.pdf';
 
-final DateTime tStudyNoteCreatedAt = DateTime.utc(2024, 6, 1, 10);
-final DateTime tStudyNoteUpdatedAt = DateTime.utc(2024, 6, 2, 12);
+final DateTime tStudyNoteCreatedAt = DateTime.utc(
+  2024,
+  6,
+  1,
+  10,
+);
+final DateTime tStudyNoteUpdatedAt = DateTime.utc(
+  2024,
+  6,
+  2,
+  12,
+);
 
 final StudyNoteEntity tStudyNoteEntity = StudyNoteEntity(
   noteId: tStudyNoteId,
@@ -317,13 +358,14 @@ final StudyNoteEntity tStudyNoteEntity = StudyNoteEntity(
   pdfStoragePath: tStudyNotePdfStoragePath,
 );
 
-final StudyNoteEntity tStudyNoteEntityWithoutPdf = StudyNoteEntity(
-  noteId: tStudyNoteId,
-  name: tStudyNoteName,
-  description: tStudyNoteDescription,
-  gradeId: tGradeId,
-  isPublished: true,
-);
+final StudyNoteEntity tStudyNoteEntityWithoutPdf =
+    StudyNoteEntity(
+      noteId: tStudyNoteId,
+      name: tStudyNoteName,
+      description: tStudyNoteDescription,
+      gradeId: tGradeId,
+      isPublished: true,
+    );
 
 final StudyNoteModel tStudyNoteModel = StudyNoteModel(
   noteId: tStudyNoteId,
@@ -344,7 +386,9 @@ final StudyNoteModel tSecondStudyNoteModel = StudyNoteModel(
   description: 'Compact notes for chapter two',
   gradeId: tGradeId,
   isPublished: false,
-  createdAt: tStudyNoteCreatedAt.subtract(const Duration(days: 1)),
+  createdAt: tStudyNoteCreatedAt.subtract(
+    const Duration(days: 1),
+  ),
   updatedAt: tStudyNoteUpdatedAt,
 );
 
@@ -357,8 +401,12 @@ Map<String, dynamic> tStudyNoteJson() {
     FirestoreFields.pdfFileName: tStudyNotePdfFileName,
     FirestoreFields.pdfFileSize: tStudyNotePdfFileSize,
     FirestoreFields.pdfStoragePath: tStudyNotePdfStoragePath,
-    FirestoreFields.createdAt: Timestamp.fromDate(tStudyNoteCreatedAt),
-    FirestoreFields.updatedAt: Timestamp.fromDate(tStudyNoteUpdatedAt),
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tStudyNoteCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tStudyNoteUpdatedAt,
+    ),
   };
 }
 
@@ -368,7 +416,345 @@ Map<String, dynamic> tStudyNoteJsonWithoutPdf() {
     FirestoreFields.description: tStudyNoteDescription,
     FirestoreFields.gradeId: tGradeId,
     FirestoreFields.isPublished: true,
-    FirestoreFields.createdAt: Timestamp.fromDate(tStudyNoteCreatedAt),
-    FirestoreFields.updatedAt: Timestamp.fromDate(tStudyNoteUpdatedAt),
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tStudyNoteCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tStudyNoteUpdatedAt,
+    ),
+  };
+}
+
+// Exams feature dummy data
+
+const String tExamId = 'exam-123';
+const String tSecondExamId = 'exam-456';
+const String tExamName = 'Midterm Physics Exam';
+const int tExamDurationMinutes = 60;
+const int tExamQuestionCount = 1;
+const int tExamTotalScore = 5;
+const int tExamParticipantsCount = 0;
+
+final DateTime tExamCreatedAt = DateTime.utc(2024, 8, 1, 9);
+final DateTime tExamUpdatedAt = DateTime.utc(2024, 8, 2, 10);
+
+const String tExamQuestionId = 'question-123';
+const String tSecondExamQuestionId = 'question-456';
+const String tExamQuestionText = 'What is velocity?';
+const int tExamQuestionDegree = 5;
+const int tExamCorrectChoiceIndex = 1;
+const List<String> tExamChoices = [
+  'Distance only',
+  'Displacement over time',
+  'Mass over volume',
+  'Force over area',
+];
+const String tExamQuestionImageUrl =
+    'https://storage.example.com/exam-question.jpg';
+const String tExamQuestionImageStoragePath =
+    'exam_question_images/exam-123/question-123/1.jpg';
+const String tExamQuestionImageName = 'question.jpg';
+const String tExamQuestionImageDownloadUrl =
+    'https://storage.example.com/new-exam-question.jpg';
+const String tReplacementExamQuestionImageStoragePath =
+    'exam_question_images/exam-123/question-123/2.jpg';
+
+const String tExamResultId = 'exam-123_student-123';
+const String tExamResultStudentId = 'student-123';
+const String tExamResultStudentName = 'Ahmed Ali';
+const String tExamResultGradeName = 'Grade 1';
+const int tExamResultScore = 4;
+const int tExamResultTotalScore = 5;
+
+final DateTime tExamResultStartedAt = DateTime.utc(
+  2024,
+  9,
+  1,
+  9,
+);
+final DateTime tExamResultExpiresAt = DateTime.utc(
+  2024,
+  9,
+  1,
+  10,
+);
+final DateTime tExamResultSubmittedAt = DateTime.utc(
+  2024,
+  9,
+  1,
+  9,
+  40,
+);
+final DateTime tFutureDateTime = DateTime.utc(2100, 1, 1);
+final DateTime tPastDateTime = DateTime.utc(2020, 1, 1);
+
+final ExamQuestionEntity tExamQuestionEntity =
+    ExamQuestionEntity(
+      questionId: tExamQuestionId,
+      examId: tExamId,
+      questionText: tExamQuestionText,
+      degree: tExamQuestionDegree,
+      choices: tExamChoices,
+      correctChoiceIndex: tExamCorrectChoiceIndex,
+      imageUrl: tExamQuestionImageUrl,
+      imageStoragePath: tExamQuestionImageStoragePath,
+      createdAt: tExamCreatedAt,
+      updatedAt: tExamUpdatedAt,
+    );
+
+final ExamQuestionEntity tExamQuestionEntityWithoutImage =
+    tExamQuestionEntity.copyWith(clearImage: true);
+
+final ExamQuestionModel tExamQuestionModel = ExamQuestionModel(
+  questionId: tExamQuestionId,
+  examId: tExamId,
+  questionText: tExamQuestionText,
+  degree: tExamQuestionDegree,
+  choices: tExamChoices,
+  correctChoiceIndex: tExamCorrectChoiceIndex,
+  imageUrl: tExamQuestionImageUrl,
+  imageStoragePath: tExamQuestionImageStoragePath,
+  createdAt: tExamCreatedAt,
+  updatedAt: tExamUpdatedAt,
+);
+
+final ExamQuestionModel tSecondExamQuestionModel =
+    ExamQuestionModel(
+      questionId: tSecondExamQuestionId,
+      examId: tExamId,
+      questionText: 'What is acceleration?',
+      degree: 10,
+      choices: const [
+        'Velocity over time',
+        'Mass over time',
+        'Distance only',
+        'Energy over force',
+      ],
+      correctChoiceIndex: 0,
+      createdAt: tExamCreatedAt.add(const Duration(minutes: 1)),
+      updatedAt: tExamUpdatedAt,
+    );
+
+final ExamQuestionImageFile tExamQuestionImageFile =
+    ExamQuestionImageFile(
+      name: tExamQuestionImageName,
+      sizeInBytes: 4,
+      bytes: Uint8List.fromList(const [1, 2, 3, 4]),
+    );
+
+Map<String, dynamic> tExamQuestionJson({
+  String examId = tExamId,
+}) {
+  return {
+    FirestoreFields.examId: examId,
+    FirestoreFields.questionText: tExamQuestionText,
+    FirestoreFields.questionScore: tExamQuestionDegree,
+    FirestoreFields.option1: tExamChoices[0],
+    FirestoreFields.option2: tExamChoices[1],
+    FirestoreFields.option3: tExamChoices[2],
+    FirestoreFields.option4: tExamChoices[3],
+    FirestoreFields.correctOption: tExamCorrectChoiceIndex,
+    FirestoreFields.questionImageUrl: tExamQuestionImageUrl,
+    FirestoreFields.questionImageStoragePath:
+        tExamQuestionImageStoragePath,
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tExamCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tExamUpdatedAt,
+    ),
+  };
+}
+
+Map<String, dynamic> tExamQuestionJsonWithoutImage({
+  String examId = tExamId,
+}) {
+  return {
+    FirestoreFields.examId: examId,
+    FirestoreFields.questionText: tExamQuestionText,
+    FirestoreFields.questionScore: tExamQuestionDegree,
+    FirestoreFields.option1: tExamChoices[0],
+    FirestoreFields.option2: tExamChoices[1],
+    FirestoreFields.option3: tExamChoices[2],
+    FirestoreFields.option4: tExamChoices[3],
+    FirestoreFields.correctOption: null,
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tExamCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tExamUpdatedAt,
+    ),
+  };
+}
+
+Map<String, dynamic> tSecondExamQuestionJson({
+  String examId = tExamId,
+}) {
+  return {
+    ...tExamQuestionJsonWithoutImage(examId: examId),
+    FirestoreFields.questionId: tSecondExamQuestionId,
+    FirestoreFields.questionText:
+        tSecondExamQuestionModel.questionText,
+    FirestoreFields.questionScore:
+        tSecondExamQuestionModel.degree,
+    FirestoreFields.option1: tSecondExamQuestionModel.choices[0],
+    FirestoreFields.option2: tSecondExamQuestionModel.choices[1],
+    FirestoreFields.option3: tSecondExamQuestionModel.choices[2],
+    FirestoreFields.option4: tSecondExamQuestionModel.choices[3],
+    FirestoreFields.correctOption:
+        tSecondExamQuestionModel.correctChoiceIndex,
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tSecondExamQuestionModel.createdAt!,
+    ),
+  };
+}
+
+final ExamEntity tExamEntity = ExamEntity(
+  examId: tExamId,
+  gradeId: tGradeId,
+  examName: tExamName,
+  durationMinutes: tExamDurationMinutes,
+  questionCount: tExamQuestionCount,
+  totalScore: tExamTotalScore,
+  status: ExamStatus.unpublished,
+  questions: [tExamQuestionEntity],
+);
+
+final ExamEntity tPublishedExamEntity = tExamEntity.copyWith(
+  status: ExamStatus.published,
+);
+
+final ExamEntity tEndedExamEntity = tExamEntity.copyWith(
+  status: ExamStatus.ended,
+  closedAt: tExamUpdatedAt,
+);
+
+final ExamModel tExamModel = ExamModel(
+  examId: tExamId,
+  gradeId: tGradeId,
+  examName: tExamName,
+  durationMinutes: tExamDurationMinutes,
+  questionCount: tExamQuestionCount,
+  totalScore: tExamTotalScore,
+  status: ExamStatus.unpublished,
+  questions: [tExamQuestionModel],
+  createdAt: tExamCreatedAt,
+  updatedAt: tExamUpdatedAt,
+);
+
+final ExamModel tSecondExamModel = ExamModel(
+  examId: tSecondExamId,
+  gradeId: tGradeId,
+  examName: 'Final Chemistry Exam',
+  durationMinutes: 90,
+  questionCount: 0,
+  totalScore: 0,
+  status: ExamStatus.published,
+  createdAt: tExamCreatedAt.subtract(const Duration(days: 1)),
+  updatedAt: tExamUpdatedAt,
+);
+
+Map<String, dynamic> tExamJson({String examId = tExamId}) {
+  return {
+    FirestoreFields.gradeId: tGradeId,
+    FirestoreFields.examName: tExamName,
+    FirestoreFields.durationMinutes: tExamDurationMinutes,
+    FirestoreFields.questionCount: tExamQuestionCount,
+    FirestoreFields.totalScore: tExamTotalScore,
+    FirestoreFields.participantsCount: tExamParticipantsCount,
+    FirestoreFields.examStatus: 'unpublished',
+    FirestoreFields.firstAttemptAt: null,
+    FirestoreFields.closedAt: null,
+    FirestoreFields.createdAt: Timestamp.fromDate(
+      tExamCreatedAt,
+    ),
+    FirestoreFields.updatedAt: Timestamp.fromDate(
+      tExamUpdatedAt,
+    ),
+    'isDeleting': false,
+  };
+}
+
+Map<String, dynamic> tEndedExamJson({String examId = tExamId}) {
+  return {
+    ...tExamJson(examId: examId),
+    FirestoreFields.examStatus: 'ended',
+    FirestoreFields.closedAt: Timestamp.fromDate(tExamUpdatedAt),
+  };
+}
+
+Map<String, dynamic> tPublishedExamJson({
+  String examId = tExamId,
+}) {
+  return {
+    ...tExamJson(examId: examId),
+    FirestoreFields.examStatus: 'published',
+  };
+}
+
+final ExamResultEntity tExamResultEntity = ExamResultEntity(
+  resultId: tExamResultId,
+  examId: tExamId,
+  studentId: tExamResultStudentId,
+  studentName: tExamResultStudentName,
+  gradeId: tGradeId,
+  gradeName: tExamResultGradeName,
+  score: tExamResultScore,
+  totalScore: tExamResultTotalScore,
+  status: ExamAttemptStatus.submitted,
+  startedAt: tExamResultStartedAt,
+  expiresAt: tExamResultExpiresAt,
+  submittedAt: tExamResultSubmittedAt,
+);
+
+final ExamResultEntity tInProgressExamResultEntity =
+    ExamResultEntity(
+      resultId: tExamResultId,
+      examId: tExamId,
+      studentId: tExamResultStudentId,
+      studentName: tExamResultStudentName,
+      gradeId: tGradeId,
+      gradeName: tExamResultGradeName,
+      score: null,
+      totalScore: tExamResultTotalScore,
+      status: ExamAttemptStatus.inProgress,
+      startedAt: tExamResultStartedAt,
+      expiresAt: tFutureDateTime,
+    );
+
+final ExamResultModel tExamResultModel = ExamResultModel(
+  resultId: tExamResultId,
+  examId: tExamId,
+  studentId: tExamResultStudentId,
+  studentName: tExamResultStudentName,
+  gradeId: tGradeId,
+  gradeName: tExamResultGradeName,
+  score: tExamResultScore,
+  totalScore: tExamResultTotalScore,
+  status: ExamAttemptStatus.submitted,
+  startedAt: tExamResultStartedAt,
+  expiresAt: tExamResultExpiresAt,
+  submittedAt: tExamResultSubmittedAt,
+);
+
+Map<String, dynamic> tExamResultJson({String examId = tExamId}) {
+  return {
+    FirestoreFields.examId: examId,
+    FirestoreFields.studentId: tExamResultStudentId,
+    FirestoreFields.studentName: tExamResultStudentName,
+    FirestoreFields.gradeId: tGradeId,
+    FirestoreFields.gradeName: tExamResultGradeName,
+    FirestoreFields.score: tExamResultScore,
+    FirestoreFields.totalScore: tExamResultTotalScore,
+    FirestoreFields.resultStatus: 'submitted',
+    FirestoreFields.startedAt: Timestamp.fromDate(
+      tExamResultStartedAt,
+    ),
+    FirestoreFields.expiresAt: Timestamp.fromDate(
+      tExamResultExpiresAt,
+    ),
+    FirestoreFields.submittedAt: Timestamp.fromDate(
+      tExamResultSubmittedAt,
+    ),
   };
 }
