@@ -20,6 +20,10 @@ import 'package:al_mobdea_admin/features/live_session/domain/entities/meeting_ty
 import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:al_mobdea_admin/features/grades/data/models/grade_model.dart';
 import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
+import 'package:al_mobdea_admin/features/result_student/data/models/student_exam_result_model.dart';
+import 'package:al_mobdea_admin/features/result_student/data/models/student_exam_results_overview_model.dart';
+import 'package:al_mobdea_admin/features/result_student/domain/entities/student_exam_result_entity.dart';
+import 'package:al_mobdea_admin/features/result_student/domain/entities/student_exam_results_overview_entity.dart';
 import 'package:al_mobdea_admin/features/study_notes/data/models/study_note_model.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
 import 'package:al_mobdea_admin/features/students/data/models/student_model.dart';
@@ -852,6 +856,142 @@ Map<String, dynamic> tThirdGradeJson({String gradeId = 'grade-3'}) {
     FirestoreFields.gradeId: gradeId,
     FirestoreFields.name: 'Grade 3',
     FirestoreFields.displayOrder: 0,
+    FirestoreFields.isActive: true,
+  };
+}
+
+// Result student feature dummy data
+
+const String tResultStudentId = 'student-123';
+const String tStudentExamResultId = 'result-123';
+const String tSecondStudentExamResultId = 'result-456';
+const String tStudentExamResultExamId = 'exam-123';
+const String tSecondStudentExamResultExamId = 'exam-456';
+const String tStudentExamResultExamName = 'Midterm Physics Exam';
+const String tSecondStudentExamResultExamName = 'Final Chemistry Exam';
+const double tStudentExamResultObtainedScore = 80;
+const double tStudentExamResultTotalScore = 100;
+
+final DateTime tStudentExamResultSubmittedAt = DateTime.utc(
+  2024,
+  9,
+  1,
+  9,
+  40,
+);
+final DateTime tSecondStudentExamResultSubmittedAt = DateTime.utc(
+  2024,
+  10,
+  1,
+  9,
+  40,
+);
+
+final StudentExamResultEntity tStudentExamResultEntity =
+    StudentExamResultEntity(
+      resultId: tStudentExamResultId,
+      examId: tStudentExamResultExamId,
+      examName: tStudentExamResultExamName,
+      studentObtainedScore: tStudentExamResultObtainedScore,
+      examTotalScore: tStudentExamResultTotalScore,
+      examSubmittedAt: tStudentExamResultSubmittedAt,
+    );
+
+final StudentExamResultEntity tSecondStudentExamResultEntity =
+    StudentExamResultEntity(
+      resultId: tSecondStudentExamResultId,
+      examId: tSecondStudentExamResultExamId,
+      examName: tSecondStudentExamResultExamName,
+      studentObtainedScore: 90,
+      examTotalScore: 100,
+      examSubmittedAt: tSecondStudentExamResultSubmittedAt,
+    );
+
+final StudentExamResultModel tStudentExamResultModel =
+    StudentExamResultModel(
+      resultId: tStudentExamResultId,
+      examId: tStudentExamResultExamId,
+      examName: tStudentExamResultExamName,
+      studentObtainedScore: tStudentExamResultObtainedScore,
+      examTotalScore: tStudentExamResultTotalScore,
+      examSubmittedAt: tStudentExamResultSubmittedAt,
+    );
+
+final StudentExamResultModel tSecondStudentExamResultModel =
+    StudentExamResultModel(
+      resultId: tSecondStudentExamResultId,
+      examId: tSecondStudentExamResultExamId,
+      examName: tSecondStudentExamResultExamName,
+      studentObtainedScore: 90,
+      examTotalScore: 100,
+      examSubmittedAt: tSecondStudentExamResultSubmittedAt,
+    );
+
+final List<StudentExamResultModel> tStudentExamResultModels = [
+  tStudentExamResultModel,
+  tSecondStudentExamResultModel,
+];
+
+final StudentExamResultsOverviewEntity tStudentExamResultsOverviewEntity =
+    StudentExamResultsOverviewEntity(
+      studentId: tResultStudentId,
+      studentFullName: tStudentName,
+      studentGradeId: tGradeId,
+      studentGradeName: tGradeName,
+      isStudentAccountActive: true,
+      completedExamsCount: 2,
+      totalExamsCount: 4,
+      studentExamResults: [
+        tStudentExamResultEntity,
+        tSecondStudentExamResultEntity,
+      ],
+    );
+
+final StudentExamResultsOverviewModel tStudentExamResultsOverviewModel =
+    StudentExamResultsOverviewModel(
+      studentId: tResultStudentId,
+      studentFullName: tStudentName,
+      studentGradeId: tGradeId,
+      studentGradeName: tGradeName,
+      isStudentAccountActive: true,
+      completedExamsCount: 2,
+      totalExamsCount: 4,
+      studentExamResults: tStudentExamResultModels,
+    );
+
+Map<String, dynamic> tStudentExamResultJson({String examId = tStudentExamResultExamId}) {
+  return {
+    FirestoreFields.resultId: tStudentExamResultId,
+    FirestoreFields.studentId: tResultStudentId,
+    FirestoreFields.examId: examId,
+    FirestoreFields.score: tStudentExamResultObtainedScore,
+    FirestoreFields.totalScore: tStudentExamResultTotalScore,
+    FirestoreFields.submittedAt: Timestamp.fromDate(
+      tStudentExamResultSubmittedAt,
+    ),
+  };
+}
+
+Map<String, dynamic> tSecondStudentExamResultJson({
+  String examId = tSecondStudentExamResultExamId,
+}) {
+  return {
+    FirestoreFields.resultId: tSecondStudentExamResultId,
+    FirestoreFields.studentId: tResultStudentId,
+    FirestoreFields.examId: examId,
+    FirestoreFields.score: 90,
+    FirestoreFields.totalScore: 100,
+    FirestoreFields.submittedAt: Timestamp.fromDate(
+      tSecondStudentExamResultSubmittedAt,
+    ),
+  };
+}
+
+Map<String, dynamic> tResultStudentJson({String studentId = tResultStudentId}) {
+  return {
+    FirestoreFields.studentId: studentId,
+    FirestoreFields.name: tStudentName,
+    FirestoreFields.gradeId: tGradeId,
     FirestoreFields.isActive: true,
   };
 }
