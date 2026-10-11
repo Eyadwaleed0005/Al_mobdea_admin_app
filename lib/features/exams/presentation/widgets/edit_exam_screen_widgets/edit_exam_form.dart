@@ -6,11 +6,11 @@ import 'package:al_mobdea_admin/core/widgets/custom_text_form_field.dart';
 import 'package:al_mobdea_admin/features/exams/domain/entities/exam_entity.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/validation/add_exam_validation.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/widgets/add_exam_screen_widgets/exam_publication_switch.dart';
-import 'package:al_mobdea_admin/features/exams/presentation/widgets/add_exam_screen_widgets/exam_time_range_fields.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/widgets/edit_exam_screen_widgets/edit_exam_actions.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/widgets/edit_exam_screen_widgets/edit_exam_questions_card.dart';
 import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 typedef EditExamSubmit = void Function({
@@ -44,34 +44,23 @@ class EditExamForm extends StatefulWidget {
   final VoidCallback onDeleteExamPressed;
 
   final bool canCloseExam;
-
   final bool isSavingChanges;
   final bool isClosingExam;
   final bool isDeletingExam;
 
   @override
-  State<EditExamForm> createState() {
-    return _EditExamFormState();
-  }
+  State<EditExamForm> createState() => _EditExamFormState();
 }
 
 class _EditExamFormState extends State<EditExamForm> {
-  static const TimeOfDay _defaultStartTime = TimeOfDay(hour: 19, minute: 0);
-
-  static const int _defaultDurationMinutes = 120;
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _examNameController;
+  late final TextEditingController _durationController;
   late final AddExamValidation _editExamValidation;
 
   late String _selectedGradeId;
   late bool _isPublished;
-
-  TimeOfDay? _startTime;
-  TimeOfDay? _endTime;
-
-  String? _timeRangeError;
 
   bool _isSyncingForm = false;
 
@@ -81,16 +70,14 @@ class _EditExamFormState extends State<EditExamForm> {
         widget.isDeletingExam;
   }
 
-  bool get _isExamEnded {
-    return widget.exam.isEnded;
-  }
+  bool get _isExamEnded => widget.exam.isEnded;
 
-  bool get _fieldsEnabled {
-    return !_isExamEnded && !_isActionInProgress;
-  }
+  bool get _fieldsEnabled => !_isExamEnded && !_isActionInProgress;
 
-  bool get _hasChanges {
-    return _hasChangesComparedTo(widget.exam);
+  bool get _hasChanges => _hasChangesComparedTo(widget.exam);
+
+  int? get _currentDurationMinutes {
+    return int.tryParse(_normalizeDigits(_durationController.text));
   }
 
   bool _hasChangesComparedTo(ExamEntity exam) {
@@ -98,24 +85,6 @@ class _EditExamFormState extends State<EditExamForm> {
         _currentDurationMinutes != exam.durationMinutes ||
         _selectedGradeId != exam.gradeId ||
         _isPublished != exam.isPublished;
-  }
-
-  int? get _currentDurationMinutes {
-    return _durationFor(startTime: _startTime, endTime: _endTime);
-  }
-
-  int? _durationFor({
-    required TimeOfDay? startTime,
-    required TimeOfDay? endTime,
-  }) {
-    if (startTime == null || endTime == null) {
-      return null;
-    }
-
-    return ExamTimePickerHelper.durationMinutes(
-      startTime: startTime,
-      endTime: endTime,
-    );
   }
 
   @override
@@ -126,49 +95,35 @@ class _EditExamFormState extends State<EditExamForm> {
 
     _examNameController = TextEditingController(text: widget.exam.examName);
 
+    _durationController = TextEditingController(
+      text: widget.exam.durationMinutes.toString(),
+    );
+
     _selectedGradeId = widget.exam.gradeId;
     _isPublished = widget.exam.isPublished;
 
-    _syncTimesFromDuration(widget.exam.durationMinutes);
-
     _examNameController.addListener(_onFormValueChanged);
+    _durationController.addListener(_onFormValueChanged);
   }
 
   @override
   void didUpdateWidget(covariant EditExamForm oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final bool isDifferentExam = oldWidget.exam.examId != widget.exam.examId;
+    final isDifferentExam = oldWidget.exam.examId != widget.exam.examId;
 
-    final bool settingsChanged =
+    final settingsChanged =
         oldWidget.exam.examName != widget.exam.examName ||
         oldWidget.exam.gradeId != widget.exam.gradeId ||
         oldWidget.exam.durationMinutes != widget.exam.durationMinutes ||
-        oldWidget.exam.status != widget.exam.status;
+        oldWidget.exam.status != widget.exam.status ||
+        oldWidget.exam.isPublished != widget.exam.isPublished;
 
-    final bool hadLocalChanges = _hasChangesComparedTo(oldWidget.exam);
+    final hadLocalChanges = _hasChangesComparedTo(oldWidget.exam);
 
     if (isDifferentExam || (settingsChanged && !hadLocalChanges)) {
       _syncFormFromExam();
     }
-  }
-
-  void _syncTimesFromDuration(int durationMinutes) {
-    final int safeDurationMinutes = durationMinutes > 0
-        ? durationMinutes
-        : _defaultDurationMinutes;
-
-    final int endMinutes =
-        (_defaultStartTime.hour * 60) +
-        _defaultStartTime.minute +
-        safeDurationMinutes;
-
-    _startTime = _defaultStartTime;
-
-    _endTime = TimeOfDay(
-      hour: (endMinutes ~/ 60) % 24,
-      minute: endMinutes % 60,
-    );
   }
 
   void _syncFormFromExam() {
@@ -176,11 +131,9 @@ class _EditExamFormState extends State<EditExamForm> {
 
     try {
       _examNameController.text = widget.exam.examName;
-
+      _durationController.text = widget.exam.durationMinutes.toString();
       _selectedGradeId = widget.exam.gradeId;
       _isPublished = widget.exam.isPublished;
-
-      _syncTimesFromDuration(widget.exam.durationMinutes);
     } finally {
       _isSyncingForm = false;
     }
@@ -189,16 +142,18 @@ class _EditExamFormState extends State<EditExamForm> {
   @override
   void dispose() {
     _examNameController.removeListener(_onFormValueChanged);
+    _durationController.removeListener(_onFormValueChanged);
 
     _examNameController.dispose();
+    _durationController.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<PopupSelectionItem<String>> gradeItems = widget.grades
-        .map((GradeEntity grade) {
+    final gradeItems = widget.grades
+        .map((grade) {
           return PopupSelectionItem<String>(
             value: grade.gradeId,
             label: grade.name,
@@ -249,17 +204,17 @@ class _EditExamFormState extends State<EditExamForm> {
             verticalSpace(24),
             AppAnimations.formFieldEntrance(
               order: 3,
-              child: ExamTimeRangeFields(
-                startTime: _startTime,
-                endTime: _endTime,
-                isEnabled: _fieldsEnabled,
-                errorText: _timeRangeError,
-                onStartTimePressed: () {
-                  _pickTime(isStartTime: true);
-                },
-                onEndTimePressed: () {
-                  _pickTime(isStartTime: false);
-                },
+              child: CustomTextFormField(
+                controller: _durationController,
+                labelText: 'مدة الامتحان بالدقائق',
+                hintText: 'مثال: ٦٠',
+                keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                enabled: _fieldsEnabled,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9٠-٩۰-۹]')),
+                ],
+                validator: _validateDuration,
               ),
             ),
             verticalSpace(24),
@@ -319,7 +274,7 @@ class _EditExamFormState extends State<EditExamForm> {
                   tooltip: 'اختر الصف الدراسي',
                   emptyTooltip: 'لا توجد صفوف متاحة',
                   enabled: widget.grades.isNotEmpty && _fieldsEnabled,
-                  onSelected: (String gradeId) {
+                  onSelected: (gradeId) {
                     if (!_fieldsEnabled) {
                       return;
                     }
@@ -349,13 +304,13 @@ class _EditExamFormState extends State<EditExamForm> {
   }
 
   String? _validateGrade(String? value) {
-    final String? validationError = _editExamValidation.validateGrade(value);
+    final validationError = _editExamValidation.validateGrade(value);
 
     if (validationError != null) {
       return validationError;
     }
 
-    final bool exists = widget.grades.any((GradeEntity grade) {
+    final exists = widget.grades.any((grade) {
       return grade.gradeId == value;
     });
 
@@ -367,13 +322,54 @@ class _EditExamFormState extends State<EditExamForm> {
   }
 
   String get _selectedGradeText {
-    for (final GradeEntity grade in widget.grades) {
+    for (final grade in widget.grades) {
       if (grade.gradeId == _selectedGradeId) {
         return grade.name;
       }
     }
 
     return _selectedGradeId.isEmpty ? 'الصف الدراسي' : 'الصف المحدد غير متاح';
+  }
+
+  String _normalizeDigits(String value) {
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+
+    return value.trim().split('').map((character) {
+      final arabicIndex = arabicDigits.indexOf(character);
+
+      if (arabicIndex != -1) {
+        return arabicIndex.toString();
+      }
+
+      final persianIndex = persianDigits.indexOf(character);
+
+      if (persianIndex != -1) {
+        return persianIndex.toString();
+      }
+
+      return character;
+    }).join();
+  }
+
+  String? _validateDuration(String? value) {
+    final normalizedValue = _normalizeDigits(value ?? '');
+
+    final validationError = _editExamValidation.validateDuration(
+      normalizedValue,
+    );
+
+    if (validationError != null) {
+      return validationError;
+    }
+
+    final duration = int.tryParse(normalizedValue);
+
+    if (duration == null || duration <= 0) {
+      return 'أدخل مدة صحيحة أكبر من صفر';
+    }
+
+    return null;
   }
 
   void _onFormValueChanged() {
@@ -392,48 +388,6 @@ class _EditExamFormState extends State<EditExamForm> {
     setState(() {
       _isPublished = isPublished;
     });
-  }
-
-  Future<void> _pickTime({required bool isStartTime}) async {
-    if (!_fieldsEnabled) {
-      return;
-    }
-
-    final TimeOfDay? currentTime = isStartTime ? _startTime : _endTime;
-
-    final TimeOfDay? selectedTime = await ExamTimePickerHelper.show(
-      context,
-      initialTime: currentTime ?? _defaultStartTime,
-      helpText: isStartTime ? 'اختر وقت البداية' : 'اختر وقت النهاية',
-    );
-
-    if (!mounted || selectedTime == null) {
-      return;
-    }
-
-    setState(() {
-      if (isStartTime) {
-        _startTime = selectedTime;
-      } else {
-        _endTime = selectedTime;
-      }
-
-      _timeRangeError = _validateTimeRange();
-    });
-  }
-
-  String? _validateTimeRange() {
-    final int? durationMinutes = _currentDurationMinutes;
-
-    if (durationMinutes == null) {
-      return 'يرجى تحديد وقت البداية ووقت النهاية';
-    }
-
-    if (durationMinutes <= 0) {
-      return 'وقت النهاية يجب أن يكون بعد وقت البداية';
-    }
-
-    return _editExamValidation.validateDuration(durationMinutes.toString());
   }
 
   void _openQuestions() {
@@ -470,21 +424,15 @@ class _EditExamFormState extends State<EditExamForm> {
       return;
     }
 
-    final String? timeRangeError = _validateTimeRange();
+    final isFormValid = _formKey.currentState?.validate() ?? false;
 
-    setState(() {
-      _timeRangeError = timeRangeError;
-    });
-
-    final bool isFormValid = _formKey.currentState?.validate() ?? false;
-
-    if (!isFormValid || timeRangeError != null) {
+    if (!isFormValid) {
       return;
     }
 
-    final int? durationMinutes = _currentDurationMinutes;
+    final durationMinutes = _currentDurationMinutes;
 
-    if (durationMinutes == null) {
+    if (durationMinutes == null || durationMinutes <= 0) {
       return;
     }
 
