@@ -1,15 +1,9 @@
-import 'package:al_mobdea_admin/app/dependency_injection/service_locator.dart';
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
 import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/features/dashboard/presentation/screens/home_screen.dart';
-import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/cubit/bottom_navigation_cubit.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/widgets/custom_bottom_nav_bar.dart';
-import 'package:al_mobdea_admin/features/students/domain/use_cases/stream_students_use_case.dart';
-import 'package:al_mobdea_admin/features/students/presentation/cubit/student_management_cubit.dart';
-import 'package:al_mobdea_admin/features/students/presentation/screens/student_management_screen.dart';
-import 'package:al_mobdea_admin/features/study_notes/presentation/screens/content_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -57,12 +51,10 @@ class MainNavigationView extends StatelessWidget {
       case 0:
         return const HomeScreen();
       case 1:
-        return BlocProvider<StudentManagementCubit>(
-          create: (_) => StudentManagementCubit(
-            streamStudentsUseCase: getIt<StreamStudentsUseCase>(),
-            streamGradesUseCase: getIt<StreamGradesUseCase>(),
-          )..watchStudentManagement(),
-          child: const StudentManagementScreen(),
+        return const _PlaceholderScreen(
+          title: 'الطلاب',
+          description: 'ستظهر إدارة الطلاب هنا.',
+          icon: Icons.group_outlined,
         );
       case 2:
         return const ContentManagementScreen();
