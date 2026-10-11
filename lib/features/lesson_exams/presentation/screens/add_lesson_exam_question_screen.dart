@@ -20,69 +20,58 @@ class AddLessonExamQuestionScreen extends StatelessWidget {
   });
 
   final String lessonId;
-
   final int? questionNumber;
 
   @override
   Widget build(BuildContext context) {
     return AddLessonExamQuestionFeedbackListener(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
-        child: SafeArea(
-          bottom: false,
-          child: Scaffold(
-            appBar: const CustomHeaderBar(title: 'إضافة سؤال لاختبار الدرس'),
-            backgroundColor: ColorPalette.background,
-            body: BackgroundStudentLayout(
-              child: SafeArea(
-                child: AppNetworkAwareContent(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 20.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child:
-                              BlocBuilder<
-                                AddLessonExamQuestionCubit,
-                                AddLessonExamQuestionState
-                              >(
-                                builder: (context, state) {
-                                  final isAddingQuestion =
-                                      state is AddLessonExamQuestionLoading;
-
-                                  return AddLessonExamQuestionContent(
-                                    questionNumber: questionNumber,
-                                    isAddingQuestion: isAddingQuestion,
-                                    onAddQuestionPressed:
-                                        ({
-                                          required questionText,
-                                          required degree,
-                                          required choices,
-                                          image,
-                                        }) {
-                                          return context
-                                              .read<
-                                                AddLessonExamQuestionCubit
-                                              >()
-                                              .addQuestion(
-                                                lessonId: lessonId,
-                                                questionText: questionText,
-                                                degree: degree,
-                                                choices: choices,
-                                                image: image,
-                                              );
-                                        },
-                                  );
-                                },
-                              ),
-                        ),
-                      ],
-                    ),
+        value: AppSystemUi.dark(),
+        child: Scaffold(
+          appBar: const CustomHeaderBar(
+            title: 'إضافة سؤال لاختبار الدرس',
+            showBackButton: true,
+          ),
+          backgroundColor: ColorPalette.background,
+          body: BackgroundStudentLayout(
+            child: SafeArea(
+              top: false,
+              child: AppNetworkAwareContent(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 20.h,
                   ),
+                  child:
+                      BlocBuilder<
+                        AddLessonExamQuestionCubit,
+                        AddLessonExamQuestionState
+                      >(
+                        builder: (context, state) {
+                          return AddLessonExamQuestionContent(
+                            questionNumber: questionNumber,
+                            isAddingQuestion:
+                                state is AddLessonExamQuestionLoading,
+                            onAddQuestionPressed:
+                                ({
+                                  required questionText,
+                                  required degree,
+                                  required choices,
+                                  image,
+                                }) {
+                                  return context
+                                      .read<AddLessonExamQuestionCubit>()
+                                      .addQuestion(
+                                        lessonId: lessonId,
+                                        questionText: questionText,
+                                        degree: degree,
+                                        choices: choices,
+                                        image: image,
+                                      );
+                                },
+                          );
+                        },
+                      ),
                 ),
               ),
             ),

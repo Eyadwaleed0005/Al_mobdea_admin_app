@@ -21,74 +21,62 @@ class EditLessonExamQuestionScreen extends StatelessWidget {
   });
 
   final LessonExamQuestionEntity question;
-
   final int? questionNumber;
 
   @override
   Widget build(BuildContext context) {
     return EditLessonExamQuestionFeedbackListener(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
-        child: SafeArea(
-          bottom: false,
-          child: Scaffold(
-            appBar: const CustomHeaderBar(title: 'تعديل سؤال اختبار الدرس'),
-            backgroundColor: ColorPalette.background,
-            body: BackgroundStudentLayout(
-              child: SafeArea(
-                child: AppNetworkAwareContent(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 20.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child:
-                              BlocBuilder<
-                                EditLessonExamQuestionCubit,
-                                EditLessonExamQuestionState
-                              >(
-                                builder: (context, state) {
-                                  final isUpdatingQuestion =
-                                      state is EditLessonExamQuestionLoading;
-
-                                  return EditLessonExamQuestionContent(
-                                    question: question,
-                                    questionNumber: questionNumber,
-                                    isUpdatingQuestion: isUpdatingQuestion,
-                                    onUpdateQuestionPressed:
-                                        ({
-                                          required questionText,
-                                          required degree,
-                                          required choices,
-                                          newImage,
-                                          required removeCurrentImage,
-                                        }) {
-                                          return context
-                                              .read<
-                                                EditLessonExamQuestionCubit
-                                              >()
-                                              .updateQuestion(
-                                                lessonId: question.lessonId,
-                                                questionId: question.questionId,
-                                                questionText: questionText,
-                                                degree: degree,
-                                                choices: choices,
-                                                newImage: newImage,
-                                                removeCurrentImage:
-                                                    removeCurrentImage,
-                                              );
-                                        },
-                                  );
-                                },
-                              ),
-                        ),
-                      ],
-                    ),
+        value: AppSystemUi.dark(),
+        child: Scaffold(
+          appBar: const CustomHeaderBar(
+            title: 'تعديل سؤال اختبار الدرس',
+            showBackButton: true,
+          ),
+          backgroundColor: ColorPalette.background,
+          body: BackgroundStudentLayout(
+            child: SafeArea(
+              top: false,
+              child: AppNetworkAwareContent(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 20.h,
                   ),
+                  child:
+                      BlocBuilder<
+                        EditLessonExamQuestionCubit,
+                        EditLessonExamQuestionState
+                      >(
+                        builder: (context, state) {
+                          return EditLessonExamQuestionContent(
+                            question: question,
+                            questionNumber: questionNumber,
+                            isUpdatingQuestion:
+                                state is EditLessonExamQuestionLoading,
+                            onUpdateQuestionPressed:
+                                ({
+                                  required questionText,
+                                  required degree,
+                                  required choices,
+                                  newImage,
+                                  required removeCurrentImage,
+                                }) {
+                                  return context
+                                      .read<EditLessonExamQuestionCubit>()
+                                      .updateQuestion(
+                                        lessonId: question.lessonId,
+                                        questionId: question.questionId,
+                                        questionText: questionText,
+                                        degree: degree,
+                                        choices: choices,
+                                        newImage: newImage,
+                                        removeCurrentImage: removeCurrentImage,
+                                      );
+                                },
+                          );
+                        },
+                      ),
                 ),
               ),
             ),

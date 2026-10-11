@@ -69,10 +69,12 @@ class LessonExamsContent extends StatelessWidget {
               child: LessonExamQuestionCard(
                 question: questions[index],
                 questionNumber: index + 1,
-                selectedChoiceIndex:
-                    state.selectedCorrectChoiceIndexes[questions[index].questionId],
+                selectedChoiceIndex: state
+                    .selectedCorrectChoiceIndexes[questions[index].questionId],
                 isEnabled: !state.isActionInProgress,
-                isDeleting: state.isQuestionDeleting(questions[index].questionId),
+                isDeleting: state.isQuestionDeleting(
+                  questions[index].questionId,
+                ),
                 onChoiceSelected: (choiceIndex) {
                   onChoiceSelected(questions[index], choiceIndex);
                 },

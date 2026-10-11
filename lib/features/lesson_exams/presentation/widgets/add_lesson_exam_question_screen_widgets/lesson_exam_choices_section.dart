@@ -18,7 +18,6 @@ class LessonExamChoicesSection extends StatelessWidget {
        );
 
   final List<TextEditingController> choiceControllers;
-
   final bool enabled;
 
   static const List<String> _choiceLabels = [
@@ -57,45 +56,21 @@ class LessonExamChoicesSection extends StatelessWidget {
               color: ColorPalette.primary,
             ),
           ),
-
           verticalSpace(6),
-
           Text(
             'أربعة اختيارات لكل سؤال، وحدد الإجابة الصحيحة من شاشة الاختبار',
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
             style: AppTextStyle.font12TextSecondaryRegularTajawal(),
           ),
-
           verticalSpace(16),
-
-          for (var index = 0; index < choiceControllers.length; index += 2) ...[
+          for (var index = 0; index < choiceControllers.length; index++) ...[
             if (index > 0) verticalSpace(14),
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: _ChoiceField(
-                      index: index,
-                      label: _choiceLabels[index],
-                      controller: choiceControllers[index],
-                      enabled: enabled,
-                    ),
-                  ),
-
-                  horizontalSpace(12),
-
-                  Expanded(
-                    child: _ChoiceField(
-                      index: index + 1,
-                      label: _choiceLabels[index + 1],
-                      controller: choiceControllers[index + 1],
-                      enabled: enabled,
-                    ),
-                  ),
-                ],
-              ),
+            _ChoiceField(
+              index: index,
+              label: _choiceLabels[index],
+              controller: choiceControllers[index],
+              enabled: enabled,
             ),
           ],
         ],
@@ -113,11 +88,8 @@ class _ChoiceField extends StatelessWidget {
   });
 
   final int index;
-
   final String label;
-
   final TextEditingController controller;
-
   final bool enabled;
 
   @override
@@ -127,7 +99,6 @@ class _ChoiceField extends StatelessWidget {
       children: [
         Row(
           textDirection: TextDirection.rtl,
-          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               width: 22.w,
@@ -146,14 +117,10 @@ class _ChoiceField extends StatelessWidget {
                 ),
               ),
             ),
-
             horizontalSpace(6),
-
-            Flexible(
+            Expanded(
               child: Text(
                 label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.right,
                 textDirection: TextDirection.rtl,
                 style: AppTextStyle.font13TextPrimaryMediumTajawal(),
@@ -161,9 +128,7 @@ class _ChoiceField extends StatelessWidget {
             ),
           ],
         ),
-
         verticalSpace(6),
-
         CustomTextFormField(
           controller: controller,
           hintText: 'اكتب $label',
