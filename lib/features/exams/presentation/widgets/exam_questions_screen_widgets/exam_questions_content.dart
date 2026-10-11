@@ -27,7 +27,6 @@ class ExamQuestionsContent extends StatefulWidget {
   const ExamQuestionsContent({super.key, this.examId, this.examDraft});
 
   final String? examId;
-
   final ExamDraftEntity? examDraft;
 
   @override
@@ -38,11 +37,8 @@ class ExamQuestionsContent extends StatefulWidget {
 
 class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
   bool _isQuestionRouteOpen = false;
-
   bool _isResultDialogOpen = false;
-
   bool _isConfirmationOpen = false;
-
   bool _hasNavigatedAfterSave = false;
 
   bool get _canInteract {
@@ -54,7 +50,7 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
       return false;
     }
 
-    final ExamQuestionsState state = context.read<ExamQuestionsCubit>().state;
+    final state = context.read<ExamQuestionsCubit>().state;
 
     if (state is ExamQuestionsEmpty) {
       return widget.examDraft != null;
@@ -66,32 +62,44 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
         state.savedExamId == null;
   }
 
+  String get _headerTitle {
+    return widget.examDraft != null
+        ? 'إنشاء أسئلة الاختبار'
+        : 'تعديل أسئلة الاختبار';
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ExamQuestionsCubit, ExamQuestionsState>(
       listenWhen: _shouldListen,
       listener: _handleState,
-      builder: (BuildContext context, ExamQuestionsState state) {
-        final bool isOperating = state is ExamQuestionsSuccess && state.isOperating;
+      builder: (context, state) {
+        final isOperating = state is ExamQuestionsSuccess && state.isOperating;
 
         return PopScope(
           canPop: !isOperating,
           child: AbsorbPointer(
             absorbing: isOperating,
-            child: SafeArea(
-              bottom: false,
-              child: Scaffold(
-                appBar: CustomHeaderBar(title: _headerTitle),
-                backgroundColor: ColorPalette.background,
-                body: BackgroundStudentLayout(
-                  child: SafeArea(
-                    child: AppNetworkAwareContent(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [Expanded(child: _buildState(context, state))],
-                        ),
+            child: Scaffold(
+              appBar: CustomHeaderBar(
+                title: _headerTitle,
+                showBackButton: true,
+              ),
+              backgroundColor: ColorPalette.background,
+              body: BackgroundStudentLayout(
+                child: SafeArea(
+                  top: false,
+                  child: AppNetworkAwareContent(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 20.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(child: _buildState(context, state)),
+                        ],
                       ),
                     ),
                   ),
@@ -104,28 +112,26 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
     );
   }
 
-  String get _headerTitle {
-    if (widget.examDraft != null) {
-      return 'إنشاء أسئلة الاختبار';
-    }
-
-    return 'تعديل أسئلة الاختبار';
-  }
-
   bool _shouldListen(ExamQuestionsState previous, ExamQuestionsState current) {
     if (previous is! ExamQuestionsSuccess || current is! ExamQuestionsSuccess) {
       return false;
     }
 
-    final bool operationFinished =
-        previous.isOperating && !current.isOperating && current.operation != null;
+    final operationFinished =
+        previous.isOperating &&
+        !current.isOperating &&
+        current.operation != null;
 
-    final bool hasResult = current.operationSucceeded || current.operationError != null;
+    final hasResult =
+        current.operationSucceeded || current.operationError != null;
 
     return operationFinished && hasResult;
   }
 
-  Future<void> _handleState(BuildContext context, ExamQuestionsState state) async {
+  Future<void> _handleState(
+    BuildContext context,
+    ExamQuestionsState state,
+  ) async {
     if (state is! ExamQuestionsSuccess ||
         state.operation == null ||
         state.isOperating ||
@@ -134,10 +140,8 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
       return;
     }
 
-    final ExamQuestionsOperation operation = state.operation!;
-
-    final bool succeeded = state.operationSucceeded;
-
+    final operation = state.operation!;
+    final succeeded = state.operationSucceeded;
     final AppErrorModel? error = state.operationError;
 
     if (!succeeded && error == null) {
@@ -153,20 +157,25 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
         return;
       }
 
-      final bool? confirmed = await showDialog<bool>(
+      final confirmed = await showDialog<bool>(
         context: context,
         useRootNavigator: false,
         barrierDismissible: false,
-        builder: (BuildContext dialogContext) {
+        builder: (dialogContext) {
           return PopScope(
             canPop: false,
             child: CustomOperationResultDialog(
               type: succeeded
                   ? CustomOperationResultType.success
                   : CustomOperationResultType.failure,
-              title: succeeded ? _getSuccessTitle(operation) : _getFailureTitle(operation),
-              message: succeeded ? _getSuccessMessage(operation) : error!.message,
-              actionText: operation == ExamQuestionsOperation.createExam && succeeded
+              title: succeeded
+                  ? _getSuccessTitle(operation)
+                  : _getFailureTitle(operation),
+              message: succeeded
+                  ? _getSuccessMessage(operation)
+                  : error!.message,
+              actionText:
+                  operation == ExamQuestionsOperation.createExam && succeeded
                   ? 'العودة للاختبارات'
                   : 'حسنًا',
               successIcon: Icons.check_circle_outline_rounded,
@@ -186,14 +195,15 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
       if (operation == ExamQuestionsOperation.createExam && succeeded) {
         _hasNavigatedAfterSave = true;
 
-        Navigator.of(context).popUntil((Route<dynamic> route) {
-          return route.settings.name == RouteNames.viewExamsScreen || route.isFirst;
+        Navigator.of(context).popUntil((route) {
+          return route.settings.name == RouteNames.viewExamsScreen ||
+              route.isFirst;
         });
 
         return;
       }
 
-      final ExamQuestionsCubit cubit = context.read<ExamQuestionsCubit>();
+      final cubit = context.read<ExamQuestionsCubit>();
 
       if (!cubit.isClosed) {
         cubit.clearOperationResult();
@@ -225,15 +235,21 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
     return switch (operation) {
       ExamQuestionsOperation.createExam => 'تم حفظ الاختبار وأسئلته بنجاح.',
       ExamQuestionsOperation.updateQuestion => 'تم حفظ تعديلات السؤال بنجاح.',
-      ExamQuestionsOperation.deleteQuestion => 'تم حذف السؤال وتحديث بيانات الاختبار بنجاح.',
-      ExamQuestionsOperation.saveQuestionChanges => 'تم حفظ الإجابات الصحيحة للأسئلة بنجاح.',
+      ExamQuestionsOperation.deleteQuestion =>
+        'تم حذف السؤال وتحديث بيانات الاختبار بنجاح.',
+      ExamQuestionsOperation.saveQuestionChanges =>
+        'تم حفظ الإجابات الصحيحة للأسئلة بنجاح.',
     };
   }
 
   Widget _buildState(BuildContext context, ExamQuestionsState state) {
     return switch (state) {
       ExamQuestionsLoading() => const Center(
-        child: AppLoadingIndicator(color: ColorPalette.primary, size: 32, strokeWidth: 3),
+        child: AppLoadingIndicator(
+          color: ColorPalette.primary,
+          size: 32,
+          strokeWidth: 3,
+        ),
       ),
       ExamQuestionsEmpty() => _buildEmptyContent(),
       ExamQuestionsError(:final error) => AppErrorWidget(
@@ -245,7 +261,7 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
   }
 
   Widget _buildEmptyContent() {
-    final bool canAddQuestion =
+    final canAddQuestion =
         widget.examDraft != null &&
         !_isQuestionRouteOpen &&
         !_isResultDialogOpen &&
@@ -262,7 +278,7 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
   }
 
   Widget _buildSuccessContent(ExamQuestionsSuccess state) {
-    final bool isEnabled =
+    final isEnabled =
         state.canEdit &&
         !state.isOperating &&
         state.savedExamId == null &&
@@ -271,15 +287,19 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
         !_isConfirmationOpen &&
         !_hasNavigatedAfterSave;
 
-    final bool isSaving = state.isSavingExam || state.isSavingChanges;
+    final isSaving = state.isSavingExam || state.isSavingChanges;
 
-    final bool isSaveEnabled = state.isCreatingExam
+    final isSaveEnabled = state.isCreatingExam
         ? state.canSaveExam && isEnabled
         : state.canSaveChanges && isEnabled;
 
-    final String saveButtonText = state.isCreatingExam ? 'حفظ الاختبار' : 'حفظ التعديلات';
+    final saveButtonText = state.isCreatingExam
+        ? 'حفظ الاختبار'
+        : 'حفظ التعديلات';
 
-    final String? deletingQuestionId = state.isDeletingQuestion ? state.operatingQuestionId : null;
+    final deletingQuestionId = state.isDeletingQuestion
+        ? state.operatingQuestionId
+        : null;
 
     if (state.questions.isEmpty) {
       return _buildEmptySuccessContent(state: state);
@@ -334,7 +354,7 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
   }
 
   Widget _buildEmptySuccessContent({required ExamQuestionsSuccess state}) {
-    final bool canAddQuestion =
+    final canAddQuestion =
         state.canAddQuestion &&
         !state.isOperating &&
         !_isQuestionRouteOpen &&
@@ -368,9 +388,9 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final ExamQuestionsCubit cubit = context.read<ExamQuestionsCubit>();
+    final cubit = context.read<ExamQuestionsCubit>();
 
-    final ExamQuestionDraftEntity questionDraft = ExamQuestionDraftEntity(
+    final questionDraft = ExamQuestionDraftEntity(
       question: question,
       image: cubit.questionImages[question.questionId],
     );
@@ -378,7 +398,7 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
     _setQuestionRouteOpen(true);
 
     try {
-      final ExamQuestionDraftEntity? updatedQuestionDraft = await Navigator.of(context)
+      final updatedQuestionDraft = await Navigator.of(context)
           .pushNamed<ExamQuestionDraftEntity>(
             RouteNames.editExamQuestionScreen,
             arguments: questionDraft,
@@ -392,12 +412,17 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
         return;
       }
 
-      final bool hadCurrentImage = _hasRemoteImage(question) || questionDraft.image != null;
+      final hadCurrentImage =
+          _hasRemoteImage(question) || questionDraft.image != null;
 
-      final bool hasUpdatedRemoteImage = _hasRemoteImage(updatedQuestionDraft.question);
+      final hasUpdatedRemoteImage = _hasRemoteImage(
+        updatedQuestionDraft.question,
+      );
 
-      final bool removeCurrentImage =
-          hadCurrentImage && updatedQuestionDraft.image == null && !hasUpdatedRemoteImage;
+      final removeCurrentImage =
+          hadCurrentImage &&
+          updatedQuestionDraft.image == null &&
+          !hasUpdatedRemoteImage;
 
       await cubit.updateQuestion(
         question: updatedQuestionDraft.question,
@@ -410,9 +435,8 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
   }
 
   bool _hasRemoteImage(ExamQuestionEntity question) {
-    final String imageUrl = question.imageUrl?.trim() ?? '';
-
-    final String imageStoragePath = question.imageStoragePath?.trim() ?? '';
+    final imageUrl = question.imageUrl?.trim() ?? '';
+    final imageStoragePath = question.imageStoragePath?.trim() ?? '';
 
     return imageUrl.isNotEmpty || imageStoragePath.isNotEmpty;
   }
@@ -447,7 +471,9 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
       return;
     }
 
-    await context.read<ExamQuestionsCubit>().deleteQuestion(questionId: question.questionId);
+    await context.read<ExamQuestionsCubit>().deleteQuestion(
+      questionId: question.questionId,
+    );
   }
 
   Future<void> _saveChanges() async {
@@ -465,9 +491,8 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
       return;
     }
 
-    final ExamQuestionsCubit cubit = context.read<ExamQuestionsCubit>();
-
-    final ExamDraftEntity? currentExamDraft = cubit.currentExamDraft;
+    final cubit = context.read<ExamQuestionsCubit>();
+    final currentExamDraft = cubit.currentExamDraft;
 
     if (currentExamDraft == null) {
       return;
@@ -478,7 +503,7 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
     _setQuestionRouteOpen(true);
 
     try {
-      final ExamQuestionDraftEntity? questionDraft = await Navigator.of(context)
+      final questionDraft = await Navigator.of(context)
           .pushNamed<ExamQuestionDraftEntity>(
             RouteNames.addExamQuestionsScreen,
             arguments: currentExamDraft,
@@ -488,7 +513,10 @@ class _ExamQuestionsContentState extends State<ExamQuestionsContent> {
         return;
       }
 
-      cubit.addQuestion(question: questionDraft.question, image: questionDraft.image);
+      cubit.addQuestion(
+        question: questionDraft.question,
+        image: questionDraft.image,
+      );
     } finally {
       _setQuestionRouteOpen(false);
     }

@@ -16,28 +16,22 @@ class ExamQuestionsScreen extends StatelessWidget {
   const ExamQuestionsScreen({super.key, this.examId, this.examDraft});
 
   final String? examId;
-
   final ExamDraftEntity? examDraft;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ExamQuestionsCubit>(
-      create: (_) {
-        return ExamQuestionsCubit(
-          examId: examId,
-          examDraft: examDraft,
-          getExamByIdUseCase: GetIt.instance<GetExamByIdUseCase>(),
-          createExamUseCase: GetIt.instance<CreateExamUseCase>(),
-          createExamQuestionUseCase:
-              GetIt.instance<CreateExamQuestionUseCase>(),
-          updateExamQuestionUseCase:
-              GetIt.instance<UpdateExamQuestionUseCase>(),
-          deleteExamQuestionUseCase:
-              GetIt.instance<DeleteExamQuestionUseCase>(),
-        )..initialize();
-      },
+      create: (_) => ExamQuestionsCubit(
+        examId: examId,
+        examDraft: examDraft,
+        getExamByIdUseCase: GetIt.instance<GetExamByIdUseCase>(),
+        createExamUseCase: GetIt.instance<CreateExamUseCase>(),
+        createExamQuestionUseCase: GetIt.instance<CreateExamQuestionUseCase>(),
+        updateExamQuestionUseCase: GetIt.instance<UpdateExamQuestionUseCase>(),
+        deleteExamQuestionUseCase: GetIt.instance<DeleteExamQuestionUseCase>(),
+      )..initialize(),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
+        value: AppSystemUi.dark(),
         child: ExamQuestionsContent(examId: examId, examDraft: examDraft),
       ),
     );

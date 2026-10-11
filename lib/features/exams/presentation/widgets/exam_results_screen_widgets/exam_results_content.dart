@@ -14,26 +14,30 @@ class ExamResultsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Scaffold(
-        appBar: const CustomHeaderBar(title: 'تقرير النتائج'),
-        backgroundColor: ColorPalette.background,
-        body: BackgroundStudentLayout(
-          child: SafeArea(
-            child: AppNetworkAwareContent(
-              child: AppRefreshIndicator(
-                onRefresh: () {
-                  return context.read<ExamResultsCubit>().refreshExamResults();
-                },
-                child: CustomScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                  slivers: <Widget>[
-                    SliverToBoxAdapter(child: verticalSpace(24)),
-                    const ExamResultsStateView(),
-                  ],
+    return Scaffold(
+      appBar: const CustomHeaderBar(
+        title: 'تقرير النتائج',
+        showBackButton: true,
+      ),
+      backgroundColor: ColorPalette.background,
+      body: BackgroundStudentLayout(
+        child: SafeArea(
+          top: false,
+          child: AppNetworkAwareContent(
+            child: AppRefreshIndicator(
+              onRefresh: () {
+                return context.read<ExamResultsCubit>().refreshExamResults();
+              },
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
                 ),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                slivers: [
+                  SliverToBoxAdapter(child: verticalSpace(24)),
+                  const ExamResultsStateView(),
+                ],
               ),
             ),
           ),

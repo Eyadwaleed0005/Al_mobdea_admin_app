@@ -18,22 +18,27 @@ class AddExamContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Scaffold(
-        appBar: const CustomHeaderBar(title: 'إنشاء اختبار عام'),
-        backgroundColor: ColorPalette.background,
-        body: BackgroundStudentLayout(
-          child: SafeArea(
-            child: AppNetworkAwareContent(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(child: BlocBuilder<AddExamCubit, AddExamState>(builder: _buildState)),
-                  ],
-                ),
+    return Scaffold(
+      appBar: const CustomHeaderBar(
+        title: 'إنشاء اختبار عام',
+        showBackButton: true,
+      ),
+      backgroundColor: ColorPalette.background,
+      body: BackgroundStudentLayout(
+        child: SafeArea(
+          top: false,
+          child: AppNetworkAwareContent(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: BlocBuilder<AddExamCubit, AddExamState>(
+                      builder: _buildState,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -45,20 +50,21 @@ class AddExamContent extends StatelessWidget {
   Widget _buildState(BuildContext context, AddExamState state) {
     return switch (state) {
       AddExamLoading() => const Center(
-        child: AppLoadingIndicator(color: ColorPalette.primary, size: 32, strokeWidth: 3),
+        child: AppLoadingIndicator(
+          color: ColorPalette.primary,
+          size: 32,
+          strokeWidth: 3,
+        ),
       ),
-
       AddExamEmpty() => const AppEmptyWidget(
         title: 'لا توجد صفوف دراسية',
         message: 'يجب إضافة صف دراسي وتفعيله قبل إنشاء الاختبار.',
         icon: Icons.school_outlined,
       ),
-
       AddExamError(:final error) => AppErrorWidget(
         message: error.message,
         onRetry: context.read<AddExamCubit>().retry,
       ),
-
       AddExamSuccess(:final grades) => AppAnimations.screenSection(
         delay: 120,
         child: SingleChildScrollView(

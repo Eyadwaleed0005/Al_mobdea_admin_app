@@ -14,11 +14,9 @@ class ExamResultsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<ExamResultsCubit>(
-      create: (_) {
-        return getIt<ExamResultsCubit>()..loadExamResults(examId: examId);
-      },
+      create: (_) => getIt<ExamResultsCubit>()..loadExamResults(examId: examId),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
+        value: AppSystemUi.dark(),
         child: const ExamResultsContent(),
       ),
     );

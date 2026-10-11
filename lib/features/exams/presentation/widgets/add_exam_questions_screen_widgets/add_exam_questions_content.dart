@@ -17,38 +17,44 @@ class AddExamQuestionsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: Scaffold(
-        appBar: const CustomHeaderBar(title: 'إضافة سؤال للاختبار العام'),
-        backgroundColor: ColorPalette.background,
-        body: BackgroundStudentLayout(
-          child: SafeArea(
-            child: AppNetworkAwareContent(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: BlocConsumer<AddExamQuestionCubit, AddExamQuestionState>(
-                        listenWhen: (AddExamQuestionState previous, AddExamQuestionState current) {
-                          return current is AddExamQuestionSuccess;
-                        },
-                        listener: (BuildContext context, AddExamQuestionState state) {
-                          if (state is! AddExamQuestionSuccess) {
-                            return;
-                          }
-
-                          Navigator.of(context).pop(state.questionDraft);
-                        },
-                        builder: (BuildContext context, AddExamQuestionState state) {
-                          return _buildContent(context: context, state: state);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+    return Scaffold(
+      appBar: const CustomHeaderBar(
+        title: 'إضافة سؤال للاختبار العام',
+        showBackButton: true,
+      ),
+      backgroundColor: ColorPalette.background,
+      body: BackgroundStudentLayout(
+        child: SafeArea(
+          top: false,
+          child: AppNetworkAwareContent(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child:
+                        BlocConsumer<
+                          AddExamQuestionCubit,
+                          AddExamQuestionState
+                        >(
+                          listenWhen: (previous, current) {
+                            return current is AddExamQuestionSuccess;
+                          },
+                          listener: (context, state) {
+                            if (state is AddExamQuestionSuccess) {
+                              Navigator.of(context).pop(state.questionDraft);
+                            }
+                          },
+                          builder: (context, state) {
+                            return _buildContent(
+                              context: context,
+                              state: state,
+                            );
+                          },
+                        ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -57,8 +63,11 @@ class AddExamQuestionsContent extends StatelessWidget {
     );
   }
 
-  Widget _buildContent({required BuildContext context, required AddExamQuestionState state}) {
-    final bool isLoading = state is AddExamQuestionLoading;
+  Widget _buildContent({
+    required BuildContext context,
+    required AddExamQuestionState state,
+  }) {
+    final isLoading = state is AddExamQuestionLoading;
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),

@@ -29,9 +29,7 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   late final TextEditingController _questionController;
-
   late final TextEditingController _degreeController;
-
   late final List<TextEditingController> _choiceControllers;
 
   ExamQuestionImageFile? _selectedImage;
@@ -40,25 +38,23 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   bool _imageChanged = false;
   bool _isErrorDialogOpen = false;
 
-  ExamQuestionEntity get _question {
-    return widget.questionDraft.question;
-  }
+  ExamQuestionEntity get _question => widget.questionDraft.question;
 
   bool get _hasChanges {
     if (_questionController.text.trim() != _question.questionText.trim()) {
       return true;
     }
 
-    final int? currentDegree = int.tryParse(_degreeController.text.trim());
+    final currentDegree = int.tryParse(_degreeController.text.trim());
 
     if (currentDegree != _question.degree) {
       return true;
     }
 
-    for (int index = 0; index < _choiceControllers.length; index++) {
-      final String currentChoice = _choiceControllers[index].text.trim();
+    for (var index = 0; index < _choiceControllers.length; index++) {
+      final currentChoice = _choiceControllers[index].text.trim();
 
-      final String originalChoice = index < _question.choices.length
+      final originalChoice = index < _question.choices.length
           ? _question.choices[index].trim()
           : '';
 
@@ -76,10 +72,14 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
 
     _questionController = TextEditingController(text: _question.questionText);
 
-    _degreeController = TextEditingController(text: _question.degree.toString());
+    _degreeController = TextEditingController(
+      text: _question.degree.toString(),
+    );
 
-    _choiceControllers = List<TextEditingController>.generate(4, (int index) {
-      final String choice = index < _question.choices.length ? _question.choices[index] : '';
+    _choiceControllers = List<TextEditingController>.generate(4, (index) {
+      final choice = index < _question.choices.length
+          ? _question.choices[index]
+          : '';
 
       return TextEditingController(text: choice);
     });
@@ -87,10 +87,9 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
     _selectedImage = widget.questionDraft.image;
 
     _questionController.addListener(_onFormValueChanged);
-
     _degreeController.addListener(_onFormValueChanged);
 
-    for (final TextEditingController controller in _choiceControllers) {
+    for (final controller in _choiceControllers) {
       controller.addListener(_onFormValueChanged);
     }
   }
@@ -98,15 +97,13 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   @override
   void dispose() {
     _questionController.removeListener(_onFormValueChanged);
-
     _degreeController.removeListener(_onFormValueChanged);
 
     _questionController.dispose();
     _degreeController.dispose();
 
-    for (final TextEditingController controller in _choiceControllers) {
+    for (final controller in _choiceControllers) {
       controller.removeListener(_onFormValueChanged);
-
       controller.dispose();
     }
 
@@ -116,12 +113,13 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<EditExamQuestionCubit, EditExamQuestionState>(
-      listenWhen: (EditExamQuestionState previous, EditExamQuestionState current) {
-        return current is EditExamQuestionSuccess || current is EditExamQuestionFailure;
+      listenWhen: (previous, current) {
+        return current is EditExamQuestionSuccess ||
+            current is EditExamQuestionFailure;
       },
       listener: _handleState,
-      builder: (BuildContext context, EditExamQuestionState state) {
-        final bool isUpdating = state is EditExamQuestionLoading;
+      builder: (context, state) {
+        final isUpdating = state is EditExamQuestionLoading;
 
         return PopScope(
           canPop: !isUpdating,
@@ -134,10 +132,12 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
     );
   }
 
-  Future<void> _handleState(BuildContext context, EditExamQuestionState state) async {
+  Future<void> _handleState(
+    BuildContext context,
+    EditExamQuestionState state,
+  ) async {
     if (state is EditExamQuestionSuccess) {
       Navigator.of(context).pop(state.questionDraft);
-
       return;
     }
 
@@ -152,7 +152,7 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
         context: context,
         useRootNavigator: false,
         barrierDismissible: false,
-        builder: (BuildContext dialogContext) {
+        builder: (dialogContext) {
           return PopScope(
             canPop: false,
             child: CustomOperationResultDialog(
@@ -174,46 +174,48 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   }
 
   Widget _buildScaffold({required bool isUpdatingQuestion}) {
-    return SafeArea(
-      bottom: false,
-      child: Scaffold(
-        appBar: const CustomHeaderBar(title: 'تعديل سؤال الاختبار العام'),
-        backgroundColor: ColorPalette.background,
-        body: BackgroundStudentLayout(
-          child: SafeArea(
-            child: AppNetworkAwareContent(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(
-                      child: AppAnimations.screenSection(
-                        delay: 120,
-                        child: Form(
-                          key: _formKey,
-                          child: SingleChildScrollView(
-                            physics: const BouncingScrollPhysics(),
-                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                            child: EditExamQuestionForm(
-                              questionController: _questionController,
-                              degreeController: _degreeController,
-                              choiceControllers: _choiceControllers,
-                              selectedImage: _selectedImage,
-                              currentImageUrl: _question.imageUrl,
-                              isCurrentImageRemoved: _removeCurrentImage,
-                              hasChanges: _hasChanges,
-                              isUpdatingQuestion: isUpdatingQuestion,
-                              onImageSelected: _selectImage,
-                              onImageRemoved: _removeImage,
-                              onUpdateQuestionPressed: _updateQuestion,
-                            ),
+    return Scaffold(
+      appBar: const CustomHeaderBar(
+        title: 'تعديل سؤال الاختبار العام',
+        showBackButton: true,
+      ),
+      backgroundColor: ColorPalette.background,
+      body: BackgroundStudentLayout(
+        child: SafeArea(
+          top: false,
+          child: AppNetworkAwareContent(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: AppAnimations.screenSection(
+                      delay: 120,
+                      child: Form(
+                        key: _formKey,
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          keyboardDismissBehavior:
+                              ScrollViewKeyboardDismissBehavior.onDrag,
+                          child: EditExamQuestionForm(
+                            questionController: _questionController,
+                            degreeController: _degreeController,
+                            choiceControllers: _choiceControllers,
+                            selectedImage: _selectedImage,
+                            currentImageUrl: _question.imageUrl,
+                            isCurrentImageRemoved: _removeCurrentImage,
+                            hasChanges: _hasChanges,
+                            isUpdatingQuestion: isUpdatingQuestion,
+                            onImageSelected: _selectImage,
+                            onImageRemoved: _removeImage,
+                            onUpdateQuestionPressed: _updateQuestion,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -227,7 +229,7 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
       return;
     }
 
-    final EditExamQuestionState state = context.read<EditExamQuestionCubit>().state;
+    final state = context.read<EditExamQuestionCubit>().state;
 
     if (state is EditExamQuestionLoading) {
       return;
@@ -237,7 +239,7 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   }
 
   void _selectImage(ExamQuestionImageFile selectedImage) {
-    final EditExamQuestionState state = context.read<EditExamQuestionCubit>().state;
+    final state = context.read<EditExamQuestionCubit>().state;
 
     if (state is EditExamQuestionLoading) {
       return;
@@ -251,17 +253,15 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   }
 
   void _removeImage() {
-    final EditExamQuestionState state = context.read<EditExamQuestionCubit>().state;
+    final state = context.read<EditExamQuestionCubit>().state;
 
     if (state is EditExamQuestionLoading) {
       return;
     }
 
-    final bool hasLocalImage = _selectedImage != null;
-
-    final bool hasOriginalLocalImage = widget.questionDraft.image != null;
-
-    final bool hasRemoteImage = _question.hasImage;
+    final hasLocalImage = _selectedImage != null;
+    final hasOriginalLocalImage = widget.questionDraft.image != null;
+    final hasRemoteImage = _question.hasImage;
 
     if (!hasLocalImage && !hasOriginalLocalImage && !hasRemoteImage) {
       return;
@@ -275,7 +275,7 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
   }
 
   Future<void> _updateQuestion() async {
-    final EditExamQuestionState state = context.read<EditExamQuestionCubit>().state;
+    final state = context.read<EditExamQuestionCubit>().state;
 
     if (state is EditExamQuestionLoading || !_hasChanges) {
       return;
@@ -283,25 +283,23 @@ class _EditExamQuestionContentState extends State<EditExamQuestionContent> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final bool isFormValid = _formKey.currentState?.validate() ?? false;
+    final isFormValid = _formKey.currentState?.validate() ?? false;
 
     if (!isFormValid) {
       return;
     }
 
-    final int? degree = int.tryParse(_degreeController.text.trim());
+    final degree = int.tryParse(_degreeController.text.trim());
 
     if (degree == null) {
       return;
     }
 
-    final List<String> choices = _choiceControllers
-        .map((TextEditingController controller) {
-          return controller.text.trim();
-        })
+    final choices = _choiceControllers
+        .map((controller) => controller.text.trim())
         .toList(growable: false);
 
-    final ExamQuestionImageFile? newImage = _imageChanged && !_removeCurrentImage
+    final newImage = _imageChanged && !_removeCurrentImage
         ? _selectedImage
         : null;
 

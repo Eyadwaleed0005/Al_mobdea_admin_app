@@ -16,7 +16,7 @@ class AddExamQuestionsScreen extends StatelessWidget {
     return BlocProvider<AddExamQuestionCubit>(
       create: (_) => AddExamQuestionCubit(),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
+        value: AppSystemUi.dark(),
         child: AddExamQuestionsContent(examDraft: examDraft),
       ),
     );

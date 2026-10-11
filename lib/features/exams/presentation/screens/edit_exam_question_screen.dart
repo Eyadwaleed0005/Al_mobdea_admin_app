@@ -16,15 +16,12 @@ class EditExamQuestionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<EditExamQuestionCubit>(
-      create: (_) {
-        return EditExamQuestionCubit(
-          questionDraft: questionDraft,
-          updateExamQuestionUseCase:
-              GetIt.instance<UpdateExamQuestionUseCase>(),
-        );
-      },
+      create: (_) => EditExamQuestionCubit(
+        questionDraft: questionDraft,
+        updateExamQuestionUseCase: GetIt.instance<UpdateExamQuestionUseCase>(),
+      ),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
+        value: AppSystemUi.dark(),
         child: EditExamQuestionContent(questionDraft: questionDraft),
       ),
     );

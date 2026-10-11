@@ -17,7 +17,6 @@ class ExamQuestionChoicesFields extends StatelessWidget {
        );
 
   final List<TextEditingController> choiceControllers;
-
   final bool enabled;
 
   static const List<String> _choiceHints = [
@@ -54,42 +53,12 @@ class ExamQuestionChoicesFields extends StatelessWidget {
             style: AppTextStyle.font16TextPrimarySemiBoldKufam(),
           ),
           verticalSpace(16),
-          _buildChoicesGrid(),
+          for (var index = 0; index < choiceControllers.length; index++) ...[
+            if (index > 0) verticalSpace(12),
+            _buildChoiceField(index),
+          ],
         ],
       ),
-    );
-  }
-
-  Widget _buildChoicesGrid() {
-    final List<Widget> rows = <Widget>[];
-
-    for (int index = 0; index < choiceControllers.length; index += 2) {
-      final int firstIndex = index;
-
-      final int secondIndex = index + 1;
-
-      rows.add(
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(child: _buildChoiceField(firstIndex)),
-              horizontalSpace(12),
-              Expanded(child: _buildChoiceField(secondIndex)),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        for (int index = 0; index < rows.length; index++) ...[
-          if (index > 0) verticalSpace(12),
-          rows[index],
-        ],
-      ],
     );
   }
 

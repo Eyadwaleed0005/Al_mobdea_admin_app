@@ -29,7 +29,7 @@ class EditExamScreen extends StatelessWidget {
         gradesRepository: GetIt.instance<GradesRepository>(),
       )..initialize(),
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
+        value: AppSystemUi.dark(),
         child: const EditExamContent(),
       ),
     );

@@ -1,9 +1,9 @@
 import 'package:al_mobdea_admin/app/routes/route_names.dart';
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
-import 'package:al_mobdea_admin/core/widgets/app_error_widget.dart';
-import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
+import 'package:al_mobdea_admin/core/widgets/app_error_widget.dart';
 import 'package:al_mobdea_admin/core/widgets/app_network_aware_content.dart';
+import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/core/widgets/custom_delete_confirmation_bottom_sheet.dart';
 import 'package:al_mobdea_admin/core/widgets/custom_header_bar.dart';
 import 'package:al_mobdea_admin/core/widgets/custom_operation_result_dialog.dart';
@@ -19,9 +19,7 @@ class EditExamContent extends StatefulWidget {
   const EditExamContent({super.key});
 
   @override
-  State<EditExamContent> createState() {
-    return _EditExamContentState();
-  }
+  State<EditExamContent> createState() => _EditExamContentState();
 }
 
 class _EditExamContentState extends State<EditExamContent> {
@@ -34,9 +32,11 @@ class _EditExamContentState extends State<EditExamContent> {
       return false;
     }
 
-    final EditExamState state = context.read<EditExamCubit>().state;
+    final state = context.read<EditExamCubit>().state;
 
-    return state is EditExamReady && !state.isOperating && !state.operationSucceeded;
+    return state is EditExamReady &&
+        !state.isOperating &&
+        !state.operationSucceeded;
   }
 
   @override
@@ -44,27 +44,33 @@ class _EditExamContentState extends State<EditExamContent> {
     return BlocConsumer<EditExamCubit, EditExamState>(
       listenWhen: _shouldListen,
       listener: _showOperationResult,
-      builder: (BuildContext context, EditExamState state) {
-        final bool isOperating = state is EditExamReady && state.isOperating;
+      builder: (context, state) {
+        final isOperating = state is EditExamReady && state.isOperating;
 
         return PopScope(
           canPop: !isOperating,
           child: AbsorbPointer(
             absorbing: isOperating,
-            child: SafeArea(
-              bottom: false,
-              child: Scaffold(
-                appBar: const CustomHeaderBar(title: 'تعديل الاختبار العام'),
-                backgroundColor: ColorPalette.background,
-                body: BackgroundStudentLayout(
-                  child: SafeArea(
-                    child: AppNetworkAwareContent(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [Expanded(child: _buildState(context, state))],
-                        ),
+            child: Scaffold(
+              appBar: const CustomHeaderBar(
+                title: 'تعديل الاختبار العام',
+                showBackButton: true,
+              ),
+              backgroundColor: ColorPalette.background,
+              body: BackgroundStudentLayout(
+                child: SafeArea(
+                  top: false,
+                  child: AppNetworkAwareContent(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16.w,
+                        vertical: 20.h,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(child: _buildState(context, state)),
+                        ],
                       ),
                     ),
                   ),
@@ -88,12 +94,10 @@ class _EditExamContentState extends State<EditExamContent> {
   Widget _buildState(BuildContext context, EditExamState state) {
     return switch (state) {
       EditExamLoading() => const EditExamLoadingSkeleton(),
-
       EditExamError(:final error) => AppErrorWidget(
         message: error.message,
         onRetry: context.read<EditExamCubit>().retry,
       ),
-
       EditExamReady() => AppAnimations.screenSection(
         delay: 120,
         child: EditExamForm(
@@ -101,9 +105,12 @@ class _EditExamContentState extends State<EditExamContent> {
           exam: state.exam,
           grades: state.grades,
           canCloseExam: state.canClose,
-          isSavingChanges: state.isOperating && state.operation == EditExamOperation.save,
-          isClosingExam: state.isOperating && state.operation == EditExamOperation.close,
-          isDeletingExam: state.isOperating && state.operation == EditExamOperation.delete,
+          isSavingChanges:
+              state.isOperating && state.operation == EditExamOperation.save,
+          isClosingExam:
+              state.isOperating && state.operation == EditExamOperation.close,
+          isDeletingExam:
+              state.isOperating && state.operation == EditExamOperation.delete,
           onSaveChangesPressed:
               ({
                 required String examName,
@@ -130,22 +137,29 @@ class _EditExamContentState extends State<EditExamContent> {
     };
   }
 
-  Future<void> _showOperationResult(BuildContext context, EditExamState state) async {
-    if (state is! EditExamReady || state.operation == null || _isDialogOpen || _hasFinished) {
+  Future<void> _showOperationResult(
+    BuildContext context,
+    EditExamState state,
+  ) async {
+    if (state is! EditExamReady ||
+        state.operation == null ||
+        _isDialogOpen ||
+        _hasFinished) {
       return;
     }
 
-    final bool succeeded = state.operationSucceeded;
+    final succeeded = state.operationSucceeded;
     final error = state.operationError;
 
     if (!succeeded && error == null) {
       return;
     }
 
-    final String successMessage = switch (state.operation!) {
+    final successMessage = switch (state.operation!) {
       EditExamOperation.save => 'تم حفظ تعديلات الاختبار بنجاح.',
       EditExamOperation.close => 'تم إغلاق الاختبار بنجاح.',
-      EditExamOperation.delete => 'تم حذف الاختبار وأسئلته وصوره ومحاولات الطلاب ونتائجهم بنجاح.',
+      EditExamOperation.delete =>
+        'تم حذف الاختبار وأسئلته وصوره ومحاولات الطلاب ونتائجهم بنجاح.',
     };
 
     _isDialogOpen = true;
@@ -157,11 +171,11 @@ class _EditExamContentState extends State<EditExamContent> {
         return;
       }
 
-      final bool? confirmed = await showDialog<bool>(
+      final confirmed = await showDialog<bool>(
         context: context,
         useRootNavigator: false,
         barrierDismissible: false,
-        builder: (BuildContext dialogContext) {
+        builder: (dialogContext) {
           return PopScope(
             canPop: false,
             child: CustomOperationResultDialog(
@@ -184,7 +198,6 @@ class _EditExamContentState extends State<EditExamContent> {
       }
 
       _hasFinished = true;
-
       Navigator.of(context).pop();
     } finally {
       _isDialogOpen = false;
@@ -220,8 +233,8 @@ class _EditExamContentState extends State<EditExamContent> {
       return;
     }
 
-    final EditExamCubit cubit = context.read<EditExamCubit>();
-    final EditExamState currentState = cubit.state;
+    final cubit = context.read<EditExamCubit>();
+    final currentState = cubit.state;
 
     if (currentState is! EditExamReady || !currentState.canClose) {
       return;
@@ -229,7 +242,7 @@ class _EditExamContentState extends State<EditExamContent> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final bool confirmed = await _confirm(
+    final confirmed = await _confirm(
       title: 'إغلاق الاختبار',
       message:
           'هل تريد إغلاق الاختبار؟ '
@@ -251,8 +264,8 @@ class _EditExamContentState extends State<EditExamContent> {
       return;
     }
 
-    final EditExamCubit cubit = context.read<EditExamCubit>();
-    final EditExamState currentState = cubit.state;
+    final cubit = context.read<EditExamCubit>();
+    final currentState = cubit.state;
 
     if (currentState is! EditExamReady) {
       return;
@@ -260,7 +273,7 @@ class _EditExamContentState extends State<EditExamContent> {
 
     FocusManager.instance.primaryFocus?.unfocus();
 
-    final bool confirmed = await _confirm(
+    final confirmed = await _confirm(
       title: 'حذف الاختبار',
       message: currentState.exam.isEnded
           ? 'سيتم حذف الاختبار وأسئلته وصوره ومحاولات الطلاب '
@@ -285,8 +298,8 @@ class _EditExamContentState extends State<EditExamContent> {
       return;
     }
 
-    final EditExamCubit cubit = context.read<EditExamCubit>();
-    final EditExamState currentState = cubit.state;
+    final cubit = context.read<EditExamCubit>();
+    final currentState = cubit.state;
 
     if (currentState is! EditExamReady) {
       return;
@@ -297,8 +310,10 @@ class _EditExamContentState extends State<EditExamContent> {
     _isQuestionsRouteOpen = true;
 
     try {
-      await Navigator.of(context)
-          .pushNamed(RouteNames.examQuestionsScreen, arguments: currentState.exam.examId);
+      await Navigator.of(context).pushNamed(
+        RouteNames.examQuestionsScreen,
+        arguments: currentState.exam.examId,
+      );
     } finally {
       _isQuestionsRouteOpen = false;
     }

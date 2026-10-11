@@ -16,19 +16,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   await SystemChrome.setPreferredOrientations(const [
     DeviceOrientation.portraitUp,
   ]);
-
   setupServiceLocator();
-
   await ScreenUtil.ensureScreenSize();
-
   unawaited(getIt<NetworkStatusCubit>().startMonitoring());
-
   DevicePreviewService.run(child: const MyApp());
 }
 
@@ -38,7 +32,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final routeObserver = getIt<AppRouteObserver>();
-
     return BlocProvider<NetworkStatusCubit>.value(
       value: getIt<NetworkStatusCubit>(),
       child: MaterialApp(
