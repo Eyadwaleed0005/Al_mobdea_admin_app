@@ -4,7 +4,7 @@ import 'package:al_mobdea_admin/app/dependency_injection/features/dashboard_inje
 import 'package:al_mobdea_admin/app/dependency_injection/features/exams_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/grades_injection.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/lesson_exams_dependencies.dart';
-import 'package:al_mobdea_admin/app/dependency_injection/features/live_session_injection.dart';
+import 'package:al_mobdea_admin/app/dependency_injection/features/live_session_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/lessons_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/students_dependencies.dart';
 import 'package:al_mobdea_admin/app/dependency_injection/features/student_exam_results_dependencies.dart';

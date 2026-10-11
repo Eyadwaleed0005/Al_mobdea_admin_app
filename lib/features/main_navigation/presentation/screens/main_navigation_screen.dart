@@ -65,10 +65,15 @@ class MainNavigationView extends StatelessWidget {
           icon: Icons.assignment_outlined,
         );
       case 4:
-        return const _PlaceholderScreen(
-          title: 'الحصة',
-          description: 'ستظهر الحصة المباشرة هنا.',
-          icon: Icons.videocam_outlined,
+        return BlocProvider<LiveSessionCubit>(
+          create: (_) => LiveSessionCubit(
+            streamGradesUseCase: getIt<StreamGradesUseCase>(),
+            getLiveSessionUseCase: getIt<GetLiveSessionUseCase>(),
+            saveLiveSessionUseCase: getIt<SaveLiveSessionUseCase>(),
+            deleteLiveSessionUseCase: getIt<DeleteLiveSessionUseCase>(),
+            networkStatusCubit: getIt<NetworkStatusCubit>(),
+          )..initialize(),
+          child: const LiveSessionScreen(),
         );
       default:
         return const HomeScreen();

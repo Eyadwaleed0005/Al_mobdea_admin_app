@@ -10,6 +10,7 @@ class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton,
     this.onBack,
     this.onProfileTap,
+    this.titleStyle,
   });
 
   final String title;
@@ -18,6 +19,7 @@ class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? showBackButton;
   final VoidCallback? onBack;
   final VoidCallback? onProfileTap;
+  final TextStyle? titleStyle;
 
   @override
   Size get preferredSize => const CustomAppBar(title: '').preferredSize;
@@ -30,6 +32,7 @@ class CustomHeaderBar extends StatelessWidget implements PreferredSizeWidget {
       showBackButton: showBackButton,
       onBack: onBack,
       onProfileTap: onProfileTap,
+      titleStyle: titleStyle,
     );
   }
 }

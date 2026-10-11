@@ -43,6 +43,9 @@ import 'package:al_mobdea_admin/features/lessons/domain/use_cases/update_lesson_
 import 'package:al_mobdea_admin/features/lesson_exams/data/data_sources/lesson_exams_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/live_session/data/data_sources/live_sessions_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/live_session/domain/repository/live_sessions_repository.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/delete_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/get_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/save_live_session_use_case.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/repositories/lesson_exam_repository.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/use_cases/create_lesson_exam_question_use_case.dart';
 import 'package:al_mobdea_admin/features/lesson_exams/domain/use_cases/delete_lesson_exam_question_use_case.dart';
@@ -297,6 +300,15 @@ class MockLiveSessionsRemoteDataSource extends Mock
 
 class MockLiveSessionsRepository extends Mock
     implements LiveSessionsRepository {}
+
+class MockGetLiveSessionUseCase extends Mock
+    implements GetLiveSessionUseCase {}
+
+class MockSaveLiveSessionUseCase extends Mock
+    implements SaveLiveSessionUseCase {}
+
+class MockDeleteLiveSessionUseCase extends Mock
+    implements DeleteLiveSessionUseCase {}
 
 // Grades feature mocks
 class MockGradesRemoteDataSource extends Mock
