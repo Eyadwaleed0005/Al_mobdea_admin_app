@@ -29,61 +29,56 @@ class ViewLessonsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: AppSystemUi.light(),
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: const CustomHeaderBar(title: 'إدارة الدروس'),
-          backgroundColor: ColorPalette.background,
-          body: BackgroundStudentLayout(
-            child: SafeArea(
-              child: AppNetworkAwareContent(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 20.h,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: AppAnimations.screenSection(
-                          delay: 0,
-                          child: BlocBuilder<ViewLessonsCubit, ViewLessonsState>(
-                            builder: (context, state) {
-                              if (state is ViewLessonsInitial ||
-                                  state is ViewLessonsLoading) {
-                                return const ViewLessonsLoadingSkeleton();
-                              }
-
-                              if (state is ViewLessonsFailure) {
-                                return AppErrorWidget(
-                                  message: state.error.message,
-                                  onRetry: () {
-                                    context.read<ViewLessonsCubit>().retry();
-                                  },
-                                );
-                              }
-
-                              if (state is ViewLessonsDataSuccess) {
-                                return ViewLessonsContent(
-                                  state: state,
-                                  onAddLessonPressed: () {
-                                    _handleAddLessonPressed(context);
-                                  },
-                                  onLessonTap: (lesson) {
-                                    _handleLessonTap(context, lesson);
-                                  },
-                                );
-                              }
-
+      value: AppSystemUi.dark(),
+      child: Scaffold(
+        appBar: const CustomHeaderBar(title: 'إدارة الدروس'),
+        backgroundColor: ColorPalette.background,
+        body: BackgroundStudentLayout(
+          child: SafeArea(
+            top: false,
+            child: AppNetworkAwareContent(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: AppAnimations.screenSection(
+                        delay: 0,
+                        child: BlocBuilder<ViewLessonsCubit, ViewLessonsState>(
+                          builder: (context, state) {
+                            if (state is ViewLessonsInitial ||
+                                state is ViewLessonsLoading) {
                               return const ViewLessonsLoadingSkeleton();
-                            },
-                          ),
+                            }
+
+                            if (state is ViewLessonsFailure) {
+                              return AppErrorWidget(
+                                message: state.error.message,
+                                onRetry: () {
+                                  context.read<ViewLessonsCubit>().retry();
+                                },
+                              );
+                            }
+
+                            if (state is ViewLessonsDataSuccess) {
+                              return ViewLessonsContent(
+                                state: state,
+                                onAddLessonPressed: () {
+                                  _handleAddLessonPressed(context);
+                                },
+                                onLessonTap: (lesson) {
+                                  _handleLessonTap(context, lesson);
+                                },
+                              );
+                            }
+
+                            return const ViewLessonsLoadingSkeleton();
+                          },
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -118,9 +113,7 @@ class ViewLessonsScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).pushNamed(
-      RouteNames.editLessonScreen,
-      arguments: lessonId,
-    );
+    Navigator.of(context)
+        .pushNamed(RouteNames.editLessonScreen, arguments: lessonId);
   }
 }

@@ -1,5 +1,7 @@
 import 'package:al_mobdea_admin/app/routes/feature_routes/app_startup_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/dashboard_routes.dart';
+import 'package:al_mobdea_admin/app/routes/feature_routes/exams_routes.dart';
+import 'package:al_mobdea_admin/app/routes/feature_routes/lessons_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/main_navigation_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/students_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/study_notes_routes.dart';
@@ -13,6 +15,8 @@ abstract final class AppRoutes {
         DashboardRoutes.generateRoute(settings) ??
         MainNavigationRoutes.generateRoute(settings) ??
         StudentsRoutes.generateRoute(settings) ??
-        StudyNotesRoutes.generateRoute(settings);
+        StudyNotesRoutes.generateRoute(settings) ??
+        ExamsRoutes.generateRoute(settings) ??
+        LessonsRoutes.generateRoute(settings);
   }
 }

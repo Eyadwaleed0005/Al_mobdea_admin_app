@@ -1,3 +1,4 @@
+import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
 
 sealed class ContentManagementState {
@@ -13,24 +14,27 @@ final class ContentManagementLoading extends ContentManagementState {
 }
 
 final class ContentManagementLoaded extends ContentManagementState {
-  ContentManagementLoaded({required List<StudyNoteEntity> notes})
-    : notes = List<StudyNoteEntity>.unmodifiable(notes);
+  ContentManagementLoaded({
+    required List<LessonEntity> lessons,
+    required List<StudyNoteEntity> notes,
+  }) : lessons = List<LessonEntity>.unmodifiable(lessons),
+       notes = List<StudyNoteEntity>.unmodifiable(notes);
 
+  final List<LessonEntity> lessons;
   final List<StudyNoteEntity> notes;
+
+  int get lessonsCount => lessons.length;
 
   int get notesCount => notes.length;
 
-  int get publishedNotesCount => notes.where((note) => note.isPublished).length;
+  String get lessonsSubtitle => LessonEntity.summarySubtitle(lessons);
 
-  int get draftNotesCount => notesCount - publishedNotesCount;
+  String get notesSubtitle => StudyNoteEntity.summarySubtitle(notes);
 
-  String get notesSubtitle {
-    return StudyNoteEntity.summarySubtitle(notes);
-  }
-
-  String get welcomeSubtitle {
-    return StudyNoteEntity.contentSummarySubtitle(notesCount: notesCount);
-  }
+  String get welcomeSubtitle => [
+    LessonEntity.countSubtitle(lessons),
+    StudyNoteEntity.countSubtitle(notes),
+  ].join(' • ');
 }
 
 final class ContentManagementFailure extends ContentManagementState {

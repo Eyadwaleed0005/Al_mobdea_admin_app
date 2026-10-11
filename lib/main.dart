@@ -17,13 +17,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  await SystemChrome.setPreferredOrientations(
-    const [DeviceOrientation.portraitUp],
-  );
+  await SystemChrome.setPreferredOrientations(const [
+    DeviceOrientation.portraitUp,
+  ]);
 
   setupServiceLocator();
 
@@ -31,9 +29,7 @@ Future<void> main() async {
 
   unawaited(getIt<NetworkStatusCubit>().startMonitoring());
 
-  DevicePreviewService.run(
-    child: const MyApp(),
-  );
+  DevicePreviewService.run(child: const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -49,10 +45,7 @@ class MyApp extends StatelessWidget {
         title: 'المبدع - لوحة التحكم',
         debugShowCheckedModeBanner: false,
         locale: DevicePreviewService.locale(context),
-        theme: ThemeData(
-          fontFamily: 'Tajawal',
-          useMaterial3: true,
-        ),
+        theme: ThemeData(fontFamily: 'Tajawal', useMaterial3: true),
         initialRoute: RouteNames.splashScreen,
         onGenerateRoute: AppRoutes.generateRoute,
         navigatorObservers: [routeObserver],

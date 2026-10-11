@@ -22,52 +22,46 @@ class AddLessonScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AddLessonFeedbackListener(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
-        child: SafeArea(
-          bottom: false,
-          child: Scaffold(
-            appBar: const CustomHeaderBar(title: 'إضافة درس'),
-            backgroundColor: ColorPalette.background,
-            body: BackgroundStudentLayout(
-              child: SafeArea(
-                child: AppNetworkAwareContent(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 20.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: AppAnimations.screenSection(
-                            delay: 0,
-                            child: BlocBuilder<AddLessonCubit, AddLessonState>(
-                              builder: (context, state) {
-                                if (state.isPageLoading) {
-                                  return const AddLessonLoadingSkeleton();
-                                }
+        value: AppSystemUi.dark(),
+        child: Scaffold(
+          appBar: const CustomHeaderBar(
+            title: 'إضافة درس',
+            showBackButton: true,
+          ),
+          backgroundColor: ColorPalette.background,
+          body: BackgroundStudentLayout(
+            child: SafeArea(
+              top: false,
+              child: AppNetworkAwareContent(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 20.h,
+                  ),
+                  child: AppAnimations.screenSection(
+                    delay: 0,
+                    child: BlocBuilder<AddLessonCubit, AddLessonState>(
+                      builder: (context, state) {
+                        if (state.isPageLoading) {
+                          return const AddLessonLoadingSkeleton();
+                        }
 
-                                if (state.hasPageFailure &&
-                                    state.error != null) {
-                                  return AppErrorWidget(
-                                    message: state.error!.message,
-                                    onRetry: () {
-                                      context.read<AddLessonCubit>().retry();
-                                    },
-                                  );
-                                }
+                        if (state.hasPageFailure) {
+                          return AppErrorWidget(
+                            message:
+                                state.error?.message ??
+                                'تعذر تحميل بيانات إضافة الدرس.',
+                            onRetry: () {
+                              context.read<AddLessonCubit>().retry();
+                            },
+                          );
+                        }
 
-                                if (state.isPageReady) {
-                                  return AddLessonContent(state: state);
-                                }
-
-                                return const AddLessonLoadingSkeleton();
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
+                        if (state.isPageReady) {
+                          return AddLessonContent(state: state);
+                        }
+                        return const AddLessonLoadingSkeleton();
+                      },
                     ),
                   ),
                 ),

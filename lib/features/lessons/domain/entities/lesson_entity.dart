@@ -29,6 +29,53 @@ class LessonEntity {
     return pdfStoragePath?.trim().isNotEmpty ?? false;
   }
 
+  static String countSubtitle(List<LessonEntity> lessons) {
+    return _countLabel(lessons.length);
+  }
+
+  static String summarySubtitle(List<LessonEntity> lessons) {
+    if (lessons.isEmpty) {
+      return 'لا توجد دروس حتى الآن';
+    }
+
+    final total = lessons.length;
+    final published = lessons.where((lesson) => lesson.isPublished).length;
+    final drafts = total - published;
+    final countLabel = countSubtitle(lessons);
+
+    if (published == total) {
+      return '$countLabel • جميعها منشورة';
+    }
+
+    if (drafts == total) {
+      return '$countLabel • جميعها مسودات';
+    }
+
+    return '$countLabel'
+        ' • منشورة: ${_arabicNumber(published)}'
+        ' • مسودات: ${_arabicNumber(drafts)}';
+  }
+
+  static String _countLabel(int count) {
+    if (count == 0) return '٠ دروس';
+    if (count == 1) return 'درس واحد';
+    if (count == 2) return 'درسان';
+
+    final remainder = count % 100;
+    final noun = remainder >= 3 && remainder <= 10 ? 'دروس' : 'درسًا';
+
+    return '${_arabicNumber(count)} $noun';
+  }
+
+  static String _arabicNumber(int number) {
+    const digits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+    return number.toString().split('').map((character) {
+      final digit = int.tryParse(character);
+      return digit == null ? character : digits[digit];
+    }).join();
+  }
+
   LessonEntity copyWith({
     String? lessonId,
     String? gradeId,

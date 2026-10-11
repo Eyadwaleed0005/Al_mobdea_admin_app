@@ -50,70 +50,66 @@ class EditLessonScreen extends StatelessWidget {
       return;
     }
 
-    context.read<EditLessonCubit>().deleteLesson();
+    final cubit = context.read<EditLessonCubit>();
+    final currentState = cubit.state;
+
+    if (currentState.isDeleting || !currentState.canDelete) {
+      return;
+    }
+
+    cubit.deleteLesson();
   }
 
   @override
   Widget build(BuildContext context) {
     return EditLessonFeedbackListener(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
-        child: SafeArea(
-          bottom: false,
-          child: Scaffold(
-            appBar: const CustomHeaderBar(title: 'تعديل الدرس'),
-            backgroundColor: ColorPalette.background,
-            body: BackgroundStudentLayout(
-              child: SafeArea(
-                child: AppNetworkAwareContent(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 20.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: BlocBuilder<EditLessonCubit, EditLessonState>(
-                            builder: (context, state) {
-                              if (state.isInitial || state.isPageLoading) {
-                                return const EditLessonLoadingSkeleton();
-                              }
+        value: AppSystemUi.dark(),
+        child: Scaffold(
+          appBar: const CustomHeaderBar(
+            title: 'تعديل الدرس',
+            showBackButton: true,
+          ),
+          backgroundColor: ColorPalette.background,
+          body: BackgroundStudentLayout(
+            child: SafeArea(
+              top: false,
+              child: AppNetworkAwareContent(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 20.h,
+                  ),
+                  child: BlocBuilder<EditLessonCubit, EditLessonState>(
+                    builder: (context, state) {
+                      if (state.isInitial || state.isPageLoading) {
+                        return const EditLessonLoadingSkeleton();
+                      }
 
-                              if (state.hasPageFailure) {
-                                final error = state.pageError;
+                      if (state.hasPageFailure) {
+                        return AppErrorWidget(
+                          message:
+                              state.pageError?.message ??
+                              'تعذر تحميل بيانات الدرس.',
+                          onRetry: () {
+                            context.read<EditLessonCubit>().retry();
+                          },
+                        );
+                      }
 
-                                if (error == null) {
-                                  return const SizedBox.shrink();
-                                }
-
-                                return AppErrorWidget(
-                                  message: error.message,
-                                  onRetry: () {
-                                    context.read<EditLessonCubit>().retry();
-                                  },
-                                );
-                              }
-
-                              if (state.isPageReady) {
-                                return EditLessonContent(
-                                  state: state,
-                                  onDeletePressed: () {
-                                    _showDeleteConfirmation(
-                                      context: context,
-                                      state: state,
-                                    );
-                                  },
-                                );
-                              }
-
-                              return const EditLessonLoadingSkeleton();
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                      if (state.isPageReady) {
+                        return EditLessonContent(
+                          state: state,
+                          onDeletePressed: () {
+                            _showDeleteConfirmation(
+                              context: context,
+                              state: state,
+                            );
+                          },
+                        );
+                      }
+                      return const EditLessonLoadingSkeleton();
+                    },
                   ),
                 ),
               ),
