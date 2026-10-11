@@ -1,8 +1,20 @@
+import 'package:al_mobdea_admin/app/dependency_injection/service_locator.dart';
+import 'package:al_mobdea_admin/core/connection/cubit/network_status_cubit.dart';
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
 import 'package:al_mobdea_admin/features/dashboard/presentation/screens/home_screen.dart';
+import 'package:al_mobdea_admin/features/exams/presentation/screens/view_exams_screen.dart';
+import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/delete_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/get_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/domain/use_cases/save_live_session_use_case.dart';
+import 'package:al_mobdea_admin/features/live_session/presentation/cubit/live_session_cubit.dart';
+import 'package:al_mobdea_admin/features/live_session/presentation/screens/live_session_screen.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/cubit/bottom_navigation_cubit.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/widgets/custom_bottom_nav_bar.dart';
+import 'package:al_mobdea_admin/features/students/presentation/cubit/student_management_cubit.dart';
+import 'package:al_mobdea_admin/features/students/presentation/screens/student_management_screen.dart';
+import 'package:al_mobdea_admin/features/study_notes/presentation/screens/content_management_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -55,16 +67,18 @@ class MainNavigationView extends StatelessWidget {
     switch (index) {
       case 0:
         return const HomeScreen();
+
       case 1:
-        return const _PlaceholderScreen(
-          title: 'الطلاب',
-          description: 'ستظهر إدارة الطلاب هنا.',
-          icon: Icons.group_outlined,
+        return BlocProvider<StudentManagementCubit>(
+          create: (_) => getIt<StudentManagementCubit>(),
+          child: const StudentManagementScreen(),
         );
       case 2:
         return const ContentManagementScreen();
+
       case 3:
         return const ViewExamsScreen();
+
       case 4:
         return BlocProvider<LiveSessionCubit>(
           create: (_) => LiveSessionCubit(
@@ -76,6 +90,7 @@ class MainNavigationView extends StatelessWidget {
           )..initialize(),
           child: const LiveSessionScreen(),
         );
+
       default:
         return const HomeScreen();
     }

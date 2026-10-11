@@ -62,7 +62,7 @@ class ColorPalette {
   static const Color textPrimary = Color(0xFF27191D);
   static const Color textDark = textPrimary;
   static const Color textSecondary = Color(0xFF604B49);
-  static const Color textMuted = wine100;
+  static const Color textMuted = Color(0xFF9A807C);
   static const Color textLight = Color(0xFFFFFFFF);
   static const Color textHighLight = gold400;
   static const Color textBlack = textPrimary;
@@ -98,6 +98,7 @@ class ColorPalette {
   static const Color softSage = wine100;
   static const Color paleMint = wine50;
   static const Color black = Color(0xFF000000);
+  static const Color semanticSuccessSoftBg = Color(0xFFE9F5EE);
 
   // Shadow helper
   static const Color primaryShadow = Color(0x1464051F);

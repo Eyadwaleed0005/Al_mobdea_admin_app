@@ -1,4 +1,5 @@
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_service.dart';
+import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/auth/firebase_student_auth_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/auth/student_auth_remote_data_source.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/firestore/firebase_students_remote_data_source.dart';
@@ -17,6 +18,7 @@ import 'package:al_mobdea_admin/features/students/domain/use_cases/update_studen
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_profile_use_case.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_status_use_case.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_subscription_use_case.dart';
+import 'package:al_mobdea_admin/features/students/presentation/cubit/student_management_cubit.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:get_it/get_it.dart';
 
@@ -91,4 +93,11 @@ void registerStudentsDependencies(GetIt getIt) {
   getIt.registerLazySingleton<DeleteStudentUseCase>(
     () => DeleteStudentUseCase(studentAuthRepository: getIt<StudentAuthRepository>()),
   );
+  // Cubits
+getIt.registerFactory<StudentManagementCubit>(
+  () => StudentManagementCubit(
+    streamStudentsUseCase: getIt<StreamStudentsUseCase>(),
+    streamGradesUseCase: getIt<StreamGradesUseCase>(),
+  ),
+);
 }

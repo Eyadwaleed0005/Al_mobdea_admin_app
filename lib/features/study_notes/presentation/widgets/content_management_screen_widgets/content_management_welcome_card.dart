@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ContentManagementWelcomeCard extends StatelessWidget {
-  const ContentManagementWelcomeCard({super.key});
+  const ContentManagementWelcomeCard({super.key, required this.subtitle});
+
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,7 @@ class ContentManagementWelcomeCard extends StatelessWidget {
           ),
           verticalSpace(12),
           Text(
-            '٢٤ درسًا • ١٢ ملزمة • ٦ وحدات دراسية',
+            subtitle,
             textAlign: TextAlign.right,
             textDirection: TextDirection.rtl,
             style: AppTextStyle.font13TextPrimaryRegularTajawal().copyWith(

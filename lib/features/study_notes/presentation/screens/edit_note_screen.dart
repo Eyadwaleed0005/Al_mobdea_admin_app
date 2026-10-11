@@ -23,85 +23,83 @@ class EditNoteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return EditNoteFeedbackListener(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
-        child: SafeArea(
-          bottom: false,
-          child: Scaffold(
-            appBar: CustomHeaderBar(title: 'تعديل المذكرة'),
-            backgroundColor: ColorPalette.background,
-            body: BackgroundStudentLayout(
-              child: SafeArea(
-                child: AppNetworkAwareContent(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 20.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: AppAnimations.screenSection(
-                            delay: 0,
-                            child: BlocBuilder<EditNoteCubit, EditNoteState>(
-                              builder: (context, state) {
-                                if (state.isInitial || state.isPageLoading) {
-                                  return const EditNoteLoadingSkeleton();
-                                }
-          
-                                if (state.hasPageFailure) {
-                                  return AppErrorWidget(
-                                    message:
-                                        state.pageError?.message ??
-                                        'تعذر تحميل بيانات المذكرة.',
-                                    onRetry: () {
-                                      context.read<EditNoteCubit>().retry();
-                                    },
-                                  );
-                                }
-          
-                                if (state.isPageReady) {
-                                  return EditNoteContent(
-                                    state: state,
-                                    onDeletePressed: () async {
-                                      if (state.isDeleting || !state.canDelete) {
-                                        return;
-                                      }
-          
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-          
-                                      final noteName = state.note?.name.trim();
-          
-                                      final confirmed =
-                                          await showCustomDeleteConfirmationBottomSheet(
-                                            context,
-                                            title: 'حذف المذكرة',
-                                            message:
-                                                noteName != null &&
-                                                    noteName.isNotEmpty
-                                                ? 'هل أنت متأكد من حذف مذكرة "$noteName"؟ سيتم حذف المذكرة وملف PDF الخاص بها نهائيًا، ولا يمكن التراجع عن هذه العملية.'
-                                                : 'هل أنت متأكد من حذف هذه المذكرة؟ سيتم حذف المذكرة وملف PDF الخاص بها نهائيًا، ولا يمكن التراجع عن هذه العملية.',
-                                            confirmText: 'حذف المذكرة',
-                                            cancelText: 'إلغاء',
-                                          );
-          
-                                      if (!context.mounted || !confirmed) {
-                                        return;
-                                      }
-          
-                                      context.read<EditNoteCubit>().deleteNote();
-                                    },
-                                  );
-                                }
-          
+        value: AppSystemUi.dark(),
+        child: Scaffold(
+          appBar: CustomHeaderBar(title: 'تعديل المذكرة'),
+          backgroundColor: ColorPalette.background,
+          body: BackgroundStudentLayout(
+            child: SafeArea(
+              top: false,
+              child: AppNetworkAwareContent(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 20.h,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: AppAnimations.screenSection(
+                          delay: 0,
+                          child: BlocBuilder<EditNoteCubit, EditNoteState>(
+                            builder: (context, state) {
+                              if (state.isInitial || state.isPageLoading) {
                                 return const EditNoteLoadingSkeleton();
-                              },
-                            ),
+                              }
+
+                              if (state.hasPageFailure) {
+                                return AppErrorWidget(
+                                  message:
+                                      state.pageError?.message ??
+                                      'تعذر تحميل بيانات المذكرة.',
+                                  onRetry: () {
+                                    context.read<EditNoteCubit>().retry();
+                                  },
+                                );
+                              }
+
+                              if (state.isPageReady) {
+                                return EditNoteContent(
+                                  state: state,
+                                  onDeletePressed: () async {
+                                    if (state.isDeleting || !state.canDelete) {
+                                      return;
+                                    }
+
+                                    FocusManager.instance.primaryFocus
+                                        ?.unfocus();
+
+                                    final noteName = state.note?.name.trim();
+
+                                    final confirmed =
+                                        await showCustomDeleteConfirmationBottomSheet(
+                                          context,
+                                          title: 'حذف المذكرة',
+                                          message:
+                                              noteName != null &&
+                                                  noteName.isNotEmpty
+                                              ? 'هل أنت متأكد من حذف مذكرة "$noteName"؟ سيتم حذف المذكرة وملف PDF الخاص بها نهائيًا، ولا يمكن التراجع عن هذه العملية.'
+                                              : 'هل أنت متأكد من حذف هذه المذكرة؟ سيتم حذف المذكرة وملف PDF الخاص بها نهائيًا، ولا يمكن التراجع عن هذه العملية.',
+                                          confirmText: 'حذف المذكرة',
+                                          cancelText: 'إلغاء',
+                                        );
+
+                                    if (!context.mounted || !confirmed) {
+                                      return;
+                                    }
+
+                                    context.read<EditNoteCubit>().deleteNote();
+                                  },
+                                );
+                              }
+
+                              return const EditNoteLoadingSkeleton();
+                            },
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

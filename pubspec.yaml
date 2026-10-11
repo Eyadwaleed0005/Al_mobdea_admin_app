@@ -50,6 +50,7 @@ dependencies:
   internet_connection_checker_plus: ^3.1.2
   shared_preferences: ^2.5.5
   flutter_svg: ^2.0.17
+  device_preview_plus: ^2.5.5
 
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4

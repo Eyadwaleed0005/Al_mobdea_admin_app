@@ -37,16 +37,21 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   static const double defaultToolbarHeight = 74.0;
 
   @override
-  Size get preferredSize => Size.fromHeight((toolbarHeight ?? defaultToolbarHeight).h);
+  Size get preferredSize =>
+      Size.fromHeight((toolbarHeight ?? defaultToolbarHeight).h);
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.of(context).padding.top;
     final totalHeight = preferredSize.height + topPadding;
     final canPop = Navigator.of(context).canPop();
-    final bool shouldShowBack = showBackButton ?? (canPop && !showProfileIcon);
+    final shouldShowBack = showBackButton ?? (canPop && !showProfileIcon);
 
     final barColor = backgroundColor ?? ColorPalette.primary;
+    final effectiveTitleStyle =
+        (titleStyle ?? AppTextStyle.font18TextLightSemiBoldKufam()).copyWith(
+          color: titleColor,
+        );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
@@ -61,10 +66,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             Positioned.fill(
               child: CustomPaint(
-                painter: _CurvedAppBarPainter(color: barColor, topPadding: topPadding),
+                painter: _CurvedAppBarPainter(
+                  color: barColor,
+                  topPadding: topPadding,
+                ),
               ),
             ),
-
             Positioned(
               top: topPadding,
               left: 0,
@@ -76,19 +83,24 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   textDirection: TextDirection.ltr,
                   children: [
                     _buildLeading(context, shouldShowBack: shouldShowBack),
-
-                    const Spacer(),
                     ...?actions,
-
-                    Flexible(
+                    Expanded(
                       child: Padding(
                         padding: EdgeInsets.only(right: 8.w, left: 12.w),
-                        child: Text(
-                          title,
-                          textDirection: TextDirection.rtl,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: titleStyle ?? AppTextStyle.font18TextLightSemiBoldKufam(),
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              title,
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.right,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: effectiveTitleStyle,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -167,7 +179,14 @@ class _CurvedAppBarPainter extends CustomPainter {
         apexX,
         apexY,
       )
-      ..cubicTo(apexX - apexX * 0.45, apexY, apexX * 0.16, leftY - (leftY - apexY) * 0.22, 0, leftY)
+      ..cubicTo(
+        apexX - apexX * 0.45,
+        apexY,
+        apexX * 0.16,
+        leftY - (leftY - apexY) * 0.22,
+        0,
+        leftY,
+      )
       ..lineTo(0, 0)
       ..close();
 

@@ -21,7 +21,6 @@ class CustomDatePickerField extends StatelessWidget {
   });
 
   final TextEditingController controller;
-
   final String hintText;
   final String? labelText;
 
@@ -31,7 +30,6 @@ class CustomDatePickerField extends StatelessWidget {
   final DateTime? lastDate;
 
   final ValueChanged<DateTime> onDateSelected;
-
   final FormFieldValidator<String>? validator;
 
   final bool isRequired;
@@ -41,322 +39,221 @@ class CustomDatePickerField extends StatelessWidget {
     return DateTime(date.year, date.month, date.day);
   }
 
-  DateTime _getInitialDate({
-    required DateTime first,
-    required DateTime last,
-  }) {
-    final date = _normalizeDate(
-      selectedDate ?? initialDate ?? DateTime.now(),
-    );
+  DateTime _getInitialDate({required DateTime first, required DateTime last}) {
+    final date = _normalizeDate(selectedDate ?? initialDate ?? DateTime.now());
 
-    if (date.isBefore(first)) {
-      return first;
-    }
-
-    if (date.isAfter(last)) {
-      return last;
-    }
+    if (date.isBefore(first)) return first;
+    if (date.isAfter(last)) return last;
 
     return date;
   }
 
   String _formatDate(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
-
     final month = date.month.toString().padLeft(2, '0');
 
     return '$day/$month/${date.year}';
   }
 
-  Future<void> _openDatePicker(BuildContext context) async {
-    if (!enabled) {
-      return;
+  Color? _selectionBackground(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) return null;
+
+    if (states.contains(WidgetState.selected)) {
+      return ColorPalette.primary;
     }
 
-    final normalizedFirstDate = _normalizeDate(
-      firstDate ?? DateTime(2000),
+    return null;
+  }
+
+  Color _selectionForeground(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) {
+      return ColorPalette.disabled;
+    }
+
+    if (states.contains(WidgetState.selected)) {
+      return ColorPalette.surface;
+    }
+
+    return ColorPalette.textPrimary;
+  }
+
+  Color? _interactionOverlay(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) return null;
+
+    if (states.contains(WidgetState.pressed) ||
+        states.contains(WidgetState.hovered) ||
+        states.contains(WidgetState.focused)) {
+      return ColorPalette.primary.withValues(alpha: 0.10);
+    }
+
+    return null;
+  }
+
+  OutlineInputBorder _inputBorder(Color color, double width) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: color, width: width),
+    );
+  }
+
+  ThemeData _pickerTheme(ThemeData theme) {
+    // Use logical pixel sizes inside the dialog.
+    final bodyStyle = AppTextStyle.font15TextPrimaryMediumTajawal().copyWith(
+      fontSize: 15,
     );
 
-    final normalizedLastDate = _normalizeDate(
-      lastDate ?? DateTime(2100),
-    );
+    return theme.copyWith(
+      disabledColor: ColorPalette.disabled,
+      dividerColor: ColorPalette.divider,
+      colorScheme: theme.colorScheme.copyWith(
+        primary: ColorPalette.primary,
+        onPrimary: ColorPalette.surface,
+        secondary: ColorPalette.accent,
+        onSecondary: ColorPalette.textPrimary,
+        surface: ColorPalette.surface,
+        onSurface: ColorPalette.textPrimary,
+        error: ColorPalette.error,
+        outline: ColorPalette.border,
+      ),
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: ColorPalette.surface,
+        surfaceTintColor: Colors.transparent,
+        shadowColor: ColorPalette.primaryPressed.withValues(alpha: 0.14),
+        elevation: 8,
+        dividerColor: ColorPalette.divider,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: ColorPalette.border, width: 1),
+        ),
+        headerBackgroundColor: ColorPalette.primary,
+        headerForegroundColor: ColorPalette.surface,
+        headerHeadlineStyle: AppTextStyle.font18PrimarySemiBoldKufam().copyWith(
+          color: ColorPalette.surface,
+          fontSize: 22,
+        ),
+        headerHelpStyle: AppTextStyle.font14TextPrimaryRegularTajawal()
+            .copyWith(color: ColorPalette.surface, fontSize: 14),
+        weekdayStyle: AppTextStyle.font15TextMutedRegularTajawal().copyWith(
+          color: ColorPalette.textSecondary,
+          fontSize: 14,
+        ),
+        dayStyle: bodyStyle,
+        dayBackgroundColor: WidgetStateProperty.resolveWith<Color?>(
+          _selectionBackground,
+        ),
+        dayForegroundColor: WidgetStateProperty.resolveWith<Color>(
+          _selectionForeground,
+        ),
+        dayOverlayColor: WidgetStateProperty.resolveWith<Color?>(
+          _interactionOverlay,
+        ),
+        dayShape: WidgetStateProperty.all<OutlinedBorder>(const CircleBorder()),
+        todayBackgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+          if (states.contains(WidgetState.disabled)) return null;
 
-    final pickerInitialDate = _getInitialDate(
-      first: normalizedFirstDate,
-      last: normalizedLastDate,
+          return states.contains(WidgetState.selected)
+              ? ColorPalette.primary
+              : ColorPalette.primarySoftBackground;
+        }),
+        todayForegroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return ColorPalette.disabled;
+          }
+
+          return states.contains(WidgetState.selected)
+              ? ColorPalette.surface
+              : ColorPalette.primary;
+        }),
+        todayBorder: const BorderSide(color: ColorPalette.primary, width: 1.2),
+        yearStyle: bodyStyle,
+        yearBackgroundColor: WidgetStateProperty.resolveWith<Color?>(
+          _selectionBackground,
+        ),
+        yearForegroundColor: WidgetStateProperty.resolveWith<Color>(
+          _selectionForeground,
+        ),
+        yearOverlayColor: WidgetStateProperty.resolveWith<Color?>(
+          _interactionOverlay,
+        ),
+        yearShape: WidgetStateProperty.all<OutlinedBorder>(
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        cancelButtonStyle: TextButton.styleFrom(
+          foregroundColor: ColorPalette.textSecondary,
+          textStyle: bodyStyle,
+        ),
+        confirmButtonStyle: TextButton.styleFrom(
+          foregroundColor: ColorPalette.primary,
+          textStyle: bodyStyle,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: ColorPalette.primarySoftBackground,
+          hintStyle: AppTextStyle.font15TextMutedRegularTajawal().copyWith(
+            fontSize: 15,
+          ),
+          labelStyle: bodyStyle,
+          enabledBorder: _inputBorder(ColorPalette.border, 1),
+          focusedBorder: _inputBorder(ColorPalette.primary, 1.3),
+          errorBorder: _inputBorder(ColorPalette.error, 1),
+          focusedErrorBorder: _inputBorder(ColorPalette.error, 1.3),
+        ),
+      ),
     );
+  }
+
+  Future<void> _openDatePicker(BuildContext context) async {
+    if (!enabled) return;
+
+    FocusScope.of(context).unfocus();
+
+    final first = _normalizeDate(firstDate ?? DateTime(2000));
+    final last = _normalizeDate(lastDate ?? DateTime(2100));
+
+    // Keep a valid range even if the supplied bounds are reversed.
+    final rangeStart = first.isAfter(last) ? last : first;
+    final rangeEnd = first.isAfter(last) ? first : last;
+
+    final media = MediaQuery.of(context);
+    final availableWidth =
+        media.size.width - media.padding.left - media.padding.right;
+    final availableHeight =
+        media.size.height - media.padding.top - media.padding.bottom;
+
+    final useInputMode =
+        availableWidth < 360 ||
+        availableHeight < 500 ||
+        media.textScaler.scale(16) > 20.8;
 
     final selected = await showDatePicker(
       context: context,
-      initialDate: pickerInitialDate,
-      firstDate: normalizedFirstDate,
-      lastDate: normalizedLastDate,
+      initialDate: _getInitialDate(first: rangeStart, last: rangeEnd),
+      firstDate: rangeStart,
+      lastDate: rangeEnd,
+      initialEntryMode: useInputMode
+          ? DatePickerEntryMode.inputOnly
+          : DatePickerEntryMode.calendar,
       helpText: labelText ?? 'اختر التاريخ',
       cancelText: 'إلغاء',
       confirmText: 'اختيار',
-      barrierColor: ColorPalette.deepSurface.withValues(
-        alpha: 0.45,
-      ),
-      builder: (context, child) {
-        final currentTheme = Theme.of(context);
-
+      barrierColor: ColorPalette.deepSurface.withValues(alpha: 0.45),
+      builder: (dialogContext, child) {
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Theme(
-            data: currentTheme.copyWith(
-              disabledColor: ColorPalette.disabled,
-              dividerColor: ColorPalette.divider,
-              colorScheme: currentTheme.colorScheme.copyWith(
-                primary: ColorPalette.primary,
-                onPrimary: ColorPalette.surface,
-                secondary: ColorPalette.accent,
-                onSecondary: ColorPalette.textPrimary,
-                surface: ColorPalette.surface,
-                onSurface: ColorPalette.textPrimary,
-                error: ColorPalette.error,
-                outline: ColorPalette.border,
-              ),
-              datePickerTheme: DatePickerThemeData(
-                backgroundColor: ColorPalette.surface,
-                surfaceTintColor: ColorPalette.surface
-                    .withValues(alpha: 0),
-                shadowColor: ColorPalette.primaryPressed
-                    .withValues(alpha: 0.14),
-                elevation: 8,
-                dividerColor: ColorPalette.divider,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24.r),
-                  side: BorderSide(
-                    color: ColorPalette.border,
-                    width: 1.w,
-                  ),
-                ),
-
-                headerBackgroundColor: ColorPalette.primary,
-                headerForegroundColor: ColorPalette.surface,
-                headerHeadlineStyle:
-                    AppTextStyle.font18PrimarySemiBoldKufam()
-                        .copyWith(
-                          color: ColorPalette.surface,
-                          fontSize: 22.sp,
-                        ),
-                headerHelpStyle:
-                    AppTextStyle.font14TextPrimaryRegularTajawal()
-                        .copyWith(color: ColorPalette.surface),
-
-                weekdayStyle:
-                    AppTextStyle.font15TextMutedRegularTajawal()
-                        .copyWith(
-                          color: ColorPalette.textSecondary,
-                        ),
-
-                dayStyle:
-                    AppTextStyle.font15TextPrimaryMediumTajawal(),
-
-                dayBackgroundColor:
-                    WidgetStateProperty.resolveWith<Color?>((
-                      states,
-                    ) {
-                      if (states.contains(
-                        WidgetState.selected,
-                      )) {
-                        return ColorPalette.primary;
-                      }
-
-                      return null;
-                    }),
-
-                dayForegroundColor:
-                    WidgetStateProperty.resolveWith<Color>((
-                      states,
-                    ) {
-                      if (states.contains(
-                        WidgetState.selected,
-                      )) {
-                        return ColorPalette.surface;
-                      }
-
-                      if (states.contains(
-                        WidgetState.disabled,
-                      )) {
-                        return ColorPalette.disabled;
-                      }
-
-                      return ColorPalette.textPrimary;
-                    }),
-
-                dayOverlayColor:
-                    WidgetStateProperty.resolveWith<Color?>((
-                      states,
-                    ) {
-                      if (states.contains(WidgetState.pressed) ||
-                          states.contains(WidgetState.hovered) ||
-                          states.contains(WidgetState.focused)) {
-                        return ColorPalette
-                            .primarySoftBackground;
-                      }
-
-                      return null;
-                    }),
-
-                dayShape:
-                    WidgetStateProperty.all<OutlinedBorder>(
-                      const CircleBorder(),
-                    ),
-
-                todayBackgroundColor:
-                    WidgetStateProperty.resolveWith<Color?>((
-                      states,
-                    ) {
-                      if (states.contains(
-                        WidgetState.selected,
-                      )) {
-                        return ColorPalette.primary;
-                      }
-
-                      return ColorPalette.primarySoftBackground;
-                    }),
-
-                todayForegroundColor:
-                    WidgetStateProperty.resolveWith<Color>((
-                      states,
-                    ) {
-                      if (states.contains(
-                        WidgetState.selected,
-                      )) {
-                        return ColorPalette.surface;
-                      }
-
-                      return ColorPalette.primary;
-                    }),
-
-                todayBorder: BorderSide(
-                  color: ColorPalette.primary,
-                  width: 1.2.w,
-                ),
-
-                yearStyle:
-                    AppTextStyle.font15TextPrimaryMediumTajawal(),
-
-                yearBackgroundColor:
-                    WidgetStateProperty.resolveWith<Color?>((
-                      states,
-                    ) {
-                      if (states.contains(
-                        WidgetState.selected,
-                      )) {
-                        return ColorPalette.primary;
-                      }
-
-                      return null;
-                    }),
-
-                yearForegroundColor:
-                    WidgetStateProperty.resolveWith<Color>((
-                      states,
-                    ) {
-                      if (states.contains(
-                        WidgetState.selected,
-                      )) {
-                        return ColorPalette.surface;
-                      }
-
-                      if (states.contains(
-                        WidgetState.disabled,
-                      )) {
-                        return ColorPalette.disabled;
-                      }
-
-                      return ColorPalette.textPrimary;
-                    }),
-
-                yearOverlayColor:
-                    WidgetStateProperty.resolveWith<Color?>((
-                      states,
-                    ) {
-                      if (states.contains(WidgetState.pressed) ||
-                          states.contains(WidgetState.hovered) ||
-                          states.contains(WidgetState.focused)) {
-                        return ColorPalette
-                            .primarySoftBackground;
-                      }
-
-                      return null;
-                    }),
-
-                yearShape:
-                    WidgetStateProperty.all<OutlinedBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                          12.r,
-                        ),
-                      ),
-                    ),
-
-                cancelButtonStyle: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.all(
-                    ColorPalette.textSecondary,
-                  ),
-                  overlayColor: WidgetStateProperty.all(
-                    ColorPalette.primarySoftBackground,
-                  ),
-                ),
-
-                confirmButtonStyle: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.all(
-                    ColorPalette.primary,
-                  ),
-                  overlayColor: WidgetStateProperty.all(
-                    ColorPalette.primarySoftBackground,
-                  ),
-                ),
-
-                inputDecorationTheme: InputDecorationTheme(
-                  filled: true,
-                  fillColor: ColorPalette.primarySoftBackground,
-                  hintStyle:
-                      AppTextStyle.font15TextMutedRegularTajawal(),
-                  labelStyle:
-                      AppTextStyle.font15TextPrimaryMediumTajawal(),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                    borderSide: BorderSide(
-                      color: ColorPalette.border,
-                      width: 1.w,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                    borderSide: BorderSide(
-                      color: ColorPalette.primary,
-                      width: 1.3.w,
-                    ),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16.r),
-                    borderSide: BorderSide(
-                      color: ColorPalette.error,
-                      width: 1.w,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            data: _pickerTheme(Theme.of(dialogContext)),
             child: child ?? const SizedBox.shrink(),
           ),
         );
       },
     );
 
-    if (selected == null) {
-      return;
-    }
+    if (!context.mounted || selected == null) return;
 
-    final normalizedSelectedDate = _normalizeDate(selected);
+    final normalizedDate = _normalizeDate(selected);
 
-    controller.text = _formatDate(normalizedSelectedDate);
-
-    onDateSelected(normalizedSelectedDate);
+    controller.text = _formatDate(normalizedDate);
+    onDateSelected(normalizedDate);
   }
 
   @override
@@ -369,19 +266,13 @@ class CustomDatePickerField extends StatelessWidget {
       enabled: enabled,
       readOnly: true,
       validator: validator,
-      onTap: () {
-        _openDatePicker(context);
-      },
+      onTap: () => _openDatePicker(context),
       suffixIcon: Icon(
         Icons.calendar_month_outlined,
-        color: enabled
-            ? ColorPalette.primary
-            : ColorPalette.disabled,
+        color: enabled ? ColorPalette.primary : ColorPalette.disabled,
         size: 24.sp,
       ),
-      onSuffixTap: () {
-        _openDatePicker(context);
-      },
+      onSuffixTap: () => _openDatePicker(context),
     );
   }
 }

@@ -30,50 +30,40 @@ class ViewNotesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: AppSystemUi.light(),
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: CustomHeaderBar(title: 'مذكرات المذاكرة'),
-          backgroundColor: ColorPalette.background,
-          body: BackgroundStudentLayout(
-            child: SafeArea(
-              child: AppNetworkAwareContent(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: AppAnimations.screenSection(
-                          delay: 0,
-                          child: BlocBuilder<ViewNotesCubit, ViewNotesState>(
-                            builder: (context, state) {
-                              if (state is ViewNotesInitial ||
-                                  state is ViewNotesLoading) {
-                                return const ViewNotesLoadingSkeleton();
-                              }
-        
-                              if (state is ViewNotesFailure) {
-                                return AppErrorWidget(
-                                  message:
-                                      'تعذر تحميل بيانات المذكرات، تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
-                                  onRetry: () {
-                                    context.read<ViewNotesCubit>().retry();
-                                  },
-                                );
-                              }
-        
-                              if (state is ViewNotesDataSuccess) {
-                                return _buildSuccessContent(context, state);
-                              }
-        
-                              return const ViewNotesLoadingSkeleton();
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+      value: AppSystemUi.dark(),
+      child: Scaffold(
+        appBar: CustomHeaderBar(title: 'مذكرات المذاكرة', showBackButton: true),
+        backgroundColor: ColorPalette.background,
+        body: BackgroundStudentLayout(
+          child: SafeArea(
+            top: false,
+            child: AppNetworkAwareContent(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
+                child: AppAnimations.screenSection(
+                  delay: 0,
+                  child: BlocBuilder<ViewNotesCubit, ViewNotesState>(
+                    builder: (context, state) {
+                      if (state is ViewNotesInitial ||
+                          state is ViewNotesLoading) {
+                        return const ViewNotesLoadingSkeleton();
+                      }
+
+                      if (state is ViewNotesFailure) {
+                        return AppErrorWidget(
+                          message: 'تعذر تحميل بيانات المذكرات، تحقق من اتصالك بالإنترنت وحاول مرة أخرى.',
+                          onRetry: () {
+                            context.read<ViewNotesCubit>().retry();
+                          },
+                        );
+                      }
+
+                      if (state is ViewNotesDataSuccess) {
+                        return _buildSuccessContent(context, state);
+                      }
+
+                      return const ViewNotesLoadingSkeleton();
+                    },
                   ),
                 ),
               ),
@@ -170,9 +160,7 @@ class ViewNotesScreen extends StatelessWidget {
       return;
     }
 
-    Navigator.of(context).pushNamed(
-      RouteNames.editNoteScreen,
-      arguments: noteId,
-    );
+    Navigator.of(context)
+        .pushNamed(RouteNames.editNoteScreen, arguments: noteId);
   }
 }

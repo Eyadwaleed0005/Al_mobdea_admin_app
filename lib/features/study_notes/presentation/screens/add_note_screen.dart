@@ -22,49 +22,47 @@ class AddNoteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AddNoteFeedbackListener(
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
-        child: SafeArea(
-          bottom: false,
-          child: Scaffold(
-            appBar: CustomHeaderBar(title: 'إضافة مذكرة'),
-            backgroundColor: ColorPalette.background,
-            body: BackgroundStudentLayout(
-              child: SafeArea(
-                child: AppNetworkAwareContent(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 20.h,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          child: AppAnimations.screenSection(
-                            delay: 0,
-                            child: BlocBuilder<AddNoteCubit, AddNoteState>(
-                              builder: (context, state) {
-                                if (state.isPageLoading) {
-                                  return const AddNoteLoadingSkeleton();
-                                }
-                                if (state.hasPageFailure && state.error != null) {
-                                  return AppErrorWidget(
-                                    message: state.error!.message,
-                                    onRetry: () {
-                                      context.read<AddNoteCubit>().retry();
-                                    },
-                                  );
-                                }
-                                if (state.isPageReady) {
-                                  return AddNoteContent(state: state);
-                                }
+        value: AppSystemUi.dark(),
+        child: Scaffold(
+          appBar: CustomHeaderBar(title: 'إضافة مذكرة'),
+          backgroundColor: ColorPalette.background,
+          body: BackgroundStudentLayout(
+            child: SafeArea(
+              top: false,
+              child: AppNetworkAwareContent(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 20.h,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: AppAnimations.screenSection(
+                          delay: 0,
+                          child: BlocBuilder<AddNoteCubit, AddNoteState>(
+                            builder: (context, state) {
+                              if (state.isPageLoading) {
                                 return const AddNoteLoadingSkeleton();
-                              },
-                            ),
+                              }
+                              if (state.hasPageFailure && state.error != null) {
+                                return AppErrorWidget(
+                                  message: state.error!.message,
+                                  onRetry: () {
+                                    context.read<AddNoteCubit>().retry();
+                                  },
+                                );
+                              }
+                              if (state.isPageReady) {
+                                return AddNoteContent(state: state);
+                              }
+                              return const AddNoteLoadingSkeleton();
+                            },
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

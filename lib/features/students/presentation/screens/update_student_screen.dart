@@ -15,19 +15,16 @@ class UpdateStudentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.dark(),
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: CustomHeaderBar(title: 'حساب طالب', showBackButton: true),
-          backgroundColor: ColorPalette.background,
-          body: BackgroundStudentLayout(
-            child: UpdateStudentFeedbackListener(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [const Expanded(child: UpdateStudentBody())],
-                ),
+      child: Scaffold(
+        appBar: CustomHeaderBar(title: 'حساب طالب', showBackButton: true),
+        backgroundColor: ColorPalette.background,
+        body: BackgroundStudentLayout(
+          child: UpdateStudentFeedbackListener(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [const Expanded(child: UpdateStudentBody())],
               ),
             ),
           ),

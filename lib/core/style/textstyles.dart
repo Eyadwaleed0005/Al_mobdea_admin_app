@@ -774,6 +774,14 @@ class AppTextStyle {
       color: ColorPalette.surface,
     );
   }
+  static TextStyle font14SuccessMediumTajawal() {
+  return TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeightHelper.medium,
+    fontFamily: tajawal,
+    color: ColorPalette.success,
+  );
+}
 
   static TextStyle font18PrimarySemiBoldKufam() {
     return TextStyle(

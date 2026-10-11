@@ -22,7 +22,8 @@ class StudentManagementScreen extends StatefulWidget {
   const StudentManagementScreen({super.key});
 
   @override
-  State<StudentManagementScreen> createState() => _StudentManagementScreenState();
+  State<StudentManagementScreen> createState() =>
+      _StudentManagementScreenState();
 }
 
 class _StudentManagementScreenState extends State<StudentManagementScreen> {
@@ -37,75 +38,81 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
   }
 
   void _navigateToUpdate(StudentEntity student) {
-    Navigator.of(context).pushNamed(RouteNames.updateStudentScreen, arguments: student.studentId);
+    Navigator.of(
+      context,
+    ).pushNamed(RouteNames.updateStudentScreen, arguments: student.studentId);
   }
 
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: AppSystemUi.dark(),
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: CustomHeaderBar(title: 'إدارة الطلاب', showProfileIcon: true),
-          backgroundColor: ColorPalette.background,
-          body: BackgroundStudentLayout(
-            child: AppNetworkAwareContent(
-              child: BlocBuilder<StudentManagementCubit, StudentManagementState>(
-                builder: (context, state) {
-                  return switch (state) {
-                    StudentManagementInitial() ||
-                    StudentManagementLoading() => const StudentManagementSkeleton(),
+      child: Scaffold(
+        backgroundColor: ColorPalette.background,
+        appBar: CustomHeaderBar(title: 'إدارة الطلاب', showProfileIcon: true),
+        body: BackgroundStudentLayout(
+          child: AppNetworkAwareContent(
+            child: BlocBuilder<StudentManagementCubit, StudentManagementState>(
+              builder: (context, state) {
+                return switch (state) {
+                  StudentManagementInitial() || StudentManagementLoading() =>
+                    const StudentManagementSkeleton(),
 
-                    StudentManagementEmpty() => Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                      child: AppEmptyWidget(
-                        title: 'لا يوجد طلاب بعد',
-                        message: 'ابدأ بإضافة أول طالب وإنشاء حسابه لمتابعة الدروس والاختبارات.',
-                        actionText: 'إضافة طالب',
-                        icon: Icons.person_outline_rounded,
-                        onActionPressed: _navigateToAdd,
+                  StudentManagementEmpty() => Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 20.h,
+                    ),
+                    child: AppEmptyWidget(
+                      title: 'لا يوجد طلاب بعد',
+                      message: 'ابدأ بإضافة أول طالب وإنشاء حسابه لمتابعة الدروس والاختبارات.',
+                      actionText: 'إضافة طالب',
+                      icon: Icons.person_outline_rounded,
+                      onActionPressed: _navigateToAdd,
+                    ),
+                  ),
+
+                  StudentManagementNoSearchResults(
+                    grades: final grades,
+                    filters: final filters,
+                  ) =>
+                    StudentManagementContent(
+                      grades: grades,
+                      filters: filters,
+                      onAddStudent: _navigateToAdd,
+                      content: const AppNoSearchResultsWidget(
+                        message:
+                            'جرب البحث باسم آخر أو تغيير الفلاتر المستخدمة.',
                       ),
                     ),
 
-                    StudentManagementNoSearchResults(
-                      grades: final grades,
-                      filters: final filters,
-                    ) =>
-                      StudentManagementContent(
+                  StudentManagementLoaded(
+                    students: final students,
+                    grades: final grades,
+                    filters: final filters,
+                  ) =>
+                    StudentManagementContent(
+                      grades: grades,
+                      filters: filters,
+                      onAddStudent: _navigateToAdd,
+                      content: StudentsList(
+                        students: students,
                         grades: grades,
-                        filters: filters,
-                        onAddStudent: _navigateToAdd,
-                        content: const AppNoSearchResultsWidget(
-                          message: 'جرب البحث باسم آخر أو تغيير الفلاتر المستخدمة.',
-                        ),
+                        onStudentTap: _navigateToUpdate,
                       ),
+                    ),
 
-                    StudentManagementLoaded(
-                      students: final students,
-                      grades: final grades,
-                      filters: final filters,
-                    ) =>
-                      StudentManagementContent(
-                        grades: grades,
-                        filters: filters,
-                        onAddStudent: _navigateToAdd,
-                        content: StudentsList(
-                          students: students,
-                          grades: grades,
-                          onStudentTap: _navigateToUpdate,
-                        ),
-                      ),
-
-                    StudentManagementFailure(error: final error) => AppErrorWidget(
+                  StudentManagementFailure(error: final error) =>
+                    AppErrorWidget(
                       message: error.message,
                       onRetry: () {
-                        context.read<StudentManagementCubit>().watchStudentManagement();
+                        context
+                            .read<StudentManagementCubit>()
+                            .watchStudentManagement();
                       },
                     ),
-                  };
-                },
-              ),
+                };
+              },
             ),
           ),
         ),
