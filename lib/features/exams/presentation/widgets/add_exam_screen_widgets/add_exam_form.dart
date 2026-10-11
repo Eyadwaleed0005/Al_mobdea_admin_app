@@ -8,9 +8,9 @@ import 'package:al_mobdea_admin/features/exams/domain/entities/exam_draft_entity
 import 'package:al_mobdea_admin/features/exams/presentation/cubit/add_exam_cubit.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/validation/add_exam_validation.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/widgets/add_exam_screen_widgets/exam_publication_switch.dart';
-import 'package:al_mobdea_admin/features/exams/presentation/widgets/add_exam_screen_widgets/exam_time_range_fields.dart';
 import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,64 +20,38 @@ class AddExamForm extends StatefulWidget {
   final List<GradeEntity> grades;
 
   @override
-  State<AddExamForm> createState() {
-    return _AddExamFormState();
-  }
+  State<AddExamForm> createState() => _AddExamFormState();
 }
 
 class _AddExamFormState extends State<AddExamForm> {
-  static const TimeOfDay _defaultStartTime = TimeOfDay(hour: 19, minute: 0);
-
-  static const TimeOfDay _defaultEndTime = TimeOfDay(hour: 21, minute: 0);
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _examNameController = TextEditingController();
 
+  final TextEditingController _durationController = TextEditingController();
+
   late final AddExamValidation _addExamValidation;
 
   String _selectedGradeId = '';
-
   bool _isPublished = false;
-
-  TimeOfDay? _startTime = _defaultStartTime;
-
-  TimeOfDay? _endTime = _defaultEndTime;
-
-  String? _timeRangeError;
-
-  int? get _durationMinutes {
-    final TimeOfDay? startTime = _startTime;
-    final TimeOfDay? endTime = _endTime;
-
-    if (startTime == null || endTime == null) {
-      return null;
-    }
-
-    return ExamTimePickerHelper.durationMinutes(
-      startTime: startTime,
-      endTime: endTime,
-    );
-  }
 
   @override
   void initState() {
     super.initState();
-
     _addExamValidation = AddExamValidation();
   }
 
   @override
   void dispose() {
     _examNameController.dispose();
-
+    _durationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<PopupSelectionItem<String>> gradeItems = widget.grades
-        .map((GradeEntity grade) {
+    final gradeItems = widget.grades
+        .map((grade) {
           return PopupSelectionItem<String>(
             value: grade.gradeId,
             label: grade.name,
@@ -107,16 +81,16 @@ class _AddExamFormState extends State<AddExamForm> {
             onChanged: _changePublicationStatus,
           ),
           verticalSpace(24),
-          ExamTimeRangeFields(
-            startTime: _startTime,
-            endTime: _endTime,
-            errorText: _timeRangeError,
-            onStartTimePressed: () {
-              _pickTime(isStartTime: true);
-            },
-            onEndTimePressed: () {
-              _pickTime(isStartTime: false);
-            },
+          CustomTextFormField(
+            controller: _durationController,
+            labelText: 'مدة الامتحان بالدقائق',
+            hintText: 'مثال: ٦٠',
+            keyboardType: TextInputType.number,
+            textInputAction: TextInputAction.done,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9٠-٩۰-۹]')),
+            ],
+            validator: _validateDuration,
           ),
           verticalSpace(32),
           CustomButton(
@@ -152,9 +126,8 @@ class _AddExamFormState extends State<AddExamForm> {
                   tooltip: 'اختر الصف الدراسي',
                   emptyTooltip: 'لا توجد صفوف متاحة',
                   enabled: widget.grades.isNotEmpty,
-                  onSelected: (String gradeId) {
+                  onSelected: (gradeId) {
                     _selectGrade(gradeId);
-
                     gradeField.didChange(gradeId);
                   },
                 ),
@@ -180,7 +153,7 @@ class _AddExamFormState extends State<AddExamForm> {
       return 'الصف الدراسي';
     }
 
-    for (final GradeEntity grade in widget.grades) {
+    for (final grade in widget.grades) {
       if (grade.gradeId == _selectedGradeId) {
         return grade.name;
       }
@@ -201,73 +174,61 @@ class _AddExamFormState extends State<AddExamForm> {
     });
   }
 
-  Future<void> _pickTime({required bool isStartTime}) async {
-    final TimeOfDay? currentTime = isStartTime ? _startTime : _endTime;
+  String _normalizeDigits(String value) {
+    const arabicDigits = '٠١٢٣٤٥٦٧٨٩';
+    const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
 
-    final TimeOfDay? selectedTime = await ExamTimePickerHelper.show(
-      context,
-      initialTime:
-          currentTime ?? (isStartTime ? _defaultStartTime : _defaultEndTime),
-      helpText: isStartTime ? 'اختر وقت البداية' : 'اختر وقت النهاية',
-    );
+    return value.trim().split('').map((character) {
+      final arabicIndex = arabicDigits.indexOf(character);
 
-    if (!mounted || selectedTime == null) {
-      return;
-    }
-
-    setState(() {
-      if (isStartTime) {
-        _startTime = selectedTime;
-      } else {
-        _endTime = selectedTime;
+      if (arabicIndex != -1) {
+        return arabicIndex.toString();
       }
 
-      _timeRangeError = _validateTimeRange(showErrors: false);
-    });
+      final persianIndex = persianDigits.indexOf(character);
+
+      if (persianIndex != -1) {
+        return persianIndex.toString();
+      }
+
+      return character;
+    }).join();
   }
 
-  String? _validateTimeRange({required bool showErrors}) {
-    final TimeOfDay? startTime = _startTime;
-    final TimeOfDay? endTime = _endTime;
+  String? _validateDuration(String? value) {
+    final normalizedValue = _normalizeDigits(value ?? '');
 
-    if (startTime == null) {
-      return showErrors ? 'يرجى تحديد وقت البداية' : null;
-    }
-
-    if (endTime == null) {
-      return showErrors ? 'يرجى تحديد وقت النهاية' : null;
-    }
-
-    final int durationMinutes = ExamTimePickerHelper.durationMinutes(
-      startTime: startTime,
-      endTime: endTime,
+    final validationError = _addExamValidation.validateDuration(
+      normalizedValue,
     );
 
-    if (durationMinutes <= 0) {
-      return 'وقت النهاية يجب أن يكون بعد وقت البداية';
+    if (validationError != null) {
+      return validationError;
     }
 
-    return _addExamValidation.validateDuration(durationMinutes.toString());
+    final duration = int.tryParse(normalizedValue);
+
+    if (duration == null || duration <= 0) {
+      return 'أدخل مدة صحيحة أكبر من صفر';
+    }
+
+    return null;
   }
 
   void _handleNextPressed() {
     FocusScope.of(context).unfocus();
 
-    final String? timeRangeError = _validateTimeRange(showErrors: true);
+    final isFormValid = _formKey.currentState?.validate() ?? false;
 
-    setState(() {
-      _timeRangeError = timeRangeError;
-    });
-
-    final bool isFormValid = _formKey.currentState?.validate() ?? false;
-
-    if (!isFormValid || timeRangeError != null) {
+    if (!isFormValid) {
       return;
     }
 
-    final int? durationMinutes = _durationMinutes;
+    final durationMinutes = int.tryParse(
+      _normalizeDigits(_durationController.text),
+    );
 
-    if (durationMinutes == null) {
+    if (durationMinutes == null || durationMinutes <= 0) {
       return;
     }
 
