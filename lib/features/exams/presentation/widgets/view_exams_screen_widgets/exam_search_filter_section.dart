@@ -4,7 +4,6 @@ import 'package:al_mobdea_admin/core/widgets/custom_search_bar.dart';
 import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
 import 'package:al_mobdea_admin/features/students/presentation/widgets/student_management_screen_widgets/grade_popup_menu_field.dart';
 import 'package:flutter/material.dart';
-
 enum ExamPublicationFilter { all, published, unpublished, ended }
 
 class ExamSearchFilterSection extends StatelessWidget {
@@ -45,9 +44,9 @@ class ExamSearchFilterSection extends StatelessWidget {
         Row(
           textDirection: TextDirection.rtl,
           children: [
-            Expanded(child: _buildPublicationStatusPopupMenu()),
-            horizontalSpace(16),
             Expanded(child: _buildGradesPopupMenu()),
+            horizontalSpace(16),
+            Expanded(child: _buildPublicationStatusPopupMenu()),
           ],
         ),
       ],
@@ -72,7 +71,7 @@ class ExamSearchFilterSection extends StatelessWidget {
       items: const [
         PopupSelectionItem<ExamPublicationFilter>(
           value: ExamPublicationFilter.all,
-          label: 'الكل',
+          label: 'كل الحالات',
         ),
         PopupSelectionItem<ExamPublicationFilter>(
           value: ExamPublicationFilter.published,
@@ -89,26 +88,18 @@ class ExamSearchFilterSection extends StatelessWidget {
       ],
       value: selectedPublicationFilter,
       selectedText: _selectedPublicationStatusName,
-      filterValue: _selectedPublicationFilterValue,
-      tooltip: 'اختيار حالة الاختبار',
+      filterValue: _selectedPublicationStatusName,
+      tooltip: 'اختيار حالة الامتحان',
       onSelected: onPublicationStatusSelected,
     );
   }
 
   String get _selectedPublicationStatusName {
     return switch (selectedPublicationFilter) {
-      ExamPublicationFilter.all => 'حالة الاختبار',
+      ExamPublicationFilter.all => 'كل الحالات',
       ExamPublicationFilter.published => 'منشور',
       ExamPublicationFilter.unpublished => 'غير منشور',
       ExamPublicationFilter.ended => 'منتهي',
     };
-  }
-
-  String? get _selectedPublicationFilterValue {
-    if (selectedPublicationFilter == ExamPublicationFilter.all) {
-      return null;
-    }
-
-    return _selectedPublicationStatusName;
   }
 }
