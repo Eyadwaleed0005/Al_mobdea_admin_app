@@ -21,7 +21,7 @@ class ViewExamsScreen extends StatelessWidget {
         )..loadData();
       },
       child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: AppSystemUi.light(),
+        value: AppSystemUi.dark(),
         child: const ViewExamsContent(),
       ),
     );

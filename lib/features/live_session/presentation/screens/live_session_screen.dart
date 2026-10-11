@@ -20,33 +20,43 @@ class LiveSessionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final cubit = context.read<LiveSessionCubit>();
 
+    const header = CustomHeaderBar(
+      title: 'رابط الحصة المباشرة',
+      showProfileIcon: true,
+    );
+
+    final headerHeight =
+        header.preferredSize.height + MediaQuery.paddingOf(context).top;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: AppSystemUi.light(),
-      child: SafeArea(
-        bottom: false,
-        child: Scaffold(
-          appBar: CustomHeaderBar(title: 'رابط الحصة المباشرة', showProfileIcon: true),
-          backgroundColor: ColorPalette.background,
-          body: BackgroundStudentLayout(
-            child: SafeArea(
-              child: AppNetworkAwareContent(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        child: AppAnimations.screenSection(
-                          delay: 0,
-                          child: LiveSessionFeedbackListener(
-                            child: AppRefreshIndicator(
-                              onRefresh: cubit.refreshLiveSession,
-                              child: const LiveSessionBody(),
-                            ),
-                          ),
-                        ),
+      value: AppSystemUi.dark(),
+      child: Scaffold(
+        backgroundColor: ColorPalette.background,
+        body: BackgroundStudentLayout(
+          child: LiveSessionFeedbackListener(
+            child: NestedScrollView(
+              headerSliverBuilder: (context, innerBoxIsScrolled) {
+                return [
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: headerHeight, child: header),
+                  ),
+                ];
+              },
+              body: SafeArea(
+                top: false,
+                child: AppNetworkAwareContent(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 20.h,
+                    ),
+                    child: AppAnimations.screenSection(
+                      delay: 0,
+                      child: AppRefreshIndicator(
+                        onRefresh: cubit.refreshLiveSession,
+                        child: const LiveSessionBody(),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),

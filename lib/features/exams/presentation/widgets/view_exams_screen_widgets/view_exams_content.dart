@@ -1,4 +1,5 @@
 import 'package:al_mobdea_admin/app/routes/route_names.dart';
+import 'package:al_mobdea_admin/core/helper/app_system_ui.dart';
 import 'package:al_mobdea_admin/core/helper/spacer.dart';
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
@@ -10,6 +11,7 @@ import 'package:al_mobdea_admin/features/exams/presentation/cubit/view_exams_cub
 import 'package:al_mobdea_admin/features/exams/presentation/cubit/view_exams_state.dart';
 import 'package:al_mobdea_admin/features/exams/presentation/widgets/view_exams_screen_widgets/view_exams_state_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -18,22 +20,27 @@ class ViewExamsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: AppSystemUi.dark(),
       child: Scaffold(
-        appBar: const CustomHeaderBar(title: 'إدارة الاختبارات', showProfileIcon: true),
+        appBar: const CustomHeaderBar(
+          title: 'إدارة الاختبارات',
+          showProfileIcon: true,
+        ),
         backgroundColor: ColorPalette.background,
         body: BackgroundStudentLayout(
           child: SafeArea(
+            top: false,
             child: AppNetworkAwareContent(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
+                children: [
                   Expanded(
                     child: CustomScrollView(
                       physics: const BouncingScrollPhysics(),
-                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                      slivers: <Widget>[
+                      keyboardDismissBehavior:
+                          ScrollViewKeyboardDismissBehavior.onDrag,
+                      slivers: [
                         SliverToBoxAdapter(child: verticalSpace(24)),
                         const ViewExamsStateView(),
                       ],
@@ -51,10 +58,10 @@ class ViewExamsContent extends StatelessWidget {
 
   Widget _buildFixedAddButton(BuildContext context) {
     return BlocSelector<ViewExamsCubit, ViewExamsState, bool>(
-      selector: (ViewExamsState state) {
+      selector: (state) {
         return state is ViewExamsEmpty || state is ViewExamsSuccess;
       },
-      builder: (BuildContext context, bool shouldShowButton) {
+      builder: (context, shouldShowButton) {
         return AnimatedSwitcher(
           duration: const Duration(milliseconds: 200),
           child: shouldShowButton
@@ -66,12 +73,15 @@ class ViewExamsContent extends StatelessWidget {
                     child: CustomButton(
                       text: 'إنشاء اختبار جديد',
                       onPressed: () {
-                        Navigator.of(context).pushNamed(RouteNames.addExamScreen);
+                        Navigator.of(context)
+                            .pushNamed(RouteNames.addExamScreen);
                       },
                     ),
                   ),
                 )
-              : const SizedBox.shrink(key: ValueKey<String>('hidden-add-exam-button')),
+              : const SizedBox.shrink(
+                  key: ValueKey<String>('hidden-add-exam-button'),
+                ),
         );
       },
     );
