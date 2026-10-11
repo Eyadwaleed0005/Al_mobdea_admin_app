@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "649818924107",
+    "project_id": "al-mobdea-education-platform",
+    "storage_bucket": "al-mobdea-education-platform.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649818924107:android:eb88d6279c2e93c19f59ce",
+        "android_client_info": {
+          "package_name": "com.famex.alMobdea"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg2gjnOezCRcnwA9fa4bUCG7JAQKB2qNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649818924107:android:71661f054ec4ee539f59ce",
+        "android_client_info": {
+          "package_name": "com.famex.alMobdea.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg2gjnOezCRcnwA9fa4bUCG7JAQKB2qNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649818924107:android:ffdcba2491a121479f59ce",
+        "android_client_info": {
+          "package_name": "com.famex.al_mobdea"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAg2gjnOezCRcnwA9fa4bUCG7JAQKB2qNM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
