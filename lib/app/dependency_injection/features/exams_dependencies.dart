@@ -24,6 +24,7 @@ import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exam_resul
 import 'package:al_mobdea_admin/features/exams/domain/use_case/stream_exams_use_case.dart';
 import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_question_use_case.dart';
 import 'package:al_mobdea_admin/features/exams/domain/use_case/update_exam_use_case.dart';
+import 'package:al_mobdea_admin/features/exams/presentation/cubit/exam_results_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get_it/get_it.dart';
 
@@ -39,9 +40,7 @@ void registerExamsDependencies(GetIt getIt) {
 
   // Services
   getIt.registerLazySingleton<ExamFirestoreGuardService>(
-    () => ExamFirestoreGuardService(
-      editingPolicy: getIt<ExamEditingPolicy>(),
-    ),
+    () => ExamFirestoreGuardService(editingPolicy: getIt<ExamEditingPolicy>()),
   );
 
   getIt.registerLazySingleton<ExamQuestionImageService>(
@@ -107,9 +106,7 @@ void registerExamsDependencies(GetIt getIt) {
 
   // Repository
   getIt.registerLazySingleton<ExamsRepository>(
-    () => ExamsRepositoryImpl(
-      remoteDataSource: getIt<ExamsRemoteDataSource>(),
-    ),
+    () => ExamsRepositoryImpl(remoteDataSource: getIt<ExamsRemoteDataSource>()),
   );
 
   // Use Cases
@@ -155,5 +152,14 @@ void registerExamsDependencies(GetIt getIt) {
 
   getIt.registerLazySingleton<DeleteExamQuestionUseCase>(
     () => DeleteExamQuestionUseCase(examsRepository: getIt<ExamsRepository>()),
+  );
+
+  // Presentation
+  getIt.registerFactory<ExamResultsCubit>(
+    () => ExamResultsCubit(
+      getExamByIdUseCase: getIt<GetExamByIdUseCase>(),
+      getExamResultsUseCase: getIt<GetExamResultsUseCase>(),
+      streamExamResultsUseCase: getIt<StreamExamResultsUseCase>(),
+    ),
   );
 }

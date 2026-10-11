@@ -604,6 +604,42 @@ class AppTextStyle {
     );
   }
 
+  static TextStyle font22HighlightBoldKufam() {
+    return TextStyle(
+      fontSize: 22.sp,
+      fontWeight: FontWeightHelper.bold,
+      fontFamily: kufam,
+      color: ColorPalette.highlight,
+    );
+  }
+
+  static TextStyle font11TextMutedRegularTajawal() {
+    return TextStyle(
+      fontSize: 11.sp,
+      fontWeight: FontWeightHelper.regular,
+      fontFamily: tajawal,
+      color: ColorPalette.textMuted,
+    );
+  }
+
+  static TextStyle font11PrimaryBoldTajawal() {
+    return TextStyle(
+      fontSize: 11.sp,
+      fontWeight: FontWeightHelper.bold,
+      fontFamily: tajawal,
+      color: ColorPalette.primary,
+    );
+  }
+
+  static TextStyle font12TextMutedRegularTajawal() {
+    return TextStyle(
+      fontSize: 12.sp,
+      fontWeight: FontWeightHelper.regular,
+      fontFamily: tajawal,
+      color: ColorPalette.textMuted,
+    );
+  }
+
   static TextStyle font20HighlightSemiBoldKufam() {
     return TextStyle(
       fontSize: 20.sp,

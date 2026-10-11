@@ -5,6 +5,7 @@ import 'package:al_mobdea_admin/features/exams/data/models/exam_model.dart';
 import 'package:al_mobdea_admin/features/exams/data/models/exam_question_model.dart';
 import 'package:al_mobdea_admin/features/exams/data/models/exam_result_model.dart';
 import 'package:al_mobdea_admin/features/exams/domain/entities/exam_attempt_status.dart';
+import 'package:al_mobdea_admin/features/exams/domain/entities/exam_draft_entity.dart';
 import 'package:al_mobdea_admin/features/exams/domain/entities/exam_entity.dart';
 import 'package:al_mobdea_admin/features/exams/domain/entities/exam_question_entity.dart';
 import 'package:al_mobdea_admin/features/exams/domain/entities/exam_result_entity.dart';
@@ -636,6 +637,13 @@ final ExamEntity tPublishedExamEntity = tExamEntity.copyWith(
 final ExamEntity tEndedExamEntity = tExamEntity.copyWith(
   status: ExamStatus.ended,
   closedAt: tExamUpdatedAt,
+);
+
+final ExamDraftEntity tExamDraft = ExamDraftEntity(
+  examName: tExamName,
+  gradeId: tGradeId,
+  durationMinutes: tExamDurationMinutes,
+  status: ExamStatus.unpublished,
 );
 
 final ExamModel tExamModel = ExamModel(

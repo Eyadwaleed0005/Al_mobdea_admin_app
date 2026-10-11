@@ -7,7 +7,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class BottomNavItemData {
-  const BottomNavItemData({required this.index, required this.label, required this.iconPath});
+  const BottomNavItemData({
+    required this.index,
+    required this.label,
+    required this.iconPath,
+  });
 
   final int index;
   final String label;
@@ -15,7 +19,12 @@ class BottomNavItemData {
 }
 
 class NavItem extends StatelessWidget {
-  const NavItem({super.key, required this.data, required this.isSelected, required this.onTap});
+  const NavItem({
+    super.key,
+    required this.data,
+    required this.isSelected,
+    required this.onTap,
+  });
 
   final BottomNavItemData data;
   final bool isSelected;
@@ -23,7 +32,9 @@ class NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foregroundColor = isSelected ? Colors.white : ColorPalette.textSecondary;
+    final foregroundColor = isSelected
+        ? Colors.white
+        : ColorPalette.textSecondary;
 
     return Semantics(
       button: true,
@@ -59,17 +70,22 @@ class NavItem extends StatelessWidget {
                             data.label,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: AppTextStyle.font12TextSecondaryRegularTajawal().copyWith(
-                              color: foregroundColor,
-                              fontWeight: FontWeightHelper.bold,
-                            ),
+                            style:
+                                AppTextStyle.font12TextSecondaryRegularTajawal()
+                                    .copyWith(
+                                      color: foregroundColor,
+                                      fontWeight: FontWeightHelper.bold,
+                                    ),
                           ),
                         ),
                       ],
                     )
                   : Center(
                       key: const ValueKey<String>('unselected'),
-                      child: _NavIcon(path: data.iconPath, color: foregroundColor),
+                      child: _NavIcon(
+                        path: data.iconPath,
+                        color: foregroundColor,
+                      ),
                     ),
             ),
           ),

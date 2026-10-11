@@ -1,6 +1,5 @@
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
-import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/features/dashboard/presentation/screens/home_screen.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/cubit/bottom_navigation_cubit.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/widgets/custom_bottom_nav_bar.dart';
@@ -12,7 +11,10 @@ class MainNavigationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(create: (_) => BottomNavigationCubit(), child: const MainNavigationView());
+    return BlocProvider(
+      create: (_) => BottomNavigationCubit(),
+      child: const MainNavigationView(),
+    );
   }
 }
 
@@ -27,7 +29,10 @@ class MainNavigationView extends StatelessWidget {
       body: BlocBuilder<BottomNavigationCubit, int>(
         buildWhen: (prev, curr) => prev != curr,
         builder: (context, currentIndex) {
-          return KeyedSubtree(key: ValueKey<int>(currentIndex), child: _buildScreen(currentIndex));
+          return KeyedSubtree(
+            key: ValueKey<int>(currentIndex),
+            child: _buildScreen(currentIndex),
+          );
         },
       ),
       bottomNavigationBar: AppAnimations.bottomNavBarEntrance(
@@ -59,11 +64,7 @@ class MainNavigationView extends StatelessWidget {
       case 2:
         return const ContentManagementScreen();
       case 3:
-        return const _PlaceholderScreen(
-          title: 'الامتحانات',
-          description: 'ستظهر الامتحانات هنا.',
-          icon: Icons.assignment_outlined,
-        );
+        return const ViewExamsScreen();
       case 4:
         return BlocProvider<LiveSessionCubit>(
           create: (_) => LiveSessionCubit(
@@ -78,58 +79,5 @@ class MainNavigationView extends StatelessWidget {
       default:
         return const HomeScreen();
     }
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  const _PlaceholderScreen({required this.title, required this.description, required this.icon});
-
-  final String title;
-  final String description;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return BackgroundStudentLayout(
-      child: Scaffold(
-        backgroundColor: ColorPalette.background,
-        body: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 44, color: ColorPalette.primary),
-                const SizedBox(height: 14),
-                Text(
-                  title,
-                  textDirection: TextDirection.rtl,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Kufam',
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF27191D),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Text(
-                    description,
-                    textDirection: TextDirection.rtl,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontFamily: 'Tajawal',
-                      color: Color(0xFF604B49),
-                      height: 1.6,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

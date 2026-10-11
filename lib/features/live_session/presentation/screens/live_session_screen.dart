@@ -1,7 +1,6 @@
 import 'package:al_mobdea_admin/core/helper/app_system_ui.dart';
 import 'package:al_mobdea_admin/core/style/app_animations.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
-import 'package:al_mobdea_admin/core/style/textstyles.dart';
 import 'package:al_mobdea_admin/core/widgets/app_network_aware_content.dart';
 import 'package:al_mobdea_admin/core/widgets/app_refresh_indicator.dart';
 import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
@@ -26,20 +25,13 @@ class LiveSessionScreen extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Scaffold(
-          appBar: CustomHeaderBar(
-            title: 'رابط الحصة المباشرة',
-            showProfileIcon: true,
-            titleStyle: AppTextStyle.font22TextLightBoldKufam(),
-          ),
+          appBar: CustomHeaderBar(title: 'رابط الحصة المباشرة', showProfileIcon: true),
           backgroundColor: ColorPalette.background,
           body: BackgroundStudentLayout(
             child: SafeArea(
               child: AppNetworkAwareContent(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 20.h,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 20.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
