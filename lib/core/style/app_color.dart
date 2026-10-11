@@ -68,7 +68,6 @@ class ColorPalette {
   static const Color textBlack = textPrimary;
 
   static const Color success = Color(0xFF257C53);
-  static const Color semanticSuccessSoftBg = Color(0x1A257C53);
   static const Color cardFillSoft = Color(0xFFFAF7F5);
 
   static const Color error = Color(0xFFBA3D4D);

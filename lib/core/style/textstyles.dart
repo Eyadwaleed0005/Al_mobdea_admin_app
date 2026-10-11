@@ -181,15 +181,6 @@ class AppTextStyle {
     );
   }
 
-  static TextStyle font14SuccessMediumTajawal() {
-    return TextStyle(
-      fontSize: 14.sp,
-      fontWeight: FontWeightHelper.medium,
-      fontFamily: tajawal,
-      color: ColorPalette.success,
-    );
-  }
-
   static TextStyle font15SurfaceMediumTajawal() {
     return TextStyle(
       fontSize: 15.sp,
@@ -735,7 +726,7 @@ class AppTextStyle {
       fontSize: 20.sp,
       fontWeight: FontWeightHelper.semiBold,
       fontFamily: kufam,
-      color: ColorPalette.primary,
+      color: ColorPalette.surface,
     );
   }
 
@@ -762,7 +753,7 @@ class AppTextStyle {
       fontSize: 15.sp,
       fontWeight: FontWeightHelper.regular,
       fontFamily: tajawal,
-      color: ColorPalette.textSecondary,
+      color: ColorPalette.textMuted,
     );
   }
 
