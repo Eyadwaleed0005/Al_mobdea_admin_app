@@ -3,7 +3,9 @@ import 'package:al_mobdea_admin/app/routes/feature_routes/dashboard_routes.dart'
 import 'package:al_mobdea_admin/app/routes/feature_routes/exams_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/lesson_exams_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/lessons_routes.dart';
+import 'package:al_mobdea_admin/app/routes/feature_routes/live_session_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/main_navigation_routes.dart';
+import 'package:al_mobdea_admin/app/routes/feature_routes/result_student_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/students_routes.dart';
 import 'package:al_mobdea_admin/app/routes/feature_routes/study_notes_routes.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +18,11 @@ abstract final class AppRoutes {
         DashboardRoutes.generateRoute(settings) ??
         MainNavigationRoutes.generateRoute(settings) ??
         StudentsRoutes.generateRoute(settings) ??
+        StudentExamResultsRoutes.generateRoute(settings) ??
         StudyNotesRoutes.generateRoute(settings) ??
         ExamsRoutes.generateRoute(settings) ??
         LessonsRoutes.generateRoute(settings) ??
-        LessonExamsRoutes.generateRoute(settings);
+        LessonExamsRoutes.generateRoute(settings) ??
+        LiveSessionRoutes.generateRoute(settings);
   }
 }
