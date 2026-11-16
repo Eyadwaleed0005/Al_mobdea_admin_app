@@ -1,5 +1,5 @@
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/delete_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/delete_study_note_use_case.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';

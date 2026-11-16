@@ -9,27 +9,13 @@ class StudyNoteModel extends StudyNoteEntity {
     required super.description,
     required super.gradeId,
     required super.isPublished,
-    super.pdfStoragePath,
-    super.pdfFileName,
-    super.pdfFileSize,
+    required super.pdfStoragePath,
+    required super.pdfFileName,
+    required super.pdfFileSize,
+    super.isFree = true,
     super.createdAt,
     super.updatedAt,
   });
-
-  factory StudyNoteModel.fromEntity(StudyNoteEntity note) {
-    return StudyNoteModel(
-      noteId: note.noteId,
-      name: note.name,
-      description: note.description,
-      gradeId: note.gradeId,
-      isPublished: note.isPublished,
-      pdfStoragePath: note.pdfStoragePath,
-      pdfFileName: note.pdfFileName,
-      pdfFileSize: note.pdfFileSize,
-      createdAt: note.createdAt,
-      updatedAt: note.updatedAt,
-    );
-  }
 
   factory StudyNoteModel.fromMap({
     required String documentId,
@@ -37,122 +23,95 @@ class StudyNoteModel extends StudyNoteEntity {
   }) {
     return StudyNoteModel(
       noteId: documentId,
-      name: _readString(map[FirestoreFields.name]),
-      description: _readString(map[FirestoreFields.description]),
-      gradeId: _readString(map[FirestoreFields.gradeId]),
-      isPublished: _readBool(map[FirestoreFields.isPublished]),
-      pdfStoragePath: _readNullableString(map[FirestoreFields.pdfStoragePath]),
-      pdfFileName: _readNullableString(map[FirestoreFields.pdfFileName]),
-      pdfFileSize: _readNullablePositiveInt(map[FirestoreFields.pdfFileSize]),
+      name: map[FirestoreFields.name] as String? ?? '',
+      description: map[FirestoreFields.description] as String? ?? '',
+      gradeId: map[FirestoreFields.gradeId] as String? ?? '',
+      isPublished: map[FirestoreFields.isPublished] as bool? ?? false,
+      isFree: map[FirestoreFields.isFree] as bool? ?? true,
+      pdfStoragePath: map[FirestoreFields.pdfStoragePath] as String? ?? '',
+      pdfFileName: map[FirestoreFields.pdfFileName] as String? ?? '',
+      pdfFileSize: _readFileSize(map[FirestoreFields.pdfFileSize]),
       createdAt: _readDateTime(map[FirestoreFields.createdAt]),
       updatedAt: _readDateTime(map[FirestoreFields.updatedAt]),
     );
   }
 
+  factory StudyNoteModel.fromEntity(StudyNoteEntity entity) {
+    return StudyNoteModel(
+      noteId: entity.noteId,
+      name: entity.name,
+      description: entity.description,
+      gradeId: entity.gradeId,
+      isPublished: entity.isPublished,
+      isFree: entity.isFree,
+      pdfStoragePath: entity.pdfStoragePath,
+      pdfFileName: entity.pdfFileName,
+      pdfFileSize: entity.pdfFileSize,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    );
+  }
+
   Map<String, dynamic> toCreateMap() {
-    final map = <String, dynamic>{
+    return {
       FirestoreFields.name: name.trim(),
       FirestoreFields.description: description.trim(),
       FirestoreFields.gradeId: gradeId.trim(),
       FirestoreFields.isPublished: isPublished,
+      FirestoreFields.isFree: isFree,
+      FirestoreFields.pdfStoragePath: pdfStoragePath.trim(),
+      FirestoreFields.pdfFileName: pdfFileName.trim(),
+      FirestoreFields.pdfFileSize: pdfFileSize,
       FirestoreFields.createdAt: FieldValue.serverTimestamp(),
       FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
     };
-
-    _addPdfFieldsIfAvailable(map);
-
-    return map;
   }
 
-  Map<String, dynamic> toUpdateMap({bool removePdf = false}) {
-    final map = <String, dynamic>{
+  Map<String, dynamic> toUpdateMap() {
+    return {
       FirestoreFields.name: name.trim(),
       FirestoreFields.description: description.trim(),
       FirestoreFields.gradeId: gradeId.trim(),
       FirestoreFields.isPublished: isPublished,
+      FirestoreFields.isFree: isFree,
+      FirestoreFields.pdfStoragePath: pdfStoragePath.trim(),
+      FirestoreFields.pdfFileName: pdfFileName.trim(),
+      FirestoreFields.pdfFileSize: pdfFileSize,
       FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
     };
-
-    if (removePdf) {
-      _addDeletedPdfFields(map);
-    } else {
-      _addPdfFieldsIfAvailable(map);
-    }
-
-    return map;
   }
 
-  void _addPdfFieldsIfAvailable(Map<String, dynamic> map) {
-    final normalizedStoragePath = pdfStoragePath?.trim();
-    final normalizedFileName = pdfFileName?.trim();
-    final normalizedFileSize = pdfFileSize;
-
-    final hasValidPdf =
-        normalizedStoragePath != null &&
-        normalizedStoragePath.isNotEmpty &&
-        normalizedFileName != null &&
-        normalizedFileName.isNotEmpty &&
-        normalizedFileSize != null &&
-        normalizedFileSize > 0;
-
-    if (!hasValidPdf) {
-      return;
-    }
-
-    map[FirestoreFields.pdfStoragePath] = normalizedStoragePath;
-    map[FirestoreFields.pdfFileName] = normalizedFileName;
-    map[FirestoreFields.pdfFileSize] = normalizedFileSize;
-  }
-
-  void _addDeletedPdfFields(Map<String, dynamic> map) {
-    map[FirestoreFields.pdfStoragePath] = FieldValue.delete();
-    map[FirestoreFields.pdfFileName] = FieldValue.delete();
-    map[FirestoreFields.pdfFileSize] = FieldValue.delete();
-  }
-
-  static String _readString(dynamic value) {
-    return value is String ? value.trim() : '';
-  }
-
-  static String? _readNullableString(dynamic value) {
-    if (value is! String) {
-      return null;
-    }
-
-    final normalizedValue = value.trim();
-
-    return normalizedValue.isEmpty ? null : normalizedValue;
-  }
-
-  static int? _readNullablePositiveInt(dynamic value) {
-    final intValue = value is int
-        ? value
-        : value is num
-        ? value.toInt()
-        : null;
-
-    if (intValue == null || intValue <= 0) {
-      return null;
-    }
-
-    return intValue;
-  }
-
-  static bool _readBool(dynamic value) {
-    return value is bool ? value : false;
-  }
-
-  static DateTime? _readDateTime(dynamic value) {
-    if (value is Timestamp) {
-      return value.toDate();
-    }
-
-    if (value is DateTime) {
+  static int _readFileSize(Object? value) {
+    if (value is int) {
       return value;
     }
 
+    if (value is num) {
+      return value.toInt();
+    }
+
+    return 0;
+  }
+
+  static DateTime? _readDateTime(Object? value) {
+    if (value is Timestamp) {
+      return value.toDate().toUtc();
+    }
+
+    if (value is DateTime) {
+      return value.toUtc();
+    }
+
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value, isUtc: true);
+    }
+
+    if (value is num) {
+      return DateTime.fromMillisecondsSinceEpoch(value.toInt(), isUtc: true);
+    }
+
     if (value is String) {
-      return DateTime.tryParse(value);
+      return DateTime.tryParse(value)?.toUtc();
     }
 
     return null;

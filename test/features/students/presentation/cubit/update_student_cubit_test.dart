@@ -91,6 +91,40 @@ void main() {
   );
 
   blocTest<UpdateStudentCubit, UpdateStudentState>(
+    'loadStudent supports a student without subscription dates',
+    setUp: () {
+      when(
+        () => mockGetStudentByIdUseCase(studentId: tStudentId),
+      ).thenAnswer(
+        (_) async => Right(
+          tStudentEntity.copyWith(
+            clearSubscriptionDates: true,
+            isActive: false,
+          ),
+        ),
+      );
+    },
+    build: buildCubit,
+    act: (cubit) => cubit.loadStudent(),
+    expect: () => [
+      isA<UpdateStudentState>().having(
+        (s) => s.status,
+        'status',
+        UpdateStudentStatus.loading,
+      ),
+      isA<UpdateStudentState>()
+          .having((s) => s.status, 'status', UpdateStudentStatus.ready)
+          .having((s) => s.subscriptionStartDate, 'start', isNull)
+          .having((s) => s.subscriptionEndDate, 'end', isNull),
+    ],
+    verify: (cubit) {
+      expect(cubit.studentNameController.text, equals(tStudentName));
+      expect(cubit.subscriptionStartDateController.text, isEmpty);
+      expect(cubit.subscriptionEndDateController.text, isEmpty);
+    },
+  );
+
+  blocTest<UpdateStudentCubit, UpdateStudentState>(
     'deleteStudent emits [deleting, deleteSuccess] on success',
     setUp: () {
       when(

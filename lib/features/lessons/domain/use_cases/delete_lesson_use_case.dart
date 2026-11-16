@@ -3,17 +3,12 @@ import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_rep
 import 'package:dartz/dartz.dart';
 
 class DeleteLessonUseCase {
-  const DeleteLessonUseCase({
-    required LessonsRepository repository,
-  }) : _repository = repository;
+  const DeleteLessonUseCase({required LessonsRepository repository})
+    : _repository = repository;
 
   final LessonsRepository _repository;
 
-  Future<Either<AppErrorModel, Unit>> call({
-    required String lessonId,
-  }) {
-    return _repository.deleteLesson(
-      lessonId: lessonId,
-    );
+  Future<Either<AppErrorModel, Unit>> call({required String lessonId}) {
+    return _repository.deleteLesson(lessonId: lessonId);
   }
 }

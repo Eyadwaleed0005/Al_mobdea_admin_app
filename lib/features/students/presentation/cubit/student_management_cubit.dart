@@ -7,22 +7,26 @@ import 'package:al_mobdea_admin/features/students/domain/entities/student_entity
 import 'package:al_mobdea_admin/features/students/domain/helper/students_filter_helper.dart';
 import 'package:al_mobdea_admin/features/students/domain/params/student_params.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/stream_students_use_case.dart';
-import 'package:al_mobdea_admin/features/students/presentation/cubit/student_management_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'student_management_state.dart';
+
 class StudentManagementCubit extends Cubit<StudentManagementState> {
   final StreamStudentsUseCase _streamStudentsUseCase;
+
   final StreamGradesUseCase _streamGradesUseCase;
 
   StreamSubscription<Either<AppErrorModel, List<StudentEntity>>>?
-      _studentsSubscription;
+  _studentsSubscription;
 
   StreamSubscription<Either<AppErrorModel, List<GradeEntity>>>?
-      _gradesSubscription;
+  _gradesSubscription;
 
   List<StudentEntity> _allStudents = const [];
+
   List<GradeEntity> _grades = const [];
+
   StudentsFilterParams _filters = const StudentsFilterParams();
 
   bool _studentsReceived = false;
@@ -32,9 +36,9 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
   StudentManagementCubit({
     required StreamStudentsUseCase streamStudentsUseCase,
     required StreamGradesUseCase streamGradesUseCase,
-  })  : _streamStudentsUseCase = streamStudentsUseCase,
-        _streamGradesUseCase = streamGradesUseCase,
-        super(const StudentManagementInitial());
+  }) : _streamStudentsUseCase = streamStudentsUseCase,
+       _streamGradesUseCase = streamGradesUseCase,
+       super(const StudentManagementInitial());
 
   Future<void> watchStudentManagement() async {
     await _studentsSubscription?.cancel();
@@ -54,29 +58,31 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
 
   void _startStudentsStream() {
     _studentsSubscription =
-        _streamStudentsUseCase(params: const StudentsFilterParams()).listen(
-      (result) {
-        result.fold(_emitFailure, (students) {
-          if (isClosed) return;
-          _allStudents = students;
-          _studentsReceived = true;
-          _emitCurrentState();
-        });
-      },
-    );
+        _streamStudentsUseCase(params: const StudentsFilterParams())
+            .listen((result) {
+              result.fold(_emitFailure, (students) {
+                if (isClosed) return;
+
+                _allStudents = students;
+                _studentsReceived = true;
+
+                _emitCurrentState();
+              });
+            });
   }
 
   void _startGradesStream() {
-    _gradesSubscription = _streamGradesUseCase(activeOnly: true).listen(
-      (result) {
-        result.fold(_emitFailure, (grades) {
-          if (isClosed) return;
-          _grades = grades;
-          _gradesReceived = true;
-          _emitCurrentState();
+    _gradesSubscription = _streamGradesUseCase(activeOnly: true)
+        .listen((result) {
+          result.fold(_emitFailure, (grades) {
+            if (isClosed) return;
+
+            _grades = grades;
+            _gradesReceived = true;
+
+            _emitCurrentState();
+          });
         });
-      },
-    );
   }
 
   void updateSearchQuery(String searchQuery) {
@@ -85,6 +91,7 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
       searchQuery: searchQuery,
       subscriptionFilter: _filters.subscriptionFilter,
     );
+
     _emitCurrentState();
   }
 
@@ -94,6 +101,7 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
       searchQuery: _filters.searchQuery,
       subscriptionFilter: _filters.subscriptionFilter,
     );
+
     _emitCurrentState();
   }
 
@@ -103,17 +111,21 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
       searchQuery: _filters.searchQuery,
       subscriptionFilter: filter,
     );
+
     _emitCurrentState();
   }
 
   void clearFilters() {
     _filters = const StudentsFilterParams();
+
     _emitCurrentState();
   }
 
   void _emitFailure(AppErrorModel error) {
     if (isClosed) return;
+
     _hasFailure = true;
+
     emit(StudentManagementFailure(error: error));
   }
 
@@ -124,6 +136,7 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
 
     if (_allStudents.isEmpty) {
       emit(const StudentManagementEmpty());
+
       return;
     }
 
@@ -136,6 +149,7 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
       emit(
         StudentManagementNoSearchResults(grades: _grades, filters: _filters),
       );
+
       return;
     }
 
@@ -152,6 +166,7 @@ class StudentManagementCubit extends Cubit<StudentManagementState> {
   Future<void> close() async {
     await _studentsSubscription?.cancel();
     await _gradesSubscription?.cancel();
+
     return super.close();
   }
 }

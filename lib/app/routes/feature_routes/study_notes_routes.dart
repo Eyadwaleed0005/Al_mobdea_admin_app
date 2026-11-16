@@ -1,10 +1,10 @@
 import 'package:al_mobdea_admin/app/routes/route_names.dart';
 import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/create_study_note_use_case.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/delete_study_note_use_case.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/get_study_note_by_id_use_case.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/stream_study_notes_use_case.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/update_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/create_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/delete_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/get_study_note_by_id_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/stream_study_notes_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/update_study_note_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/add_note_cubit.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/edit_note_cubit.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/view_notes_cubit.dart';

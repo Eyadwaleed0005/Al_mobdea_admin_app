@@ -1,5 +1,6 @@
 import 'package:al_mobdea_admin/core/helper/app_system_ui.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
+import 'package:al_mobdea_admin/core/widgets/app_network_aware_content.dart';
 import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/core/widgets/custom_header_bar.dart';
 import 'package:al_mobdea_admin/features/students/presentation/widgets/add_student_screen_widgets/add_student_feedback_listener.dart';
@@ -23,11 +24,16 @@ class AddStudentScreen extends StatelessWidget {
           ),
           backgroundColor: ColorPalette.background,
           body: BackgroundStudentLayout(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [const Expanded(child: AddStudentFormFields())],
+            child: AppNetworkAwareContent(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24.w,
+                  vertical: 20.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [const Expanded(child: AddStudentFormFields())],
+                ),
               ),
             ),
           ),

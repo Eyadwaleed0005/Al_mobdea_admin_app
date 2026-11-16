@@ -5,6 +5,7 @@ import 'package:al_mobdea_admin/core/firebase/firestore/firestore_collections.da
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_fields.dart';
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_service.dart';
 import 'package:al_mobdea_admin/features/students/data/data_sources/firestore/firebase_students_remote_data_source.dart';
+import 'package:al_mobdea_admin/features/students/data/models/student_model.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -137,8 +138,8 @@ void main() {
     test('patches an existing student document', () async {
       await seedStudent();
 
-      final updated = tStudentModel.copyWith(
-        name: 'Updated Name',
+      final updated = StudentModel.fromEntity(
+        tStudentModel.copyWith(name: 'Updated Name'),
       );
       await dataSource.updateStudent(student: updated);
 

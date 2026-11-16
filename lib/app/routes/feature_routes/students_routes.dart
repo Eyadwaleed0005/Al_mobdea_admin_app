@@ -29,10 +29,7 @@ abstract final class StudentsRoutes {
         return MaterialPageRoute<dynamic>(
           settings: settings,
           builder: (_) => BlocProvider<StudentManagementCubit>(
-            create: (_) => StudentManagementCubit(
-              streamStudentsUseCase: _get<StreamStudentsUseCase>(),
-              streamGradesUseCase: _get<StreamGradesUseCase>(),
-            )..watchStudentManagement(),
+            create: (_) => _createStudentManagementCubit(),
             child: const StudentManagementScreen(),
           ),
         );
@@ -41,37 +38,64 @@ abstract final class StudentsRoutes {
         return MaterialPageRoute<dynamic>(
           settings: settings,
           builder: (_) => BlocProvider<AddStudentCubit>(
-            create: (_) => AddStudentCubit(
-              createStudentUseCase: _get<CreateStudentUseCase>(),
-              streamGradesUseCase: _get<StreamGradesUseCase>(),
-            )..watchGrades(),
+            create: (_) => _createAddStudentCubit(),
             child: const AddStudentScreen(),
           ),
         );
 
       case RouteNames.updateStudentScreen:
-        final studentId = settings.arguments as String? ?? '';
-        return MaterialPageRoute<dynamic>(
-          settings: settings,
-          builder: (_) => BlocProvider<UpdateStudentCubit>(
-            create: (_) => UpdateStudentCubit(
-              studentId: studentId,
-              getStudentByIdUseCase: _get<GetStudentByIdUseCase>(),
-              streamGradesUseCase: _get<StreamGradesUseCase>(),
-              updateStudentProfileUseCase: _get<UpdateStudentProfileUseCase>(),
-              updateStudentEmailUseCase: _get<UpdateStudentEmailUseCase>(),
-              updateStudentPasswordUseCase: _get<UpdateStudentPasswordUseCase>(),
-              updateStudentSubscriptionUseCase:
-                  _get<UpdateStudentSubscriptionUseCase>(),
-              deleteStudentUseCase: _get<DeleteStudentUseCase>(),
-            )..initialize(),
-            child: const UpdateStudentScreen(),
-          ),
-        );
+        return _generateUpdateStudentRoute(settings);
 
       default:
         return null;
     }
+  }
+
+  static Route<dynamic>? _generateUpdateStudentRoute(RouteSettings settings) {
+    final Object? argument = settings.arguments;
+
+    if (argument is! String || argument.trim().isEmpty) {
+      return null;
+    }
+
+    final String studentId = argument.trim();
+
+    return MaterialPageRoute<dynamic>(
+      settings: settings,
+      builder: (_) => BlocProvider<UpdateStudentCubit>(
+        create: (_) => _createUpdateStudentCubit(studentId: studentId),
+        child: const UpdateStudentScreen(),
+      ),
+    );
+  }
+
+  static StudentManagementCubit _createStudentManagementCubit() {
+    return StudentManagementCubit(
+      streamStudentsUseCase: _get<StreamStudentsUseCase>(),
+      streamGradesUseCase: _get<StreamGradesUseCase>(),
+    )..watchStudentManagement();
+  }
+
+  static AddStudentCubit _createAddStudentCubit() {
+    return AddStudentCubit(
+      createStudentUseCase: _get<CreateStudentUseCase>(),
+      streamGradesUseCase: _get<StreamGradesUseCase>(),
+    )..watchGrades();
+  }
+
+  static UpdateStudentCubit _createUpdateStudentCubit({
+    required String studentId,
+  }) {
+    return UpdateStudentCubit(
+      studentId: studentId,
+      getStudentByIdUseCase: _get<GetStudentByIdUseCase>(),
+      streamGradesUseCase: _get<StreamGradesUseCase>(),
+      updateStudentProfileUseCase: _get<UpdateStudentProfileUseCase>(),
+      updateStudentEmailUseCase: _get<UpdateStudentEmailUseCase>(),
+      updateStudentPasswordUseCase: _get<UpdateStudentPasswordUseCase>(),
+      updateStudentSubscriptionUseCase: _get<UpdateStudentSubscriptionUseCase>(),
+      deleteStudentUseCase: _get<DeleteStudentUseCase>(),
+    )..initialize();
   }
 
   static T _get<T extends Object>() {

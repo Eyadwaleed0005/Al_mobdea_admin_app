@@ -1,6 +1,7 @@
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
-import 'package:al_mobdea_admin/features/students/domain/entities/student_entity.dart';
 import 'package:dartz/dartz.dart';
+
+import '../entities/student_entity.dart';
 
 abstract class StudentsRepository {
   Future<Either<AppErrorModel, List<StudentEntity>>> getStudents({

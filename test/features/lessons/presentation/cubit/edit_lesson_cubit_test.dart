@@ -154,6 +154,7 @@ void main() {
     expect(cubit.state.pageStatus, EditLessonPageStatus.initial);
     expect(cubit.state.actionStatus, EditLessonActionStatus.idle);
     expect(cubit.state.lesson, isNull);
+    expect(cubit.state.isFree, isTrue);
 
     await cubit.close();
   });
@@ -412,6 +413,7 @@ void main() {
 
       cubit.changeTitle(updatedTitle);
       cubit.changePublicationStatus(false);
+      cubit.changeFreeStatus(false);
 
       await cubit.updateLesson();
     },
@@ -421,6 +423,7 @@ void main() {
       isA<EditLessonState>(),
       isA<EditLessonState>().having((s) => s.title, 'title', updatedTitle),
       isA<EditLessonState>().having((s) => s.isPublished, 'isPublished', isFalse),
+      isA<EditLessonState>().having((s) => s.isFree, 'isFree', isFalse),
       isA<EditLessonState>()
           .having((s) => s.isUpdating, 'isUpdating', isTrue)
           .having((s) => s.actionStatus, 'actionStatus', EditLessonActionStatus.updating),
@@ -442,6 +445,7 @@ void main() {
 
       expect(submittedLesson.lessonId, tLessonId);
       expect(submittedLesson.title, updatedTitle);
+      expect(submittedLesson.isFree, isFalse);
       expect(submittedLesson.pdfFileName, tPdfFileName);
       expect(submittedLesson.pdfStoragePath, tPdfStoragePath);
     },

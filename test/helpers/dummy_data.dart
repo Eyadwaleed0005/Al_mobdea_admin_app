@@ -41,7 +41,6 @@ final DateTime tUpdatedAt = DateTime.utc(2024, 1, 2, 12);
 const String tStudentId = 'student-123';
 const String tGradeId = 'grade-1';
 const String tStudentName = 'Ahmed Ali';
-const int tStudentAge = 16;
 const String tStudentEmail = 'ahmed@example.com';
 const String tStudentPhone = '01000000000';
 
@@ -49,7 +48,6 @@ final StudentEntity tStudentEntity = StudentEntity(
   studentId: tStudentId,
   gradeId: tGradeId,
   name: tStudentName,
-  age: tStudentAge,
   email: tStudentEmail,
   phoneNumber: tStudentPhone,
   subscriptionStartAt: tSubscriptionStartAt,
@@ -62,7 +60,6 @@ final StudentModel tStudentModel = StudentModel(
   studentId: tStudentId,
   gradeId: tGradeId,
   name: tStudentName,
-  age: tStudentAge,
   email: tStudentEmail,
   phoneNumber: tStudentPhone,
   subscriptionStartAt: tSubscriptionStartAt,
@@ -78,7 +75,6 @@ Map<String, dynamic> tStudentJson() {
     FirestoreFields.studentId: tStudentId,
     FirestoreFields.gradeId: tGradeId,
     FirestoreFields.name: tStudentName,
-    FirestoreFields.age: tStudentAge,
     FirestoreFields.email: tStudentEmail,
     FirestoreFields.phoneNumber: tStudentPhone,
     FirestoreFields.subscriptionStartAt: Timestamp.fromDate(
@@ -368,14 +364,16 @@ final StudyNoteEntity tStudyNoteEntity = StudyNoteEntity(
   pdfStoragePath: tStudyNotePdfStoragePath,
 );
 
-final StudyNoteEntity tStudyNoteEntityWithoutPdf =
-    StudyNoteEntity(
-      noteId: tStudyNoteId,
-      name: tStudyNoteName,
-      description: tStudyNoteDescription,
-      gradeId: tGradeId,
-      isPublished: true,
-    );
+final StudyNoteEntity tStudyNoteEntityWithoutPdf = StudyNoteEntity(
+  noteId: tStudyNoteId,
+  name: tStudyNoteName,
+  description: tStudyNoteDescription,
+  gradeId: tGradeId,
+  isPublished: true,
+  pdfFileName: '',
+  pdfFileSize: 0,
+  pdfStoragePath: '',
+);
 
 final StudyNoteModel tStudyNoteModel = StudyNoteModel(
   noteId: tStudyNoteId,
@@ -396,6 +394,9 @@ final StudyNoteModel tSecondStudyNoteModel = StudyNoteModel(
   description: 'Compact notes for chapter two',
   gradeId: tGradeId,
   isPublished: false,
+  pdfFileName: '',
+  pdfFileSize: 0,
+  pdfStoragePath: '',
   createdAt: tStudyNoteCreatedAt.subtract(
     const Duration(days: 1),
   ),

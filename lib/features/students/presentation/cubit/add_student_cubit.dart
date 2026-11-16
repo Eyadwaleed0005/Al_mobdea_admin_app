@@ -7,94 +7,110 @@ import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dar
 import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
 import 'package:al_mobdea_admin/features/students/domain/params/student_params.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/create_student_use_case.dart';
-import 'package:al_mobdea_admin/features/students/presentation/cubit/add_student_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'add_student_state.dart';
 
 class AddStudentCubit extends Cubit<AddStudentState> {
   AddStudentCubit({
     required CreateStudentUseCase createStudentUseCase,
     required StreamGradesUseCase streamGradesUseCase,
-  })  : _createStudentUseCase = createStudentUseCase,
-        _streamGradesUseCase = streamGradesUseCase,
-        super(const AddStudentState());
+  }) : _createStudentUseCase = createStudentUseCase,
+       _streamGradesUseCase = streamGradesUseCase,
+       super(const AddStudentState());
 
   final CreateStudentUseCase _createStudentUseCase;
   final StreamGradesUseCase _streamGradesUseCase;
 
   StreamSubscription<Either<AppErrorModel, List<GradeEntity>>>?
-      _gradesSubscription;
+  _gradesSubscription;
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   final TextEditingController studentNameController = TextEditingController();
-  final TextEditingController studentAgeController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
   final TextEditingController subscriptionStartDateController =
       TextEditingController();
+
   final TextEditingController subscriptionEndDateController =
       TextEditingController();
 
   DateTime get today {
     final now = DateTime.now();
+
     return DateTime(now.year, now.month, now.day);
   }
 
   DateTime get subscriptionEndFirstDate {
     final startDate = state.subscriptionStartDate;
-    if (startDate == null) return today;
+
+    if (startDate == null) {
+      return today;
+    }
+
     return startDate.add(const Duration(days: 1));
   }
 
   Future<void> watchGrades() async {
     await _gradesSubscription?.cancel();
 
-    _gradesSubscription = _streamGradesUseCase(activeOnly: true).listen(
-      (result) {
-        if (isClosed) return;
+    if (isClosed) {
+      return;
+    }
 
-        result.fold((_) {}, (grades) {
-          final selectedGradeStillExists = grades.any((grade) {
-            return grade.gradeId == state.selectedGradeId;
+    _gradesSubscription = _streamGradesUseCase(activeOnly: true)
+        .listen((result) {
+          if (isClosed) {
+            return;
+          }
+
+          result.fold((_) {}, (grades) {
+            final selectedGradeStillExists = grades.any((grade) {
+              return grade.gradeId == state.selectedGradeId;
+            });
+
+            emit(
+              state.copyWith(
+                grades: grades,
+                clearSelectedGradeId:
+                    state.selectedGradeId != null && !selectedGradeStillExists,
+              ),
+            );
           });
-
-          emit(
-            state.copyWith(
-              grades: grades,
-              clearSelectedGradeId:
-                  state.selectedGradeId != null && !selectedGradeStillExists,
-            ),
-          );
-        });
-      },
-      onError: (Object _, StackTrace __) {
-        if (isClosed) return;
-      },
-    );
+        }, onError: (Object _, StackTrace __) {});
   }
 
   void selectGrade(String gradeId) {
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
+
     emit(
       state.copyWith(
         status: AddStudentStatus.idle,
-        selectedGradeId: gradeId,
+        selectedGradeId: gradeId.trim(),
         clearError: true,
       ),
     );
   }
 
   void generateStrongPassword() {
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
+
     final generatedPassword = PasswordGenerator.generate(length: 12);
 
-    _setControllerText(
-      controller: passwordController,
-      text: generatedPassword,
-    );
+    _setControllerText(controller: passwordController, text: generatedPassword);
+
     _setControllerText(
       controller: confirmPasswordController,
       text: generatedPassword,
@@ -112,11 +128,18 @@ class AddStudentCubit extends Cubit<AddStudentState> {
   }
 
   void onPasswordChanged(String _) {
-    if (!state.hasGeneratedPassword) return;
+    if (isClosed || state.isSubmitting || !state.hasGeneratedPassword) {
+      return;
+    }
+
     emit(state.copyWith(hasGeneratedPassword: false));
   }
 
   void selectSubscriptionStartDate(DateTime date) {
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
+
     final normalizedDate = _normalizeDate(date);
 
     subscriptionStartDateController.text = _formatDate(normalizedDate);
@@ -135,6 +158,10 @@ class AddStudentCubit extends Cubit<AddStudentState> {
   }
 
   void selectSubscriptionEndDate(DateTime date) {
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
+
     final normalizedDate = _normalizeDate(date);
 
     subscriptionEndDateController.text = _formatDate(normalizedDate);
@@ -150,34 +177,68 @@ class AddStudentCubit extends Cubit<AddStudentState> {
     formKey.currentState?.validate();
   }
 
+  void clearSubscriptionDates() {
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
+
+    subscriptionStartDateController.clear();
+    subscriptionEndDateController.clear();
+
+    emit(
+      state.copyWith(
+        status: AddStudentStatus.idle,
+        clearSubscriptionStartDate: true,
+        clearSubscriptionEndDate: true,
+        clearError: true,
+      ),
+    );
+
+    formKey.currentState?.validate();
+  }
+
   Future<void> submit() async {
-    if (state.isSubmitting) return;
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
 
     FocusManager.instance.primaryFocus?.unfocus();
 
     final isFormValid = formKey.currentState?.validate() ?? false;
-    if (!isFormValid) return;
 
-    final gradeId = state.selectedGradeId;
+    if (!isFormValid) {
+      return;
+    }
+
+    final gradeId = state.selectedGradeId?.trim();
+
+    if (gradeId == null || gradeId.isEmpty) {
+      return;
+    }
+
     final subscriptionStartDate = state.subscriptionStartDate;
     final subscriptionEndDate = state.subscriptionEndDate;
-    final age = int.tryParse(studentAgeController.text.trim());
 
-    final startDateError =
-        AppValidator.subscriptionStartDate(subscriptionStartDate);
-    final endDateError = AppValidator.subscriptionEndDate(
-      startDate: subscriptionStartDate,
-      endDate: subscriptionEndDate,
-    );
+    final hasSubscriptionDates =
+        subscriptionStartDate != null || subscriptionEndDate != null;
 
-    if (gradeId == null ||
-        subscriptionStartDate == null ||
-        subscriptionEndDate == null ||
-        age == null ||
-        startDateError != null ||
-        endDateError != null) {
-      formKey.currentState?.validate();
-      return;
+    if (hasSubscriptionDates) {
+      final startDateError = AppValidator.subscriptionStartDate(
+        subscriptionStartDate,
+      );
+
+      final endDateError = AppValidator.subscriptionEndDate(
+        startDate: subscriptionStartDate,
+        endDate: subscriptionEndDate,
+      );
+
+      if (subscriptionStartDate == null ||
+          subscriptionEndDate == null ||
+          startDateError != null ||
+          endDateError != null) {
+        formKey.currentState?.validate();
+        return;
+      }
     }
 
     emit(
@@ -192,7 +253,6 @@ class AddStudentCubit extends Cubit<AddStudentState> {
       params: CreateStudentParams(
         gradeId: gradeId,
         name: studentNameController.text,
-        age: age,
         phoneNumber: phoneController.text,
         email: emailController.text,
         password: passwordController.text,
@@ -201,7 +261,9 @@ class AddStudentCubit extends Cubit<AddStudentState> {
       ),
     );
 
-    if (isClosed) return;
+    if (isClosed) {
+      return;
+    }
 
     result.fold(
       (error) {
@@ -226,7 +288,10 @@ class AddStudentCubit extends Cubit<AddStudentState> {
   }
 
   void dismissFailure() {
-    if (state.status != AddStudentStatus.failure) return;
+    if (isClosed || state.status != AddStudentStatus.failure) {
+      return;
+    }
+
     emit(state.copyWith(status: AddStudentStatus.idle, clearError: true));
   }
 
@@ -247,6 +312,7 @@ class AddStudentCubit extends Cubit<AddStudentState> {
   String _formatDate(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
+
     return '$day/$month/${date.year}';
   }
 
@@ -255,7 +321,6 @@ class AddStudentCubit extends Cubit<AddStudentState> {
     await _gradesSubscription?.cancel();
 
     studentNameController.dispose();
-    studentAgeController.dispose();
     phoneController.dispose();
     emailController.dispose();
     passwordController.dispose();

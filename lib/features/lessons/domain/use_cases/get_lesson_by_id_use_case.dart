@@ -4,17 +4,12 @@ import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_rep
 import 'package:dartz/dartz.dart';
 
 class GetLessonByIdUseCase {
-  const GetLessonByIdUseCase({
-    required LessonsRepository repository,
-  }) : _repository = repository;
+  const GetLessonByIdUseCase({required LessonsRepository repository})
+    : _repository = repository;
 
   final LessonsRepository _repository;
 
-  Future<Either<AppErrorModel, LessonEntity>> call({
-    required String lessonId,
-  }) {
-    return _repository.getLessonById(
-      lessonId: lessonId,
-    );
+  Future<Either<AppErrorModel, LessonEntity>> call({required String lessonId}) {
+    return _repository.getLessonById(lessonId: lessonId);
   }
 }

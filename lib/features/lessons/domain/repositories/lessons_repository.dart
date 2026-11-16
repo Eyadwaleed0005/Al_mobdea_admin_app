@@ -12,8 +12,10 @@ abstract class LessonsRepository {
     required String lessonId,
   });
 
-  Stream<Either<AppErrorModel, List<LessonEntity>>>
-  streamLessons({String? gradeId, bool? isPublished});
+  Stream<Either<AppErrorModel, List<LessonEntity>>> streamLessons({
+    String? gradeId,
+    bool? isPublished,
+  });
 
   Future<Either<AppErrorModel, Unit>> createLesson({
     required LessonEntity lesson,
@@ -26,7 +28,5 @@ abstract class LessonsRepository {
     bool removeExistingPdf = false,
   });
 
-  Future<Either<AppErrorModel, Unit>> deleteLesson({
-    required String lessonId,
-  });
+  Future<Either<AppErrorModel, Unit>> deleteLesson({required String lessonId});
 }

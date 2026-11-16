@@ -1,5 +1,6 @@
 import 'package:al_mobdea_admin/core/helper/app_system_ui.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
+import 'package:al_mobdea_admin/core/widgets/app_network_aware_content.dart';
 import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/core/widgets/custom_header_bar.dart';
 import 'package:al_mobdea_admin/features/students/presentation/widgets/update_student_screen_widgets/update_student_body.dart';
@@ -19,12 +20,17 @@ class UpdateStudentScreen extends StatelessWidget {
         appBar: CustomHeaderBar(title: 'حساب طالب', showBackButton: true),
         backgroundColor: ColorPalette.background,
         body: BackgroundStudentLayout(
-          child: UpdateStudentFeedbackListener(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [const Expanded(child: UpdateStudentBody())],
+          child: AppNetworkAwareContent(
+            child: UpdateStudentFeedbackListener(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 24.w,
+                  vertical: 20.h,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [const Expanded(child: UpdateStudentBody())],
+                ),
               ),
             ),
           ),

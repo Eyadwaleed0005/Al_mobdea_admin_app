@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_initializing_formals
-
 import 'package:al_mobdea_admin/core/errors/handlers/firebase_error_handler.dart';
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_collections.dart';
 import 'package:al_mobdea_admin/core/firebase/firestore/firestore_fields.dart';
@@ -68,37 +66,27 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
   @override
   Future<void> createStudyNote({
     required StudyNoteModel note,
-    String? localPdfFilePath,
+    required String localPdfFilePath,
   }) {
     return FirebaseErrorHandler.execute(() async {
-      final noteId = note.noteId.trim();
-      final localPath = localPdfFilePath?.trim();
+      final normalizedNoteId = note.noteId.trim();
 
-      final hasPdfFile = localPath != null && localPath.isNotEmpty;
+      final normalizedLocalPdfFilePath = localPdfFilePath.trim();
 
-      if (!hasPdfFile) {
-        await _firestoreService.postData(
-          collectionPath: FirestoreCollections.studyNotes,
-          documentId: noteId,
-          data: note.toCreateMap(),
-        );
+      final normalizedPdfFileName = note.pdfFileName.trim();
 
-        return;
-      }
-
-      final pdfFileName = note.pdfFileName?.trim() ?? 'study-note.pdf';
-      final newStoragePath = _buildPdfStoragePath(noteId: noteId);
+      final newStoragePath = _buildPdfStoragePath(noteId: normalizedNoteId);
 
       var didUploadPdf = false;
 
       try {
         final uploadedMetadata = await _storageService.uploadFile(
-          localFilePath: localPath,
+          localFilePath: normalizedLocalPdfFilePath,
           storagePath: newStoragePath,
           contentType: StorageContentTypes.pdf,
           customMetadata: {
-            StorageMetadataFields.noteId: noteId,
-            StorageMetadataFields.originalFileName: pdfFileName,
+            StorageMetadataFields.noteId: normalizedNoteId,
+            StorageMetadataFields.originalFileName: normalizedPdfFileName,
           },
         );
 
@@ -107,13 +95,13 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
         final persistedNote = _copyNoteWithPdf(
           note: note,
           pdfStoragePath: uploadedMetadata.fullPath,
-          pdfFileName: pdfFileName,
-          pdfFileSize: uploadedMetadata.size ?? note.pdfFileSize ?? 0,
+          pdfFileName: normalizedPdfFileName,
+          pdfFileSize: uploadedMetadata.size ?? note.pdfFileSize,
         );
 
         await _firestoreService.postData(
           collectionPath: FirestoreCollections.studyNotes,
-          documentId: noteId,
+          documentId: normalizedNoteId,
           data: persistedNote.toCreateMap(),
         );
       } catch (error, stackTrace) {
@@ -130,66 +118,49 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
   Future<void> updateStudyNote({
     required StudyNoteModel note,
     String? replacementPdfFilePath,
-    bool removeExistingPdf = false,
   }) {
     return FirebaseErrorHandler.execute(() async {
-      final noteId = note.noteId.trim();
-      final currentNote = await _getRequiredStudyNote(noteId: noteId);
-      final replacementPath = replacementPdfFilePath?.trim();
+      final normalizedNoteId = note.noteId.trim();
+
+      final currentNote = await _getRequiredStudyNote(noteId: normalizedNoteId);
+
+      final normalizedReplacementPath = replacementPdfFilePath?.trim();
 
       final hasReplacementPdf =
-          replacementPath != null && replacementPath.isNotEmpty;
-
-      if (removeExistingPdf && hasReplacementPdf) {
-        FirebaseErrorHandler.throwFirestoreCode('invalid-argument');
-      }
-
-      if (removeExistingPdf) {
-        final oldStoragePath = currentNote.pdfStoragePath?.trim() ?? '';
-
-        await _firestoreService.patchData(
-          collectionPath: FirestoreCollections.studyNotes,
-          documentId: noteId,
-          data: note.toUpdateMap(removePdf: true),
-        );
-
-        if (oldStoragePath.isNotEmpty) {
-          await _deleteStorageFile(storagePath: oldStoragePath);
-        }
-
-        return;
-      }
+          normalizedReplacementPath != null &&
+          normalizedReplacementPath.isNotEmpty;
 
       if (!hasReplacementPdf) {
         final updatedNote = _copyNoteWithPdf(
           note: note,
-          pdfStoragePath: currentNote.pdfStoragePath ?? '',
-          pdfFileName: currentNote.pdfFileName ?? '',
-          pdfFileSize: currentNote.pdfFileSize ?? 0,
+          pdfStoragePath: currentNote.pdfStoragePath,
+          pdfFileName: currentNote.pdfFileName,
+          pdfFileSize: currentNote.pdfFileSize,
         );
 
         await _firestoreService.patchData(
           collectionPath: FirestoreCollections.studyNotes,
-          documentId: noteId,
+          documentId: normalizedNoteId,
           data: updatedNote.toUpdateMap(),
         );
 
         return;
       }
 
-      final newPdfFileName = note.pdfFileName?.trim() ?? 'study-note.pdf';
-      final newStoragePath = _buildPdfStoragePath(noteId: noteId);
+      final normalizedPdfFileName = note.pdfFileName.trim();
+
+      final newStoragePath = _buildPdfStoragePath(noteId: normalizedNoteId);
 
       var didUploadNewPdf = false;
 
       try {
         final uploadedMetadata = await _storageService.uploadFile(
-          localFilePath: replacementPath,
+          localFilePath: normalizedReplacementPath,
           storagePath: newStoragePath,
           contentType: StorageContentTypes.pdf,
           customMetadata: {
-            StorageMetadataFields.noteId: noteId,
-            StorageMetadataFields.originalFileName: newPdfFileName,
+            StorageMetadataFields.noteId: normalizedNoteId,
+            StorageMetadataFields.originalFileName: normalizedPdfFileName,
           },
         );
 
@@ -198,13 +169,13 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
         final updatedNote = _copyNoteWithPdf(
           note: note,
           pdfStoragePath: uploadedMetadata.fullPath,
-          pdfFileName: newPdfFileName,
-          pdfFileSize: uploadedMetadata.size ?? note.pdfFileSize ?? 0,
+          pdfFileName: normalizedPdfFileName,
+          pdfFileSize: uploadedMetadata.size ?? note.pdfFileSize,
         );
 
         await _firestoreService.patchData(
           collectionPath: FirestoreCollections.studyNotes,
-          documentId: noteId,
+          documentId: normalizedNoteId,
           data: updatedNote.toUpdateMap(),
         );
       } catch (error, stackTrace) {
@@ -215,7 +186,7 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
         Error.throwWithStackTrace(error, stackTrace);
       }
 
-      final oldStoragePath = currentNote.pdfStoragePath?.trim() ?? '';
+      final oldStoragePath = currentNote.pdfStoragePath.trim();
 
       if (oldStoragePath.isNotEmpty && oldStoragePath != newStoragePath) {
         await _deleteStorageFile(storagePath: oldStoragePath);
@@ -230,10 +201,10 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
 
       final currentNote = await _getRequiredStudyNote(noteId: normalizedNoteId);
 
-      final storagePath = currentNote.pdfStoragePath?.trim() ?? '';
+      final currentStoragePath = currentNote.pdfStoragePath.trim();
 
-      if (storagePath.isNotEmpty) {
-        await _deleteStorageFile(storagePath: storagePath);
+      if (currentStoragePath.isNotEmpty) {
+        await _deleteStorageFile(storagePath: currentStoragePath);
       }
 
       await _firestoreService.deleteData(
@@ -272,6 +243,7 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
       description: note.description,
       gradeId: note.gradeId,
       isPublished: note.isPublished,
+      isFree: note.isFree,
       pdfStoragePath: pdfStoragePath,
       pdfFileName: pdfFileName,
       pdfFileSize: pdfFileSize,
@@ -347,12 +319,12 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
       );
     }).toList();
 
-    notes.sort((first, second) {
-      final firstCreatedAt = first.createdAt;
-      final secondCreatedAt = second.createdAt;
+    notes.sort((firstNote, secondNote) {
+      final firstCreatedAt = firstNote.createdAt;
+      final secondCreatedAt = secondNote.createdAt;
 
       if (firstCreatedAt == null && secondCreatedAt == null) {
-        return first.name.compareTo(second.name);
+        return firstNote.name.compareTo(secondNote.name);
       }
 
       if (firstCreatedAt == null) {
@@ -369,7 +341,7 @@ class FirebaseStudyNotesRemoteDataSource implements StudyNotesRemoteDataSource {
         return dateComparison;
       }
 
-      return first.name.compareTo(second.name);
+      return firstNote.name.compareTo(secondNote.name);
     });
 
     return List<StudyNoteModel>.unmodifiable(notes);

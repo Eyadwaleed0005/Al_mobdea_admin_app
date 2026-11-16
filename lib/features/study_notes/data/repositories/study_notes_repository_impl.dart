@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_initializing_formals
-
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
 import 'package:al_mobdea_admin/core/errors/exceptions/firebase_remote_exception.dart';
 import 'package:al_mobdea_admin/features/study_notes/data/data_sources/study_notes_remote_data_source.dart';
@@ -19,108 +17,103 @@ class StudyNotesRepositoryImpl implements StudyNotesRepository {
   Future<Either<AppErrorModel, List<StudyNoteEntity>>> getStudyNotes({
     String? gradeId,
     bool? isPublished,
-  }) {
-    return _execute<List<StudyNoteEntity>>(() async {
-      final notes = await _remoteDataSource.getStudyNotes(
+  }) async {
+    try {
+      final models = await _remoteDataSource.getStudyNotes(
         gradeId: gradeId,
         isPublished: isPublished,
       );
 
-      return List<StudyNoteEntity>.unmodifiable(notes);
-    });
+      return Right(_mapModelsToEntities(models));
+    } on FirebaseRemoteException catch (error) {
+      return Left(error.errorModel);
+    }
   }
 
   @override
   Future<Either<AppErrorModel, StudyNoteEntity>> getStudyNoteById({
     required String noteId,
-  }) {
-    return _execute<StudyNoteEntity>(() {
-      return _remoteDataSource.getStudyNoteById(noteId: noteId);
-    });
+  }) async {
+    try {
+      final model = await _remoteDataSource.getStudyNoteById(noteId: noteId);
+
+      return Right(model);
+    } on FirebaseRemoteException catch (error) {
+      return Left(error.errorModel);
+    }
   }
 
   @override
   Stream<Either<AppErrorModel, List<StudyNoteEntity>>> streamStudyNotes({
     String? gradeId,
     bool? isPublished,
-  }) {
-    return _executeStream<List<StudyNoteEntity>>(() {
-      return _remoteDataSource
-          .streamStudyNotes(gradeId: gradeId, isPublished: isPublished)
-          .map<List<StudyNoteEntity>>((notes) {
-            return List<StudyNoteEntity>.unmodifiable(notes);
-          });
-    });
+  }) async* {
+    try {
+      await for (final models in _remoteDataSource.streamStudyNotes(
+        gradeId: gradeId,
+        isPublished: isPublished,
+      )) {
+        yield Right(_mapModelsToEntities(models));
+      }
+    } on FirebaseRemoteException catch (error) {
+      yield Left(error.errorModel);
+    }
   }
 
   @override
   Future<Either<AppErrorModel, Unit>> createStudyNote({
     required StudyNoteEntity note,
-    String? localPdfFilePath,
-  }) {
-    return _execute<Unit>(() async {
-      final noteModel = StudyNoteModel.fromEntity(note);
+    required String localPdfFilePath,
+  }) async {
+    try {
+      final model = StudyNoteModel.fromEntity(note);
 
       await _remoteDataSource.createStudyNote(
-        note: noteModel,
+        note: model,
         localPdfFilePath: localPdfFilePath,
       );
 
-      return unit;
-    });
+      return const Right(unit);
+    } on FirebaseRemoteException catch (error) {
+      return Left(error.errorModel);
+    }
   }
 
   @override
   Future<Either<AppErrorModel, Unit>> updateStudyNote({
     required StudyNoteEntity note,
     String? replacementPdfFilePath,
-    bool removeExistingPdf = false,
-  }) {
-    return _execute<Unit>(() async {
-      final noteModel = StudyNoteModel.fromEntity(note);
+  }) async {
+    try {
+      final model = StudyNoteModel.fromEntity(note);
 
       await _remoteDataSource.updateStudyNote(
-        note: noteModel,
+        note: model,
         replacementPdfFilePath: replacementPdfFilePath,
-        removeExistingPdf: removeExistingPdf,
       );
 
-      return unit;
-    });
+      return const Right(unit);
+    } on FirebaseRemoteException catch (error) {
+      return Left(error.errorModel);
+    }
   }
 
   @override
   Future<Either<AppErrorModel, Unit>> deleteStudyNote({
     required String noteId,
-  }) {
-    return _execute<Unit>(() async {
+  }) async {
+    try {
       await _remoteDataSource.deleteStudyNote(noteId: noteId);
 
-      return unit;
-    });
-  }
-
-  Future<Either<AppErrorModel, T>> _execute<T>(
-    Future<T> Function() operation,
-  ) async {
-    try {
-      final result = await operation();
-
-      return Right<AppErrorModel, T>(result);
+      return const Right(unit);
     } on FirebaseRemoteException catch (error) {
-      return Left<AppErrorModel, T>(error.errorModel);
+      return Left(error.errorModel);
     }
   }
 
-  Stream<Either<AppErrorModel, T>> _executeStream<T>(
-    Stream<T> Function() operation,
-  ) async* {
-    try {
-      await for (final result in operation()) {
-        yield Right<AppErrorModel, T>(result);
-      }
-    } on FirebaseRemoteException catch (error) {
-      yield Left<AppErrorModel, T>(error.errorModel);
-    }
+  List<StudyNoteEntity> _mapModelsToEntities(List<StudyNoteModel> models) {
+    return models
+        .map<StudyNoteEntity>((model) => model)
+        .toList(growable: false);
   }
 }

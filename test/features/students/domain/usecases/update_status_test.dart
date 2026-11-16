@@ -1,4 +1,5 @@
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
+import 'package:al_mobdea_admin/features/students/domain/entities/student_entity.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/update_student_status_use_case.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,7 +9,6 @@ import '../../../../helpers/dummy_data.dart';
 import '../../../../helpers/test_helper.dart';
 
 void main() {
-  late MockStudentAuthRepository authRepository;
   late MockStudentsRepository studentsRepository;
   late UpdateStudentStatusUseCase useCase;
 
@@ -17,10 +17,8 @@ void main() {
   });
 
   setUp(() {
-    authRepository = MockStudentAuthRepository();
     studentsRepository = MockStudentsRepository();
     useCase = UpdateStudentStatusUseCase(
-      studentAuthRepository: authRepository,
       studentsRepository: studentsRepository,
     );
   });
@@ -32,26 +30,27 @@ void main() {
     isRetryable: true,
   );
 
-  // Active student with a future subscription (from dummy_data).
-  final tActiveStudent = tStudentEntity;
+  void stubUpdateSuccess() {
+    when(
+      () => studentsRepository.updateStudent(
+        student: any(named: 'student'),
+      ),
+    ).thenAnswer((_) async => const Right<AppErrorModel, Unit>(unit));
+  }
 
-  test(
-    'returns the same student when status is unchanged',
-    () async {
-      final result = await useCase.call(
-        student: tActiveStudent,
-        isActive: true,
-      );
+  test('returns the same student when status is unchanged', () async {
+    final result = await useCase.call(
+      student: tStudentEntity,
+      isActive: true,
+    );
 
-      expect(result.isRight(), isTrue);
-      verifyNever(
-        () => authRepository.updateStudentAccountStatus(
-          studentId: any(named: 'studentId'),
-          isActive: any(named: 'isActive'),
-        ),
-      );
-    },
-  );
+    expect(result.isRight(), isTrue);
+    verifyNever(
+      () => studentsRepository.updateStudent(
+        student: any(named: 'student'),
+      ),
+    );
+  });
 
   test('blocks activation when the subscription has already expired', () async {
     final expiredStudent = tStudentEntity.copyWith(
@@ -65,103 +64,25 @@ void main() {
     );
 
     expect(result.isLeft(), isTrue);
+    result.fold(
+      (error) => expect(error.code, 'expired-subscription'),
+      (_) => fail('expected Left'),
+    );
     verifyNever(
-      () => authRepository.updateStudentAccountStatus(
-        studentId: any(named: 'studentId'),
-        isActive: any(named: 'isActive'),
+      () => studentsRepository.updateStudent(
+        student: any(named: 'student'),
       ),
     );
   });
 
-  test(
-    'updates auth then firestore and returns updated student',
-    () async {
-      final inactiveStudent = tStudentEntity.copyWith(
-        isActive: false,
-      );
-
-      when(
-        () => authRepository.updateStudentAccountStatus(
-          studentId: any(named: 'studentId'),
-          isActive: any(named: 'isActive'),
-        ),
-      ).thenAnswer(
-        (_) async => const Right<AppErrorModel, Unit>(unit),
-      );
-      when(
-        () => studentsRepository.updateStudent(
-          student: any(named: 'student'),
-        ),
-      ).thenAnswer(
-        (_) async => const Right<AppErrorModel, Unit>(unit),
-      );
-
-      final result = await useCase.call(
-        student: inactiveStudent,
-        isActive: true,
-      );
-
-      expect(result.isRight(), isTrue);
-      result.fold(
-        (_) => fail('expected Right'),
-        (student) => expect(student.isActive, isTrue),
-      );
-    },
-  );
-
-  test(
-    'rolls back auth status when firestore update fails',
-    () async {
-      final inactiveStudent = tStudentEntity.copyWith(
-        isActive: false,
-      );
-
-      when(
-        () => authRepository.updateStudentAccountStatus(
-          studentId: any(named: 'studentId'),
-          isActive: any(named: 'isActive'),
-        ),
-      ).thenAnswer(
-        (_) async => const Right<AppErrorModel, Unit>(unit),
-      );
-      when(
-        () => studentsRepository.updateStudent(
-          student: any(named: 'student'),
-        ),
-      ).thenAnswer(
-        (_) async => Left<AppErrorModel, Unit>(tError),
-      );
-
-      final result = await useCase.call(
-        student: inactiveStudent,
-        isActive: true,
-      );
-
-      expect(result.isLeft(), isTrue);
-      // Called twice: once to apply, once to roll back.
-      verify(
-        () => authRepository.updateStudentAccountStatus(
-          studentId: any(named: 'studentId'),
-          isActive: any(named: 'isActive'),
-        ),
-      ).called(2);
-    },
-  );
-
-  test('returns Left when the auth update fails', () async {
-    final inactiveStudent = tStudentEntity.copyWith(
+  test('blocks activation when the student has no subscription', () async {
+    final studentWithoutSubscription = tStudentEntity.copyWith(
       isActive: false,
+      clearSubscriptionDates: true,
     );
 
-    when(
-      () => authRepository.updateStudentAccountStatus(
-        studentId: any(named: 'studentId'),
-        isActive: any(named: 'isActive'),
-      ),
-    ).thenAnswer((_) async => Left<AppErrorModel, Unit>(tError));
-
     final result = await useCase.call(
-      student: inactiveStudent,
+      student: studentWithoutSubscription,
       isActive: true,
     );
 
@@ -171,5 +92,69 @@ void main() {
         student: any(named: 'student'),
       ),
     );
+  });
+
+  test('updates firestore and returns the updated student', () async {
+    stubUpdateSuccess();
+
+    final inactiveStudent = tStudentEntity.copyWith(isActive: false);
+
+    final result = await useCase.call(
+      student: inactiveStudent,
+      isActive: true,
+    );
+
+    expect(result.isRight(), isTrue);
+    result.fold(
+      (_) => fail('expected Right'),
+      (student) => expect(student.isActive, isTrue),
+    );
+
+    final captured = verify(
+      () => studentsRepository.updateStudent(
+        student: captureAny(named: 'student'),
+      ),
+    ).captured;
+
+    final updatedStudent = captured.single as StudentEntity;
+    expect(updatedStudent.isActive, isTrue);
+  });
+
+  test('deactivates a student without checking the subscription', () async {
+    stubUpdateSuccess();
+
+    final result = await useCase.call(
+      student: tStudentEntity,
+      isActive: false,
+    );
+
+    expect(result.isRight(), isTrue);
+    result.fold(
+      (_) => fail('expected Right'),
+      (student) => expect(student.isActive, isFalse),
+    );
+
+    verify(
+      () => studentsRepository.updateStudent(
+        student: any(named: 'student'),
+      ),
+    ).called(1);
+  });
+
+  test('returns Left when the firestore update fails', () async {
+    when(
+      () => studentsRepository.updateStudent(
+        student: any(named: 'student'),
+      ),
+    ).thenAnswer((_) async => Left<AppErrorModel, Unit>(tError));
+
+    final inactiveStudent = tStudentEntity.copyWith(isActive: false);
+
+    final result = await useCase.call(
+      student: inactiveStudent,
+      isActive: true,
+    );
+
+    expect(result.isLeft(), isTrue);
   });
 }

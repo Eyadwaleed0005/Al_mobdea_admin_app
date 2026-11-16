@@ -1,5 +1,6 @@
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/create_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/create_study_note_use_case.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -28,13 +29,21 @@ void main() {
       ),
     ).thenAnswer((_) async => const Right<AppErrorModel, Unit>(unit));
 
-    final result = await useCase.call(note: tStudyNoteEntity);
+    final result = await useCase.call(
+      note: tStudyNoteEntity,
+      localPdfFilePath: tStudyNoteLocalPdfFilePath,
+    );
 
     expect(result, equals(const Right<AppErrorModel, Unit>(unit)));
-    verify(() => repository.createStudyNote(note: tStudyNoteEntity)).called(1);
+    verify(
+      () => repository.createStudyNote(
+        note: tStudyNoteEntity,
+        localPdfFilePath: tStudyNoteLocalPdfFilePath,
+      ),
+    ).called(1);
   });
 
-  test('supports creating a note without a pdf', () async {
+  test('forwards the note exactly as provided', () async {
     when(
       () => repository.createStudyNote(
         note: any(named: 'note'),
@@ -42,13 +51,27 @@ void main() {
       ),
     ).thenAnswer((_) async => const Right<AppErrorModel, Unit>(unit));
 
-    final result = await useCase.call(note: tStudyNoteEntityWithoutPdf);
+    final paidNote = StudyNoteEntity(
+      noteId: tStudyNoteId,
+      name: tStudyNoteName,
+      description: tStudyNoteDescription,
+      gradeId: tGradeId,
+      isPublished: false,
+      isFree: false,
+      pdfFileName: tStudyNotePdfFileName,
+      pdfFileSize: tStudyNotePdfFileSize,
+      pdfStoragePath: tStudyNotePdfStoragePath,
+    );
 
-    expect(result.isRight(), isTrue);
+    await useCase.call(
+      note: paidNote,
+      localPdfFilePath: tStudyNoteLocalPdfFilePath,
+    );
+
     verify(
       () => repository.createStudyNote(
-        note: tStudyNoteEntityWithoutPdf,
-        localPdfFilePath: null,
+        note: paidNote,
+        localPdfFilePath: tStudyNoteLocalPdfFilePath,
       ),
     ).called(1);
   });
@@ -89,7 +112,10 @@ void main() {
       ),
     ).thenAnswer((_) async => const Left<AppErrorModel, Unit>(tAppError));
 
-    final result = await useCase.call(note: tStudyNoteEntity);
+    final result = await useCase.call(
+      note: tStudyNoteEntity,
+      localPdfFilePath: tStudyNoteLocalPdfFilePath,
+    );
 
     expect(result.isLeft(), isTrue);
     result.fold(

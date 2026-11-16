@@ -11,8 +11,8 @@ class UpdateStudentEmailUseCase {
   const UpdateStudentEmailUseCase({
     required StudentAuthRepository studentAuthRepository,
     required StudentsRepository studentsRepository,
-  })  : _studentAuthRepository = studentAuthRepository,
-        _studentsRepository = studentsRepository;
+  }) : _studentAuthRepository = studentAuthRepository,
+       _studentsRepository = studentsRepository;
 
   Future<Either<AppErrorModel, StudentEntity>> call({
     required StudentEntity student,
@@ -34,9 +34,7 @@ class UpdateStudentEmailUseCase {
         return Left<AppErrorModel, StudentEntity>(error);
       },
       (_) async {
-        final updatedStudent = student.copyWith(
-          email: normalizedEmail,
-        );
+        final updatedStudent = student.copyWith(email: normalizedEmail);
 
         final firestoreResult = await _studentsRepository.updateStudent(
           student: updatedStudent,
@@ -44,19 +42,18 @@ class UpdateStudentEmailUseCase {
 
         return firestoreResult
             .fold<Future<Either<AppErrorModel, StudentEntity>>>(
-          (error) async {
-            // Rollback the auth email if the Firestore update fails.
-            await _studentAuthRepository.updateStudentEmail(
-              studentId: student.studentId,
-              newEmail: student.email,
-            );
+              (error) async {
+                await _studentAuthRepository.updateStudentEmail(
+                  studentId: student.studentId,
+                  newEmail: student.email,
+                );
 
-            return Left<AppErrorModel, StudentEntity>(error);
-          },
-          (_) async {
-            return Right<AppErrorModel, StudentEntity>(updatedStudent);
-          },
-        );
+                return Left<AppErrorModel, StudentEntity>(error);
+              },
+              (_) async {
+                return Right<AppErrorModel, StudentEntity>(updatedStudent);
+              },
+            );
       },
     );
   }

@@ -44,9 +44,8 @@ class AddLessonCubit extends Cubit<AddLessonState> {
       ),
     );
 
-    _gradesSubscription = _streamGradesUseCase(
-      activeOnly: true,
-    ).listen(_handleGradesResult);
+    _gradesSubscription = _streamGradesUseCase(activeOnly: true)
+        .listen(_handleGradesResult);
   }
 
   void changeTitle(String value) {
@@ -76,6 +75,12 @@ class AddLessonCubit extends Cubit<AddLessonState> {
   void changePublicationStatus(bool isPublished) {
     _updateForm((currentState) {
       return currentState.copyWith(isPublished: isPublished);
+    });
+  }
+
+  void changeFreeStatus(bool isFree) {
+    _updateForm((currentState) {
+      return currentState.copyWith(isFree: isFree);
     });
   }
 
@@ -136,6 +141,7 @@ class AddLessonCubit extends Cubit<AddLessonState> {
       pdfFileSize: selectedPdf?.sizeInBytes,
       pdfStoragePath: null,
       isPublished: currentState.isPublished,
+      isFree: currentState.isFree,
     );
 
     final result = await _createLessonUseCase(
@@ -230,6 +236,7 @@ class AddLessonCubit extends Cubit<AddLessonState> {
 
   String _generateLessonId() {
     final timestamp = DateTime.now().toUtc().microsecondsSinceEpoch;
+
     return 'lesson_$timestamp';
   }
 

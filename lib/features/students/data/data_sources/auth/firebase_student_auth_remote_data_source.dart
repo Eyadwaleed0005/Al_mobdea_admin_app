@@ -6,7 +6,6 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 import 'student_auth_remote_data_source.dart';
 
-// TODO: Bound to real FirebaseFunctions once the Firebase project is created.
 class FirebaseStudentAuthRemoteDataSource
     implements StudentAuthRemoteDataSource {
   final FirebaseFunctions _firebaseFunctions;
@@ -20,7 +19,7 @@ class FirebaseStudentAuthRemoteDataSource
     required String email,
     required String password,
   }) {
-    return _execute<String>(() async {
+    return _execute(() async {
       final callable = _firebaseFunctions.httpsCallable(
         FirebaseFunctionNames.createStudentAccount,
       );
@@ -49,12 +48,12 @@ class FirebaseStudentAuthRemoteDataSource
     required String studentId,
     required String newPassword,
   }) {
-    return _execute<void>(() async {
+    return _execute(() async {
       final callable = _firebaseFunctions.httpsCallable(
         FirebaseFunctionNames.updateStudentPassword,
       );
 
-      await callable.call<Map<String, dynamic>>({
+      await callable.call<Object?>({
         FirebaseFunctionKeys.studentId: studentId,
         FirebaseFunctionKeys.newPassword: newPassword,
       });
@@ -66,12 +65,12 @@ class FirebaseStudentAuthRemoteDataSource
     required String studentId,
     required String newEmail,
   }) {
-    return _execute<void>(() async {
+    return _execute(() async {
       final callable = _firebaseFunctions.httpsCallable(
         FirebaseFunctionNames.updateStudentEmail,
       );
 
-      await callable.call<Map<String, dynamic>>({
+      await callable.call<Object?>({
         FirebaseFunctionKeys.studentId: studentId,
         FirebaseFunctionKeys.newEmail: newEmail.trim(),
       });
@@ -83,12 +82,12 @@ class FirebaseStudentAuthRemoteDataSource
     required String studentId,
     required bool isActive,
   }) {
-    return _execute<void>(() async {
+    return _execute(() async {
       final callable = _firebaseFunctions.httpsCallable(
         FirebaseFunctionNames.updateStudentAccountStatus,
       );
 
-      await callable.call<Map<String, dynamic>>({
+      await callable.call<Object?>({
         FirebaseFunctionKeys.studentId: studentId,
         FirebaseFunctionKeys.isActive: isActive,
       });
@@ -96,16 +95,16 @@ class FirebaseStudentAuthRemoteDataSource
   }
 
   @override
-  Future<void> deleteStudentAccount({required String studentId}) {
-    return _execute<void>(() async {
-      final callable = _firebaseFunctions.httpsCallable(
-        FirebaseFunctionNames.deleteStudentAccount,
-      );
+  Future<void> deleteStudentAccount({required String studentId}) async {
+    try {
+      final callable = _firebaseFunctions.httpsCallable('deleteStudentAccount');
 
-      await callable.call<Map<String, dynamic>>({
-        FirebaseFunctionKeys.studentId: studentId,
-      });
-    });
+      await callable.call<void>({'studentId': studentId});
+    } on FirebaseFunctionsException catch (error) {
+      throw FirebaseRemoteException(
+        errorModel: FirebaseErrorHandler.handle(error),
+      );
+    }
   }
 
   Future<T> _execute<T>(Future<T> Function() operation) async {

@@ -3,23 +3,22 @@ import 'package:al_mobdea_admin/features/students/domain/entities/student_entity
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StudentModel extends StudentEntity {
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
   const StudentModel({
     required super.studentId,
     required super.gradeId,
     required super.name,
-    required super.age,
     required super.email,
     required super.phoneNumber,
-    required super.subscriptionStartAt,
-    required super.subscriptionEndAt,
     required super.isActive,
     required super.isLoggedIn,
+    super.subscriptionStartAt,
+    super.subscriptionEndAt,
     this.createdAt,
     this.updatedAt,
   });
+
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   factory StudentModel.fromMap({
     required String documentId,
@@ -29,18 +28,15 @@ class StudentModel extends StudentEntity {
       studentId: map[FirestoreFields.studentId] as String? ?? documentId,
       gradeId: map[FirestoreFields.gradeId] as String,
       name: map[FirestoreFields.name] as String,
-      age: (map[FirestoreFields.age] as num).toInt(),
       email: map[FirestoreFields.email] as String,
       phoneNumber: map[FirestoreFields.phoneNumber] as String,
-      subscriptionStartAt: _requiredDateTime(
+      subscriptionStartAt: _nullableDateTime(
         map[FirestoreFields.subscriptionStartAt],
-        FirestoreFields.subscriptionStartAt,
       ),
-      subscriptionEndAt: _requiredDateTime(
+      subscriptionEndAt: _nullableDateTime(
         map[FirestoreFields.subscriptionEndAt],
-        FirestoreFields.subscriptionEndAt,
       ),
-      isActive: map[FirestoreFields.isActive] as bool? ?? true,
+      isActive: map[FirestoreFields.isActive] as bool? ?? false,
       isLoggedIn: map[FirestoreFields.isLoggedIn] as bool? ?? false,
       createdAt: _nullableDateTime(map[FirestoreFields.createdAt]),
       updatedAt: _nullableDateTime(map[FirestoreFields.updatedAt]),
@@ -52,7 +48,6 @@ class StudentModel extends StudentEntity {
       studentId: entity.studentId,
       gradeId: entity.gradeId,
       name: entity.name,
-      age: entity.age,
       email: entity.email,
       phoneNumber: entity.phoneNumber,
       subscriptionStartAt: entity.subscriptionStartAt,
@@ -62,50 +57,15 @@ class StudentModel extends StudentEntity {
     );
   }
 
-  StudentModel copyWith({
-    String? studentId,
-    String? gradeId,
-    String? name,
-    int? age,
-    String? email,
-    String? phoneNumber,
-    DateTime? subscriptionStartAt,
-    DateTime? subscriptionEndAt,
-    bool? isActive,
-    bool? isLoggedIn,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) {
-    return StudentModel(
-      studentId: studentId ?? this.studentId,
-      gradeId: gradeId ?? this.gradeId,
-      name: name ?? this.name,
-      age: age ?? this.age,
-      email: email ?? this.email,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      subscriptionStartAt: subscriptionStartAt ?? this.subscriptionStartAt,
-      subscriptionEndAt: subscriptionEndAt ?? this.subscriptionEndAt,
-      isActive: isActive ?? this.isActive,
-      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
   Map<String, dynamic> toCreateMap() {
     return {
       FirestoreFields.studentId: studentId,
       FirestoreFields.gradeId: gradeId,
       FirestoreFields.name: name,
-      FirestoreFields.age: age,
       FirestoreFields.email: email,
       FirestoreFields.phoneNumber: phoneNumber,
-      FirestoreFields.subscriptionStartAt: Timestamp.fromDate(
-        subscriptionStartAt,
-      ),
-      FirestoreFields.subscriptionEndAt: Timestamp.fromDate(
-        subscriptionEndAt,
-      ),
+      FirestoreFields.subscriptionStartAt: _toTimestamp(subscriptionStartAt),
+      FirestoreFields.subscriptionEndAt: _toTimestamp(subscriptionEndAt),
       FirestoreFields.isActive: isActive,
       FirestoreFields.isLoggedIn: isLoggedIn,
       FirestoreFields.createdAt: FieldValue.serverTimestamp(),
@@ -117,36 +77,25 @@ class StudentModel extends StudentEntity {
     return {
       FirestoreFields.gradeId: gradeId,
       FirestoreFields.name: name,
-      FirestoreFields.age: age,
       FirestoreFields.email: email,
       FirestoreFields.phoneNumber: phoneNumber,
-      FirestoreFields.subscriptionStartAt: Timestamp.fromDate(
-        subscriptionStartAt,
-      ),
-      FirestoreFields.subscriptionEndAt: Timestamp.fromDate(
-        subscriptionEndAt,
-      ),
+      FirestoreFields.subscriptionStartAt: _toTimestamp(subscriptionStartAt),
+      FirestoreFields.subscriptionEndAt: _toTimestamp(subscriptionEndAt),
       FirestoreFields.isActive: isActive,
       FirestoreFields.isLoggedIn: isLoggedIn,
       FirestoreFields.updatedAt: FieldValue.serverTimestamp(),
     };
   }
 
-  static DateTime _requiredDateTime(dynamic value, String fieldName) {
-    final dateTime = _nullableDateTime(value);
-
-    if (dateTime == null) {
-      throw FormatException('Required date field is missing: $fieldName');
-    }
-
-    return dateTime;
-  }
-
-  static DateTime? _nullableDateTime(dynamic value) {
+  static Timestamp? _toTimestamp(DateTime? value) {
     if (value == null) {
       return null;
     }
 
+    return Timestamp.fromDate(value);
+  }
+
+  static DateTime? _nullableDateTime(Object? value) {
     if (value is Timestamp) {
       return value.toDate();
     }

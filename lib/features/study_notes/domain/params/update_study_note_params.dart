@@ -4,10 +4,9 @@ class UpdateStudyNoteParams {
   const UpdateStudyNoteParams({
     required this.note,
     this.replacementPdfFilePath,
-    this.removeExistingPdf = false,
   });
 
   final StudyNoteEntity note;
+
   final String? replacementPdfFilePath;
-  final bool removeExistingPdf;
 }

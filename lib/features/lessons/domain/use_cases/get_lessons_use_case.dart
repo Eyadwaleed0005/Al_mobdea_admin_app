@@ -4,9 +4,8 @@ import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_rep
 import 'package:dartz/dartz.dart';
 
 class GetLessonsUseCase {
-  const GetLessonsUseCase({
-    required LessonsRepository repository,
-  }) : _repository = repository;
+  const GetLessonsUseCase({required LessonsRepository repository})
+    : _repository = repository;
 
   final LessonsRepository _repository;
 
@@ -14,9 +13,6 @@ class GetLessonsUseCase {
     String? gradeId,
     bool? isPublished,
   }) {
-    return _repository.getLessons(
-      gradeId: gradeId,
-      isPublished: isPublished,
-    );
+    return _repository.getLessons(gradeId: gradeId, isPublished: isPublished);
   }
 }

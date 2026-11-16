@@ -12,6 +12,7 @@ import 'package:al_mobdea_admin/features/lessons/domain/use_cases/get_lesson_by_
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/stream_lessons_use_case.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/update_lesson_use_case.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/cubit/add_lesson_cubit.dart';
+import 'package:al_mobdea_admin/features/lessons/presentation/cubit/add_lesson_pdf_picker_cubit.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/cubit/edit_lesson_cubit.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/cubit/view_lessons_cubit.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/screens/add_lesson_screen.dart';
@@ -40,8 +41,15 @@ abstract final class LessonsRoutes {
       case RouteNames.addLessonScreen:
         return MaterialPageRoute<dynamic>(
           settings: settings,
-          builder: (_) => BlocProvider<AddLessonCubit>(
-            create: (_) => _createAddLessonCubit(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<AddLessonCubit>(
+                create: (_) => _createAddLessonCubit(),
+              ),
+              BlocProvider<AddLessonPdfPickerCubit>(
+                create: (_) => AddLessonPdfPickerCubit(),
+              ),
+            ],
             child: const AddLessonScreen(),
           ),
         );

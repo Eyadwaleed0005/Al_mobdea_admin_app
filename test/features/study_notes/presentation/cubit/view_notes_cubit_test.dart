@@ -186,6 +186,9 @@ void main() {
       description: 'وصف',
       gradeId: tGradeId,
       isPublished: true,
+      pdfFileName: '',
+      pdfFileSize: 0,
+      pdfStoragePath: '',
     );
 
     final noteB = StudyNoteEntity(
@@ -194,6 +197,9 @@ void main() {
       description: 'وصف',
       gradeId: tGradeId,
       isPublished: false,
+      pdfFileName: '',
+      pdfFileSize: 0,
+      pdfStoragePath: '',
     );
 
     final state = ViewNotesDataSuccess(
@@ -223,6 +229,9 @@ void main() {
       description: 'وصف',
       gradeId: 'grade-1',
       isPublished: true,
+      pdfFileName: '',
+      pdfFileSize: 0,
+      pdfStoragePath: '',
     );
 
     final noteB = StudyNoteEntity(
@@ -231,6 +240,9 @@ void main() {
       description: 'وصف',
       gradeId: 'grade-2',
       isPublished: true,
+      pdfFileName: '',
+      pdfFileSize: 0,
+      pdfStoragePath: '',
     );
 
     final state = ViewNotesDataSuccess(
@@ -249,6 +261,9 @@ void main() {
       description: 'وصف',
       gradeId: tGradeId,
       isPublished: true,
+      pdfFileName: '',
+      pdfFileSize: 0,
+      pdfStoragePath: '',
     );
 
     final noteB = StudyNoteEntity(
@@ -257,6 +272,9 @@ void main() {
       description: 'وصف',
       gradeId: tGradeId,
       isPublished: false,
+      pdfFileName: '',
+      pdfFileSize: 0,
+      pdfStoragePath: '',
     );
 
     final publishedState = ViewNotesDataSuccess(

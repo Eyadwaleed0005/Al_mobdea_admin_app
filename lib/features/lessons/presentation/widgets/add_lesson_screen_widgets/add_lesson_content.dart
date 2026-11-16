@@ -6,6 +6,7 @@ import 'package:al_mobdea_admin/features/lessons/presentation/cubit/add_lesson_s
 import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/add_lesson_fields.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/add_lesson_options_section.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/add_lesson_pdf_picker.dart';
+import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/lesson_access_type_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -98,10 +99,21 @@ class _AddLessonContentState extends State<AddLessonContent> {
               ),
             ),
 
-            verticalSpace(50),
+            verticalSpace(20),
 
             AppAnimations.formFieldEntrance(
               order: 3,
+              child: LessonAccessTypeSwitch(
+                isFree: state.isFree,
+                enabled: !state.isSubmitting,
+                onChanged: cubit.changeFreeStatus,
+              ),
+            ),
+
+            verticalSpace(32),
+
+            AppAnimations.formFieldEntrance(
+              order: 4,
               child: AddLessonYoutubeUrlField(
                 controller: _youtubeUrlController,
                 enabled: !state.isSubmitting,
@@ -112,7 +124,7 @@ class _AddLessonContentState extends State<AddLessonContent> {
             verticalSpace(20),
 
             AppAnimations.formFieldEntrance(
-              order: 4,
+              order: 5,
               child: AddLessonPdfPicker(
                 onFileSelected: (file) {
                   final path = file.path?.trim();

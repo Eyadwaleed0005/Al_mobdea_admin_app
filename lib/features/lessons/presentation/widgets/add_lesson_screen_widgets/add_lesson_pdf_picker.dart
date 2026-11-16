@@ -3,12 +3,15 @@ import 'package:al_mobdea_admin/core/style/app_color.dart';
 import 'package:al_mobdea_admin/core/style/textstyles.dart';
 import 'package:al_mobdea_admin/core/widgets/app_loading_indicator.dart';
 import 'package:al_mobdea_admin/core/widgets/app_toast.dart';
+import 'package:al_mobdea_admin/features/lessons/presentation/cubit/add_lesson_pdf_picker_cubit.dart';
+import 'package:al_mobdea_admin/features/lessons/presentation/cubit/add_lesson_pdf_picker_state.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AddLessonPdfPicker extends StatefulWidget {
+class AddLessonPdfPicker extends StatelessWidget {
   const AddLessonPdfPicker({
     super.key,
     required this.onFileSelected,
@@ -19,116 +22,63 @@ class AddLessonPdfPicker extends StatefulWidget {
   final VoidCallback onFileRemoved;
 
   @override
-  State<AddLessonPdfPicker> createState() {
-    return _AddLessonPdfPickerState();
-  }
-}
+  Widget build(BuildContext context) {
+    return BlocConsumer<AddLessonPdfPickerCubit, AddLessonPdfPickerState>(
+      listenWhen: (previous, current) {
+        return previous.selectedFile != current.selectedFile ||
+            previous.errorMessage != current.errorMessage;
+      },
+      listener: (context, state) {
+        final cubit = context.read<AddLessonPdfPickerCubit>();
 
-class _AddLessonPdfPickerState extends State<AddLessonPdfPicker> {
-  static const int _maximumFileSizeInBytes = 25 * 1024 * 1024;
+        if (state.hasFailure) {
+          showAppToast(
+            context,
+            message: state.errorMessage!,
+            icon: Icons.error_outline_rounded,
+          );
 
-  PlatformFile? _selectedFile;
-  bool _isPickingFile = false;
+          cubit.consumeFailure();
+          return;
+        }
 
-  Future<void> _pickPdfFile() async {
-    if (_isPickingFile) {
-      return;
-    }
+        final file = state.selectedFile;
 
-    setState(() {
-      _isPickingFile = true;
-    });
+        if (file != null) {
+          onFileSelected(file);
+        } else {
+          onFileRemoved();
+        }
+      },
+      builder: (context, state) {
+        final cubit = context.read<AddLessonPdfPickerCubit>();
 
-    try {
-      final selectedFile = await FilePicker.pickFile(
-        type: FileType.custom,
-        allowedExtensions: const ['pdf'],
-      );
+        final Widget child;
 
-      if (!mounted || selectedFile == null) {
-        return;
-      }
+        if (state.isPicking) {
+          child = const _AddLessonPdfPickerLoading();
+        } else if (state.selectedFile == null) {
+          child = _EmptyAddLessonPdfPicker(onTap: cubit.pickPdfFile);
+        } else {
+          final selectedFile = state.selectedFile!;
 
-      if (!_isPdfFile(selectedFile)) {
-        showAppToast(
-          context,
-          message: 'يجب اختيار ملف PDF فقط',
-          icon: Icons.error_outline_rounded,
+          child = _AddLessonSelectedPdfPicker(
+            key: ValueKey<String>('selected-${selectedFile.name}'),
+            fileName: selectedFile.name,
+            fileSize: _formatFileSize(selectedFile.size),
+            onTap: cubit.pickPdfFile,
+            onRemove: cubit.removeSelectedFile,
+          );
+        }
+
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          child: child,
         );
-
-        return;
-      }
-
-      if (selectedFile.size > _maximumFileSizeInBytes) {
-        showAppToast(
-          context,
-          message: 'حجم الملف أكبر من الحد الأقصى 25MB',
-          icon: Icons.error_outline_rounded,
-        );
-
-        return;
-      }
-
-      final filePath = selectedFile.path?.trim();
-
-      if (filePath == null || filePath.isEmpty) {
-        showAppToast(
-          context,
-          message: 'تعذر الوصول إلى الملف المحدد، حاول مرة أخرى',
-          icon: Icons.error_outline_rounded,
-        );
-
-        return;
-      }
-
-      setState(() {
-        _selectedFile = selectedFile;
-      });
-
-      widget.onFileSelected(selectedFile);
-    } catch (error, stackTrace) {
-      if (!mounted) {
-        return;
-      }
-
-      showAppToast(
-        context,
-        message: 'تعذر اختيار الملف، حاول مرة أخرى',
-        icon: Icons.error_outline_rounded,
-      );
-
-      debugPrint('Add lesson PDF picker error: $error');
-
-      debugPrintStack(stackTrace: stackTrace);
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isPickingFile = false;
-        });
-      }
-    }
-  }
-
-  bool _isPdfFile(PlatformFile file) {
-    final extension = file.extension?.trim().toLowerCase();
-
-    if (extension == 'pdf') {
-      return true;
-    }
-
-    return file.name.trim().toLowerCase().endsWith('.pdf');
-  }
-
-  void _removeSelectedFile() {
-    if (_isPickingFile) {
-      return;
-    }
-
-    setState(() {
-      _selectedFile = null;
-    });
-
-    widget.onFileRemoved();
+      },
+    );
   }
 
   String _formatFileSize(int sizeInBytes) {
@@ -140,28 +90,6 @@ class _AddLessonPdfPickerState extends State<AddLessonPdfPicker> {
     }
 
     return '${sizeInKilobytes.toStringAsFixed(0)} KB';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final selectedFile = _selectedFile;
-
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
-      child: _isPickingFile
-          ? const _AddLessonPdfPickerLoading()
-          : selectedFile == null
-          ? _EmptyAddLessonPdfPicker(onTap: _pickPdfFile)
-          : _AddLessonSelectedPdfPicker(
-              key: ValueKey<String>('selected-${selectedFile.name}'),
-              fileName: selectedFile.name,
-              fileSize: _formatFileSize(selectedFile.size),
-              onTap: _pickPdfFile,
-              onRemove: _removeSelectedFile,
-            ),
-    );
   }
 }
 

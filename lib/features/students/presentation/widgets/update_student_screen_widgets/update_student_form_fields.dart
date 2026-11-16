@@ -44,38 +44,15 @@ class UpdateStudentFormFields extends StatelessWidget {
                 verticalSpace(18),
                 AppAnimations.formFieldEntrance(
                   order: 1,
-                  child: Row(
-                    textDirection: TextDirection.rtl,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: CustomTextFormField(
-                          controller: cubit.studentAgeController,
-                          labelText: 'عمر الطالب',
-                          hintText: 'اكتب العمر',
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.next,
-                          validator: AppValidator.studentAge,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3),
-                          ],
-                        ),
-                      ),
-                      horizontalSpace(12),
-                      Expanded(
-                        child: GradePopupMenuField(
-                          grades: state.grades,
-                          selectedGradeId: state.selectedGradeId,
-                          labelText: 'الصف الدراسي',
-                          placeholderText: 'اختر الصف',
-                          tooltip: 'اختيار الصف الدراسي',
-                          emptyTooltip: 'لا توجد صفوف متاحة حاليًا',
-                          validator: AppValidator.grade,
-                          onGradeSelected: cubit.selectGrade,
-                        ),
-                      ),
-                    ],
+                  child: GradePopupMenuField(
+                    grades: state.grades,
+                    selectedGradeId: state.selectedGradeId,
+                    labelText: 'الصف الدراسي',
+                    placeholderText: 'اختر الصف',
+                    tooltip: 'اختيار الصف الدراسي',
+                    emptyTooltip: 'لا توجد صفوف متاحة حاليًا',
+                    validator: AppValidator.grade,
+                    onGradeSelected: cubit.selectGrade,
                   ),
                 ),
                 verticalSpace(18),
@@ -160,9 +137,13 @@ class UpdateStudentFormFields extends StatelessWidget {
                           initialDate: state.subscriptionStartDate,
                           firstDate: DateTime(2000),
                           validator: (_) {
-                            if (state.subscriptionStartDate == null) {
+                            final startDate = state.subscriptionStartDate;
+                            final endDate = state.subscriptionEndDate;
+
+                            if (startDate == null && endDate != null) {
                               return 'اختر تاريخ بداية الاشتراك';
                             }
+
                             return null;
                           },
                           onDateSelected: cubit.selectSubscriptionStartDate,
@@ -178,9 +159,30 @@ class UpdateStudentFormFields extends StatelessWidget {
                           initialDate: state.subscriptionEndDate,
                           firstDate: cubit.subscriptionEndFirstDate,
                           validator: (_) {
+                            final startDate = state.subscriptionStartDate;
+                            final endDate = state.subscriptionEndDate;
+
+                            final subscriptionChanged =
+                                !_isSameDate(
+                                  startDate,
+                                  state.student?.subscriptionStartAt,
+                                ) ||
+                                !_isSameDate(
+                                  endDate,
+                                  state.student?.subscriptionEndAt,
+                                );
+
+                            if (!subscriptionChanged) {
+                              return null;
+                            }
+
+                            if (startDate == null && endDate == null) {
+                              return null;
+                            }
+
                             return AppValidator.subscriptionEndDate(
-                              startDate: state.subscriptionStartDate,
-                              endDate: state.subscriptionEndDate,
+                              startDate: startDate,
+                              endDate: endDate,
                             );
                           },
                           onDateSelected: cubit.selectSubscriptionEndDate,
@@ -199,4 +201,14 @@ class UpdateStudentFormFields extends StatelessWidget {
       },
     );
   }
+}
+
+bool _isSameDate(DateTime? first, DateTime? second) {
+  if (first == null || second == null) {
+    return first == null && second == null;
+  }
+
+  return first.year == second.year &&
+      first.month == second.month &&
+      first.day == second.day;
 }

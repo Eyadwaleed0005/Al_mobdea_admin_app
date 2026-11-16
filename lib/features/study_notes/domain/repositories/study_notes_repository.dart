@@ -19,13 +19,12 @@ abstract class StudyNotesRepository {
 
   Future<Either<AppErrorModel, Unit>> createStudyNote({
     required StudyNoteEntity note,
-    String? localPdfFilePath,
+    required String localPdfFilePath,
   });
 
   Future<Either<AppErrorModel, Unit>> updateStudyNote({
     required StudyNoteEntity note,
     String? replacementPdfFilePath,
-    bool removeExistingPdf = false,
   });
 
   Future<Either<AppErrorModel, Unit>> deleteStudyNote({required String noteId});

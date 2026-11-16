@@ -4,7 +4,7 @@ import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
 import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
 import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/stream_study_notes_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/stream_study_notes_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/view_notes_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -91,9 +91,8 @@ class ViewNotesCubit extends Cubit<ViewNotesState> {
   }
 
   void _watchGrades() {
-    _gradesSubscription = _streamGradesUseCase(
-      activeOnly: true,
-    ).listen(_onGradesResult);
+    _gradesSubscription = _streamGradesUseCase(activeOnly: true)
+        .listen(_onGradesResult);
   }
 
   void _watchStudyNotes() {

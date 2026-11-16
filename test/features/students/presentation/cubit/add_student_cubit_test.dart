@@ -76,4 +76,45 @@ void main() {
       isA<AddStudentState>().having((s) => s.grades.length, 'grades', 1),
     ],
   );
+
+  test('subscription dates are optional and can be cleared', () async {
+    final cubit = buildCubit();
+
+    expect(cubit.state.subscriptionStartDate, isNull);
+    expect(cubit.state.subscriptionEndDate, isNull);
+
+    cubit.selectSubscriptionStartDate(DateTime(2024, 5, 1, 10));
+
+    expect(cubit.state.subscriptionStartDate, DateTime(2024, 5, 1));
+    expect(cubit.state.subscriptionEndDate, isNull);
+    expect(cubit.subscriptionStartDateController.text, isNotEmpty);
+
+    cubit.selectSubscriptionEndDate(DateTime(2024, 6, 1, 10));
+
+    expect(cubit.state.subscriptionEndDate, DateTime(2024, 6, 1));
+
+    cubit.clearSubscriptionDates();
+
+    expect(cubit.state.subscriptionStartDate, isNull);
+    expect(cubit.state.subscriptionEndDate, isNull);
+    expect(cubit.subscriptionStartDateController.text, isEmpty);
+    expect(cubit.subscriptionEndDateController.text, isEmpty);
+
+    await cubit.close();
+  });
+
+  test('changing the start date clears the previous end date', () async {
+    final cubit = buildCubit();
+
+    cubit.selectSubscriptionStartDate(DateTime(2024, 5, 1));
+    cubit.selectSubscriptionEndDate(DateTime(2024, 6, 1));
+
+    cubit.selectSubscriptionStartDate(DateTime(2024, 5, 10));
+
+    expect(cubit.state.subscriptionStartDate, DateTime(2024, 5, 10));
+    expect(cubit.state.subscriptionEndDate, isNull);
+    expect(cubit.subscriptionEndDateController.text, isEmpty);
+
+    await cubit.close();
+  });
 }
