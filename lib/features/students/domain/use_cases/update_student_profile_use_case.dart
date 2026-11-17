@@ -13,9 +13,7 @@ class UpdateStudentProfileUseCase {
   Future<Either<AppErrorModel, StudentEntity>> call({
     required StudentEntity student,
   }) async {
-    final result = await _studentsRepository.updateStudent(
-      student: student,
-    );
+    final result = await _studentsRepository.updateStudent(student: student);
 
     return result.map((_) => student);
   }

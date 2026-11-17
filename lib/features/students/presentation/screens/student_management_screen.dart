@@ -18,26 +18,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class StudentManagementScreen extends StatefulWidget {
+class StudentManagementScreen extends StatelessWidget {
   const StudentManagementScreen({super.key});
 
-  @override
-  State<StudentManagementScreen> createState() =>
-      _StudentManagementScreenState();
-}
-
-class _StudentManagementScreenState extends State<StudentManagementScreen> {
-  @override
-  void initState() {
-    super.initState();
-    context.read<StudentManagementCubit>().watchStudentManagement();
-  }
-
-  void _navigateToAdd() {
+  void _navigateToAdd(BuildContext context) {
     Navigator.of(context).pushNamed(RouteNames.addStudentScreen);
   }
 
-  void _navigateToUpdate(StudentEntity student) {
+  void _navigateToUpdate(BuildContext context, StudentEntity student) {
     Navigator.of(
       context,
     ).pushNamed(RouteNames.updateStudentScreen, arguments: student.studentId);
@@ -65,10 +53,11 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                     ),
                     child: AppEmptyWidget(
                       title: 'لا يوجد طلاب بعد',
-                      message: 'ابدأ بإضافة أول طالب وإنشاء حسابه لمتابعة الدروس والاختبارات.',
+                      message:
+                          'ابدأ بإضافة أول طالب وإنشاء حسابه لمتابعة الدروس والاختبارات.',
                       actionText: 'إضافة طالب',
                       icon: Icons.person_outline_rounded,
-                      onActionPressed: _navigateToAdd,
+                      onActionPressed: () => _navigateToAdd(context),
                     ),
                   ),
 
@@ -79,7 +68,7 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                     StudentManagementContent(
                       grades: grades,
                       filters: filters,
-                      onAddStudent: _navigateToAdd,
+                      onAddStudent: () => _navigateToAdd(context),
                       content: const AppNoSearchResultsWidget(
                         message:
                             'جرب البحث باسم آخر أو تغيير الفلاتر المستخدمة.',
@@ -94,11 +83,12 @@ class _StudentManagementScreenState extends State<StudentManagementScreen> {
                     StudentManagementContent(
                       grades: grades,
                       filters: filters,
-                      onAddStudent: _navigateToAdd,
+                      onAddStudent: () => _navigateToAdd(context),
                       content: StudentsList(
                         students: students,
                         grades: grades,
-                        onStudentTap: _navigateToUpdate,
+                        onStudentTap: (student) =>
+                            _navigateToUpdate(context, student),
                       ),
                     ),
 

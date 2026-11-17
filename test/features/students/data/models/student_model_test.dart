@@ -22,31 +22,20 @@ void main() {
         expect(result.studentId, tStudentId);
         expect(result.gradeId, tGradeId);
         expect(result.name, tStudentName);
-        expect(result.age, tStudentAge);
         expect(result.email, tStudentEmail);
         expect(result.phoneNumber, tStudentPhone);
         expect(
-          result.subscriptionStartAt.isAtSameMomentAs(
-            tSubscriptionStartAt,
-          ),
+          result.subscriptionStartAt!.isAtSameMomentAs(tSubscriptionStartAt),
           isTrue,
         );
         expect(
-          result.subscriptionEndAt.isAtSameMomentAs(
-            tSubscriptionEndAt,
-          ),
+          result.subscriptionEndAt!.isAtSameMomentAs(tSubscriptionEndAt),
           isTrue,
         );
         expect(result.isActive, isTrue);
         expect(result.isLoggedIn, isFalse);
-        expect(
-          result.createdAt!.isAtSameMomentAs(tCreatedAt),
-          isTrue,
-        );
-        expect(
-          result.updatedAt!.isAtSameMomentAs(tUpdatedAt),
-          isTrue,
-        );
+        expect(result.createdAt!.isAtSameMomentAs(tCreatedAt), isTrue);
+        expect(result.updatedAt!.isAtSameMomentAs(tUpdatedAt), isTrue);
       });
 
       test('falls back to documentId when studentId field is missing', () {
@@ -71,38 +60,33 @@ void main() {
         expect(result.subscriptionEndAt, isA<DateTime>());
       });
 
-      test(
-        'throws FormatException when a required date is missing',
-        () {
-          final map = tStudentJson()
-            ..remove(FirestoreFields.subscriptionEndAt);
+      test('keeps subscription dates nullable when missing', () {
+        final map = tStudentJson()
+          ..remove(FirestoreFields.subscriptionStartAt)
+          ..remove(FirestoreFields.subscriptionEndAt);
 
-          expect(
-            () => StudentModel.fromMap(
-              documentId: tStudentId,
-              map: map,
-            ),
-            throwsA(isA<FormatException>()),
-          );
-        },
-      );
+        final result = StudentModel.fromMap(
+          documentId: tStudentId,
+          map: map,
+        );
 
-      test(
-        'defaults isActive to true and isLoggedIn to false',
-        () {
-          final map = tStudentJson()
-            ..remove(FirestoreFields.isActive)
-            ..remove(FirestoreFields.isLoggedIn);
+        expect(result.subscriptionStartAt, isNull);
+        expect(result.subscriptionEndAt, isNull);
+      });
 
-          final result = StudentModel.fromMap(
-            documentId: tStudentId,
-            map: map,
-          );
+      test('defaults isActive and isLoggedIn to false when missing', () {
+        final map = tStudentJson()
+          ..remove(FirestoreFields.isActive)
+          ..remove(FirestoreFields.isLoggedIn);
 
-          expect(result.isActive, isTrue);
-          expect(result.isLoggedIn, isFalse);
-        },
-      );
+        final result = StudentModel.fromMap(
+          documentId: tStudentId,
+          map: map,
+        );
+
+        expect(result.isActive, isFalse);
+        expect(result.isLoggedIn, isFalse);
+      });
     });
 
     group('fromEntity', () {
@@ -112,7 +96,6 @@ void main() {
         expect(result.studentId, tStudentEntity.studentId);
         expect(result.gradeId, tStudentEntity.gradeId);
         expect(result.name, tStudentEntity.name);
-        expect(result.age, tStudentEntity.age);
         expect(result.email, tStudentEntity.email);
         expect(result.phoneNumber, tStudentEntity.phoneNumber);
         expect(result.isActive, tStudentEntity.isActive);
@@ -129,7 +112,6 @@ void main() {
         expect(map[FirestoreFields.studentId], tStudentId);
         expect(map[FirestoreFields.gradeId], tGradeId);
         expect(map[FirestoreFields.name], tStudentName);
-        expect(map[FirestoreFields.age], tStudentAge);
         expect(map[FirestoreFields.email], tStudentEmail);
         expect(map[FirestoreFields.phoneNumber], tStudentPhone);
         expect(
@@ -142,42 +124,45 @@ void main() {
         );
         expect(map[FirestoreFields.isActive], isTrue);
         expect(map[FirestoreFields.isLoggedIn], isFalse);
-        expect(
-          map[FirestoreFields.createdAt],
-          isA<FieldValue>(),
+        expect(map[FirestoreFields.createdAt], isA<FieldValue>());
+        expect(map[FirestoreFields.updatedAt], isA<FieldValue>());
+        expect(map.containsKey(FirestoreFields.age), isFalse);
+      });
+
+      test('writes null subscription dates when the student has none', () {
+        final studentWithoutSubscription = StudentModel.fromEntity(
+          StudentEntity(
+            studentId: tStudentId,
+            gradeId: tGradeId,
+            name: tStudentName,
+            email: tStudentEmail,
+            phoneNumber: tStudentPhone,
+            isActive: false,
+            isLoggedIn: false,
+          ),
         );
-        expect(
-          map[FirestoreFields.updatedAt],
-          isA<FieldValue>(),
-        );
+
+        final map = studentWithoutSubscription.toCreateMap();
+
+        expect(map[FirestoreFields.subscriptionStartAt], isNull);
+        expect(map[FirestoreFields.subscriptionEndAt], isNull);
+        expect(map[FirestoreFields.isActive], isFalse);
       });
     });
 
     group('toUpdateMap', () {
-      test(
-        'excludes studentId and createdAt but stamps updatedAt',
-        () {
-          final map = tStudentModel.toUpdateMap();
+      test('excludes studentId and createdAt but stamps updatedAt', () {
+        final map = tStudentModel.toUpdateMap();
 
-          expect(
-            map.containsKey(FirestoreFields.studentId),
-            isFalse,
-          );
-          expect(
-            map.containsKey(FirestoreFields.createdAt),
-            isFalse,
-          );
-          expect(
-            map[FirestoreFields.updatedAt],
-            isA<FieldValue>(),
-          );
-          expect(map[FirestoreFields.gradeId], tGradeId);
-          expect(
-            map[FirestoreFields.subscriptionEndAt],
-            Timestamp.fromDate(tSubscriptionEndAt),
-          );
-        },
-      );
+        expect(map.containsKey(FirestoreFields.studentId), isFalse);
+        expect(map.containsKey(FirestoreFields.createdAt), isFalse);
+        expect(map[FirestoreFields.updatedAt], isA<FieldValue>());
+        expect(map[FirestoreFields.gradeId], tGradeId);
+        expect(
+          map[FirestoreFields.subscriptionEndAt],
+          Timestamp.fromDate(tSubscriptionEndAt),
+        );
+      });
     });
 
     group('copyWith', () {
@@ -191,16 +176,16 @@ void main() {
         expect(result.isActive, isFalse);
         expect(result.studentId, tStudentModel.studentId);
         expect(result.email, tStudentModel.email);
-        expect(result.createdAt, tStudentModel.createdAt);
+        expect(result.subscriptionEndAt, tStudentModel.subscriptionEndAt);
       });
 
-      test('returns an equivalent model when no arguments are passed', () {
+      test('returns an equivalent entity when no arguments are passed', () {
         final result = tStudentModel.copyWith();
 
         expect(result.studentId, tStudentModel.studentId);
         expect(result.name, tStudentModel.name);
         expect(result.email, tStudentModel.email);
-        expect(result.updatedAt, tStudentModel.updatedAt);
+        expect(result.gradeId, tStudentModel.gradeId);
       });
     });
   });

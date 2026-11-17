@@ -10,7 +10,6 @@ import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dar
 import 'package:al_mobdea_admin/features/students/presentation/cubit/add_student_cubit.dart';
 import 'package:al_mobdea_admin/features/students/presentation/cubit/add_student_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -41,28 +40,7 @@ class StudentIdentityFields extends StatelessWidget {
         verticalSpace(18),
         AppAnimations.formFieldEntrance(
           order: 1,
-          child: Row(
-            textDirection: TextDirection.rtl,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: CustomTextFormField(
-                  controller: cubit.studentAgeController,
-                  labelText: 'عمر الطالب',
-                  hintText: 'اكتب العمر',
-                  keyboardType: TextInputType.number,
-                  textInputAction: TextInputAction.next,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(3),
-                  ],
-                  validator: AppValidator.studentAge,
-                ),
-              ),
-              horizontalSpace(12),
-              Expanded(child: StudentGradeSelectionField(state: state)),
-            ],
-          ),
+          child: StudentGradeSelectionField(state: state),
         ),
       ],
     );
@@ -125,7 +103,9 @@ class _StudentGradePopupMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
       enabled: grades.isNotEmpty,
-      tooltip: grades.isEmpty ? 'لا توجد صفوف متاحة حاليًا' : 'اختيار الصف الدراسي',
+      tooltip: grades.isEmpty
+          ? 'لا توجد صفوف متاحة حاليًا'
+          : 'اختيار الصف الدراسي',
       position: PopupMenuPosition.under,
       color: ColorPalette.surface,
       surfaceTintColor: Colors.transparent,

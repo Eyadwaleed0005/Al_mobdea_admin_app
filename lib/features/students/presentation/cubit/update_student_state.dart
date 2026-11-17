@@ -43,8 +43,10 @@ class UpdateStudentState {
   final StudentEntity? student;
   final List<GradeEntity> grades;
   final String? selectedGradeId;
+
   final DateTime? subscriptionStartDate;
   final DateTime? subscriptionEndDate;
+
   final bool hasGeneratedPassword;
 
   /// هل توجد تعديلات لم يتم حفظها؟
@@ -57,15 +59,21 @@ class UpdateStudentState {
         status == UpdateStudentStatus.loading;
   }
 
-  bool get isSubmitting => status == UpdateStudentStatus.submitting;
+  bool get isSubmitting {
+    return status == UpdateStudentStatus.submitting;
+  }
 
-  bool get isRenewingSubscription =>
-      status == UpdateStudentStatus.renewingSubscription;
+  bool get isRenewingSubscription {
+    return status == UpdateStudentStatus.renewingSubscription;
+  }
 
-  bool get isDisconnectingDevice =>
-      status == UpdateStudentStatus.disconnectingDevice;
+  bool get isDisconnectingDevice {
+    return status == UpdateStudentStatus.disconnectingDevice;
+  }
 
-  bool get isDeleting => status == UpdateStudentStatus.deleting;
+  bool get isDeleting {
+    return status == UpdateStudentStatus.deleting;
+  }
 
   bool get isBusy {
     return isSubmitting ||
@@ -76,15 +84,21 @@ class UpdateStudentState {
 
   bool get hasSelectedGrade {
     final gradeId = selectedGradeId;
+
     return gradeId != null && gradeId.isNotEmpty;
   }
 
   GradeEntity? get selectedGrade {
     final gradeId = selectedGradeId;
-    if (gradeId == null || gradeId.isEmpty) return null;
+
+    if (gradeId == null || gradeId.isEmpty) {
+      return null;
+    }
 
     for (final grade in grades) {
-      if (grade.gradeId == gradeId) return grade;
+      if (grade.gradeId == gradeId) {
+        return grade;
+      }
     }
 
     return null;

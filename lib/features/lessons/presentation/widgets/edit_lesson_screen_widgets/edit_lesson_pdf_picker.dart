@@ -1,3 +1,4 @@
+import 'package:al_mobdea_admin/core/helper/app_validator.dart';
 import 'package:al_mobdea_admin/core/helper/spacer.dart';
 import 'package:al_mobdea_admin/core/style/app_color.dart';
 import 'package:al_mobdea_admin/core/style/textstyles.dart';
@@ -39,7 +40,8 @@ class EditLessonPdfPicker extends StatefulWidget {
 }
 
 class _EditLessonPdfPickerState extends State<EditLessonPdfPicker> {
-  static const int _maximumFileSizeInBytes = 25 * 1024 * 1024;
+  static const int _maximumFileSizeInBytes =
+      AppValidator.maximumLessonPdfSizeInBytes;
 
   bool _isPickingFile = false;
 
@@ -75,7 +77,9 @@ class _EditLessonPdfPickerState extends State<EditLessonPdfPicker> {
       if (selectedFile.size > _maximumFileSizeInBytes) {
         showAppToast(
           context,
-          message: 'حجم الملف أكبر من الحد الأقصى 25MB',
+          message:
+              'حجم الملف أكبر من الحد الأقصى '
+              '${AppValidator.maximumLessonPdfSizeInMegabytes}MB',
           icon: Icons.error_outline_rounded,
         );
 

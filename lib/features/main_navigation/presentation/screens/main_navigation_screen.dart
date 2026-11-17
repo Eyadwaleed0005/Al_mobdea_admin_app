@@ -12,6 +12,7 @@ import 'package:al_mobdea_admin/features/live_session/presentation/cubit/live_se
 import 'package:al_mobdea_admin/features/live_session/presentation/screens/live_session_screen.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/cubit/bottom_navigation_cubit.dart';
 import 'package:al_mobdea_admin/features/main_navigation/presentation/widgets/custom_bottom_nav_bar.dart';
+import 'package:al_mobdea_admin/features/students/domain/use_cases/stream_students_use_case.dart';
 import 'package:al_mobdea_admin/features/students/presentation/cubit/student_management_cubit.dart';
 import 'package:al_mobdea_admin/features/students/presentation/screens/student_management_screen.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/screens/content_management_screen.dart';
@@ -70,7 +71,10 @@ class MainNavigationView extends StatelessWidget {
 
       case 1:
         return BlocProvider<StudentManagementCubit>(
-          create: (_) => getIt<StudentManagementCubit>(),
+          create: (_) => StudentManagementCubit(
+            streamStudentsUseCase: getIt<StreamStudentsUseCase>(),
+            streamGradesUseCase: getIt<StreamGradesUseCase>(),
+          )..watchStudentManagement(),
           child: const StudentManagementScreen(),
         );
       case 2:

@@ -4,7 +4,7 @@ import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
 import 'package:al_mobdea_admin/features/grades/domain/entities/grade_entity.dart';
 import 'package:al_mobdea_admin/features/grades/domain/use_cases/stream_grades_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/create_study_note_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/create_study_note_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/add_note_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,9 +44,8 @@ class AddNoteCubit extends Cubit<AddNoteState> {
       ),
     );
 
-    _gradesSubscription = _streamGradesUseCase(
-      activeOnly: true,
-    ).listen(_handleGradesResult);
+    _gradesSubscription = _streamGradesUseCase(activeOnly: true)
+        .listen(_handleGradesResult);
   }
 
   void _handleGradesResult(Either<AppErrorModel, List<GradeEntity>> result) {
@@ -58,11 +57,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void _handleGradesFailure(AppErrorModel error) {
-    if (isClosed) {
-      return;
-    }
-
-    if (state.grades.isNotEmpty) {
+    if (isClosed || state.grades.isNotEmpty) {
       return;
     }
 
@@ -91,7 +86,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void changeTitle(String value) {
-    if (state.isSubmitting) {
+    if (isClosed || state.isSubmitting) {
       return;
     }
 
@@ -105,7 +100,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void changeDescription(String value) {
-    if (state.isSubmitting) {
+    if (isClosed || state.isSubmitting) {
       return;
     }
 
@@ -119,7 +114,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void selectGrade(String gradeId) {
-    if (state.isSubmitting) {
+    if (isClosed || state.isSubmitting) {
       return;
     }
 
@@ -133,7 +128,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void changePublicationStatus(bool isPublished) {
-    if (state.isSubmitting) {
+    if (isClosed || state.isSubmitting) {
       return;
     }
 
@@ -146,8 +141,22 @@ class AddNoteCubit extends Cubit<AddNoteState> {
     );
   }
 
+  void changeFreeStatus(bool isFree) {
+    if (isClosed || state.isSubmitting) {
+      return;
+    }
+
+    emit(
+      state.copyWith(
+        isFree: isFree,
+        submissionStatus: AddNoteSubmissionStatus.idle,
+        clearError: true,
+      ),
+    );
+  }
+
   void selectPdf(AddNotePdfFile pdfFile) {
-    if (state.isSubmitting) {
+    if (isClosed || state.isSubmitting) {
       return;
     }
 
@@ -161,7 +170,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void removePdf() {
-    if (state.isSubmitting) {
+    if (isClosed || state.isSubmitting) {
       return;
     }
 
@@ -175,6 +184,10 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   Future<void> createNote() async {
+    if (isClosed) {
+      return;
+    }
+
     final currentState = state;
     final selectedPdf = currentState.selectedPdf;
 
@@ -195,6 +208,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
       description: currentState.description.trim(),
       gradeId: currentState.selectedGradeId.trim(),
       isPublished: currentState.isPublished,
+      isFree: currentState.isFree,
       pdfStoragePath: '',
       pdfFileName: selectedPdf.name.trim(),
       pdfFileSize: selectedPdf.sizeInBytes,
@@ -213,6 +227,10 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void _emitSubmissionFailure(AppErrorModel error) {
+    if (isClosed) {
+      return;
+    }
+
     emit(
       state.copyWith(
         submissionStatus: AddNoteSubmissionStatus.failure,
@@ -222,6 +240,10 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void _emitSubmissionSuccess() {
+    if (isClosed) {
+      return;
+    }
+
     emit(
       state.copyWith(
         submissionStatus: AddNoteSubmissionStatus.success,
@@ -231,7 +253,7 @@ class AddNoteCubit extends Cubit<AddNoteState> {
   }
 
   void consumeSubmissionResult() {
-    if (state.submissionStatus == AddNoteSubmissionStatus.idle) {
+    if (isClosed || state.submissionStatus == AddNoteSubmissionStatus.idle) {
       return;
     }
 

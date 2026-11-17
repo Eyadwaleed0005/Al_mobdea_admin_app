@@ -1,4 +1,5 @@
 import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
+import 'package:al_mobdea_admin/features/students/domain/entities/student_entity.dart';
 import 'package:al_mobdea_admin/features/students/domain/params/student_params.dart';
 import 'package:al_mobdea_admin/features/students/domain/use_cases/create_student_use_case.dart';
 import 'package:dartz/dartz.dart';
@@ -29,7 +30,6 @@ void main() {
   final tParams = CreateStudentParams(
     gradeId: tGradeId,
     name: tStudentName,
-    age: tStudentAge,
     email: tStudentEmail,
     password: 'Str0ng@Pass',
     phoneNumber: tStudentPhone,
@@ -76,11 +76,65 @@ void main() {
           password: 'Str0ng@Pass',
         ),
       ).called(1);
-      verify(
+
+      final captured = verify(
+        () => studentsRepository.createStudent(
+          student: captureAny(named: 'student'),
+        ),
+      ).captured;
+
+      final createdStudent = captured.single as StudentEntity;
+
+      expect(createdStudent.studentId, tStudentId);
+      expect(createdStudent.isActive, isTrue);
+      expect(createdStudent.isLoggedIn, isFalse);
+      expect(createdStudent.subscriptionStartAt, tSubscriptionStartAt);
+      expect(createdStudent.subscriptionEndAt, tSubscriptionEndAt);
+    },
+  );
+
+  test(
+    'creates an inactive student without subscription dates',
+    () async {
+      when(
+        () => authRepository.createStudentAccount(
+          email: any(named: 'email'),
+          password: any(named: 'password'),
+        ),
+      ).thenAnswer(
+        (_) async => Right<AppErrorModel, String>(tStudentId),
+      );
+      when(
         () => studentsRepository.createStudent(
           student: any(named: 'student'),
         ),
-      ).called(1);
+      ).thenAnswer(
+        (_) async => const Right<AppErrorModel, Unit>(unit),
+      );
+
+      final result = await useCase.call(
+        params: CreateStudentParams(
+          gradeId: tGradeId,
+          name: tStudentName,
+          email: tStudentEmail,
+          password: 'Str0ng@Pass',
+          phoneNumber: tStudentPhone,
+        ),
+      );
+
+      expect(result.isRight(), isTrue);
+
+      final captured = verify(
+        () => studentsRepository.createStudent(
+          student: captureAny(named: 'student'),
+        ),
+      ).captured;
+
+      final createdStudent = captured.single as StudentEntity;
+
+      expect(createdStudent.subscriptionStartAt, isNull);
+      expect(createdStudent.subscriptionEndAt, isNull);
+      expect(createdStudent.isActive, isFalse);
     },
   );
 

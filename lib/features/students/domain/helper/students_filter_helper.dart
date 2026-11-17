@@ -6,8 +6,6 @@ abstract final class StudentsFilterHelper {
     required List<StudentEntity> students,
     required StudentsFilterParams params,
   }) {
-    final now = DateTime.now();
-
     return students.where((student) {
       final matchesGrade = _matchesGrade(
         student: student,
@@ -22,7 +20,6 @@ abstract final class StudentsFilterHelper {
       final matchesSubscription = _matchesSubscription(
         student: student,
         filter: params.subscriptionFilter,
-        now: now,
       );
 
       return matchesGrade && matchesSearch && matchesSubscription;
@@ -54,15 +51,9 @@ abstract final class StudentsFilterHelper {
 
     final normalizedName = student.name.trim().toLowerCase();
 
-    final normalizedPhone = student.phoneNumber.replaceAll(
-      RegExp(r'\s+'),
-      '',
-    );
+    final normalizedPhone = student.phoneNumber.replaceAll(RegExp(r'\s+'), '');
 
-    final normalizedPhoneQuery = normalizedQuery.replaceAll(
-      RegExp(r'\s+'),
-      '',
-    );
+    final normalizedPhoneQuery = normalizedQuery.replaceAll(RegExp(r'\s+'), '');
 
     return normalizedName.contains(normalizedQuery) ||
         normalizedPhone.contains(normalizedPhoneQuery);
@@ -71,20 +62,16 @@ abstract final class StudentsFilterHelper {
   static bool _matchesSubscription({
     required StudentEntity student,
     required StudentSubscriptionFilter filter,
-    required DateTime now,
   }) {
-    final isSubscriptionActive =
-        student.isActive && student.subscriptionEndAt.isAfter(now);
-
     switch (filter) {
       case StudentSubscriptionFilter.all:
         return true;
 
       case StudentSubscriptionFilter.active:
-        return isSubscriptionActive;
+        return student.isActive;
 
       case StudentSubscriptionFilter.expired:
-        return !isSubscriptionActive;
+        return !student.isActive;
     }
   }
 }

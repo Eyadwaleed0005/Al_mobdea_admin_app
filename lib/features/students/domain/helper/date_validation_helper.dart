@@ -8,9 +8,7 @@ abstract final class DateValidationHelper {
     return endAt.isAfter(startAt);
   }
 
-  static bool isEndDateInFuture({
-    required DateTime endAt,
-  }) {
+  static bool isEndDateInFuture({required DateTime endAt}) {
     return endAt.isAfter(DateTime.now());
   }
 

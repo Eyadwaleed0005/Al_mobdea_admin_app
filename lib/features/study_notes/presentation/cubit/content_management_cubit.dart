@@ -4,7 +4,7 @@ import 'package:al_mobdea_admin/core/errors/error_model/app_error_model.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/entities/lesson_entity.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/stream_lessons_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/domain/entities/study_note_entity.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/stream_study_notes_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/stream_study_notes_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/content_management_state.dart';
 import 'package:dartz/dartz.dart' show Either;
 import 'package:flutter_bloc/flutter_bloc.dart';

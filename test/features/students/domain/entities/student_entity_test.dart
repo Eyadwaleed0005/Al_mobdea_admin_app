@@ -3,38 +3,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('StudentEntity', () {
-    test('isSubscriptionExpired is true for a past end date', () {
+    test('subscription dates are optional', () {
       final student = StudentEntity(
         studentId: 's-1',
         gradeId: 'g-1',
         name: 'Test',
-        age: 15,
         email: 'a@b.com',
         phoneNumber: '0100',
-        subscriptionStartAt: DateTime(2020, 1, 1),
-        subscriptionEndAt: DateTime(2020, 1, 2),
-        isActive: true,
+        isActive: false,
         isLoggedIn: false,
       );
 
-      expect(student.isSubscriptionExpired, isTrue);
-    });
-
-    test('isSubscriptionExpired is false for a future end date', () {
-      final student = StudentEntity(
-        studentId: 's-1',
-        gradeId: 'g-1',
-        name: 'Test',
-        age: 15,
-        email: 'a@b.com',
-        phoneNumber: '0100',
-        subscriptionStartAt: DateTime(2020, 1, 1),
-        subscriptionEndAt: DateTime(2100, 1, 1),
-        isActive: true,
-        isLoggedIn: false,
-      );
-
-      expect(student.isSubscriptionExpired, isFalse);
+      expect(student.subscriptionStartAt, isNull);
+      expect(student.subscriptionEndAt, isNull);
     });
 
     test('copyWith overrides only provided fields', () {
@@ -42,7 +23,6 @@ void main() {
         studentId: 's-1',
         gradeId: 'g-1',
         name: 'Test',
-        age: 15,
         email: 'a@b.com',
         phoneNumber: '0100',
         subscriptionStartAt: DateTime(2020, 1, 1),
@@ -57,6 +37,28 @@ void main() {
       expect(updated.isActive, isFalse);
       expect(updated.studentId, 's-1');
       expect(updated.email, 'a@b.com');
+      expect(updated.subscriptionStartAt, DateTime(2020, 1, 1));
+      expect(updated.subscriptionEndAt, DateTime(2100, 1, 1));
+    });
+
+    test('copyWith can clear both subscription dates', () {
+      final student = StudentEntity(
+        studentId: 's-1',
+        gradeId: 'g-1',
+        name: 'Test',
+        email: 'a@b.com',
+        phoneNumber: '0100',
+        subscriptionStartAt: DateTime(2020, 1, 1),
+        subscriptionEndAt: DateTime(2100, 1, 1),
+        isActive: true,
+        isLoggedIn: false,
+      );
+
+      final cleared = student.copyWith(clearSubscriptionDates: true);
+
+      expect(cleared.subscriptionStartAt, isNull);
+      expect(cleared.subscriptionEndAt, isNull);
+      expect(cleared.isActive, isTrue);
     });
   });
 }

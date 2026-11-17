@@ -8,9 +8,8 @@ import 'package:dartz/dartz.dart';
 class StreamStudentsUseCase {
   final StudentsRepository _studentsRepository;
 
-  const StreamStudentsUseCase({
-    required StudentsRepository studentsRepository,
-  }) : _studentsRepository = studentsRepository;
+  const StreamStudentsUseCase({required StudentsRepository studentsRepository})
+    : _studentsRepository = studentsRepository;
 
   Stream<Either<AppErrorModel, List<StudentEntity>>> call({
     required StudentsFilterParams params,

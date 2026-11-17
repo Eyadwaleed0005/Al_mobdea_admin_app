@@ -17,6 +17,7 @@ void main() {
         expect(model.description, tStudyNoteDescription);
         expect(model.gradeId, tGradeId);
         expect(model.isPublished, isTrue);
+        expect(model.isFree, isTrue);
         expect(model.pdfFileName, tStudyNotePdfFileName);
         expect(model.pdfFileSize, tStudyNotePdfFileSize);
         expect(model.pdfStoragePath, tStudyNotePdfStoragePath);
@@ -24,13 +25,28 @@ void main() {
         expect(model.updatedAt, isNull);
       });
 
-      test('maps a note without pdf fields', () {
+      test('maps a note without pdf data to empty pdf fields', () {
         final model = StudyNoteModel.fromEntity(tStudyNoteEntityWithoutPdf);
 
-        expect(model.pdfFileName, isNull);
-        expect(model.pdfFileSize, isNull);
-        expect(model.pdfStoragePath, isNull);
-        expect(model.hasPdfFile, isFalse);
+        expect(model.pdfFileName, isEmpty);
+        expect(model.pdfFileSize, 0);
+        expect(model.pdfStoragePath, isEmpty);
+      });
+
+      test('maps the free access flag', () {
+        final paidNote = StudyNoteEntity(
+          noteId: tStudyNoteId,
+          name: tStudyNoteName,
+          description: tStudyNoteDescription,
+          gradeId: tGradeId,
+          isPublished: true,
+          isFree: false,
+          pdfFileName: tStudyNotePdfFileName,
+          pdfFileSize: tStudyNotePdfFileSize,
+          pdfStoragePath: tStudyNotePdfStoragePath,
+        );
+
+        expect(StudyNoteModel.fromEntity(paidNote).isFree, isFalse);
       });
 
       test('is an instance of StudyNoteEntity', () {
@@ -60,19 +76,18 @@ void main() {
         expect(model.updatedAt!.isAtSameMomentAs(tStudyNoteUpdatedAt), isTrue);
       });
 
-      test('maps a document map without pdf fields', () {
+      test('defaults missing pdf fields to empty values', () {
         final model = StudyNoteModel.fromMap(
           documentId: tStudyNoteId,
           map: tStudyNoteJsonWithoutPdf(),
         );
 
-        expect(model.pdfFileName, isNull);
-        expect(model.pdfFileSize, isNull);
-        expect(model.pdfStoragePath, isNull);
-        expect(model.hasPdfFile, isFalse);
+        expect(model.pdfFileName, isEmpty);
+        expect(model.pdfFileSize, 0);
+        expect(model.pdfStoragePath, isEmpty);
       });
 
-      test('treats blank strings as null for optional fields', () {
+      test('keeps raw string values from the map', () {
         final model = StudyNoteModel.fromMap(
           documentId: tStudyNoteId,
           map: {
@@ -84,14 +99,14 @@ void main() {
           },
         );
 
-        expect(model.name, tStudyNoteName);
-        expect(model.description, tStudyNoteDescription);
-        expect(model.gradeId, tGradeId);
-        expect(model.pdfFileName, isNull);
-        expect(model.pdfStoragePath, isNull);
+        expect(model.name, '  $tStudyNoteName  ');
+        expect(model.description, '  $tStudyNoteDescription  ');
+        expect(model.gradeId, '  $tGradeId  ');
+        expect(model.pdfFileName, isEmpty);
+        expect(model.pdfStoragePath, '   ');
       });
 
-      test('ignores non-positive and non-int pdf file sizes', () {
+      test('converts numeric pdf file sizes and ignores invalid values', () {
         final zeroSizeModel = StudyNoteModel.fromMap(
           documentId: tStudyNoteId,
           map: {FirestoreFields.pdfFileSize: 0},
@@ -107,18 +122,27 @@ void main() {
           map: {FirestoreFields.pdfFileSize: 'big'},
         );
 
-        expect(zeroSizeModel.pdfFileSize, isNull);
+        expect(zeroSizeModel.pdfFileSize, 0);
         expect(doubleSizeModel.pdfFileSize, 2048);
-        expect(stringSizeModel.pdfFileSize, isNull);
+        expect(stringSizeModel.pdfFileSize, 0);
       });
 
-      test('defaults isPublished to false for non-bool values', () {
+      test('defaults isPublished to false when missing', () {
         final model = StudyNoteModel.fromMap(
           documentId: tStudyNoteId,
-          map: {FirestoreFields.isPublished: 'yes'},
+          map: const <String, dynamic>{},
         );
 
         expect(model.isPublished, isFalse);
+      });
+
+      test('defaults isFree to true when missing', () {
+        final model = StudyNoteModel.fromMap(
+          documentId: tStudyNoteId,
+          map: const <String, dynamic>{},
+        );
+
+        expect(model.isFree, isTrue);
       });
 
       test('parses createdAt as ISO string', () {
@@ -132,16 +156,26 @@ void main() {
         expect(model.createdAt!.isAtSameMomentAs(tStudyNoteCreatedAt), isTrue);
       });
 
-      test('returns null dates for missing or invalid values', () {
+      test('parses createdAt as epoch milliseconds', () {
+        final epoch = tStudyNoteCreatedAt.millisecondsSinceEpoch;
+
         final model = StudyNoteModel.fromMap(
           documentId: tStudyNoteId,
-          map: {
-            FirestoreFields.createdAt: 42,
-            FirestoreFields.updatedAt: 'not-a-date',
-          },
+          map: {FirestoreFields.createdAt: epoch},
         );
 
-        expect(model.createdAt, isNull);
+        expect(
+          model.createdAt!.isAtSameMomentAs(tStudyNoteCreatedAt),
+          isTrue,
+        );
+      });
+
+      test('returns null dates for invalid string values', () {
+        final model = StudyNoteModel.fromMap(
+          documentId: tStudyNoteId,
+          map: {FirestoreFields.updatedAt: 'not-a-date'},
+        );
+
         expect(model.updatedAt, isNull);
       });
     });
@@ -154,6 +188,7 @@ void main() {
         expect(map[FirestoreFields.description], tStudyNoteDescription);
         expect(map[FirestoreFields.gradeId], tGradeId);
         expect(map[FirestoreFields.isPublished], isTrue);
+        expect(map[FirestoreFields.isFree], isTrue);
         expect(map[FirestoreFields.createdAt], isA<FieldValue>());
         expect(map[FirestoreFields.updatedAt], isA<FieldValue>());
       });
@@ -166,41 +201,35 @@ void main() {
         expect(map[FirestoreFields.pdfStoragePath], tStudyNotePdfStoragePath);
       });
 
-      test('omits pdf fields when the note has no pdf', () {
+      test('writes empty pdf fields when the note has no pdf', () {
         final map = StudyNoteModel.fromEntity(
           tStudyNoteEntityWithoutPdf,
         ).toCreateMap();
 
-        expect(map.containsKey(FirestoreFields.pdfFileName), isFalse);
-        expect(map.containsKey(FirestoreFields.pdfFileSize), isFalse);
-        expect(map.containsKey(FirestoreFields.pdfStoragePath), isFalse);
-      });
-
-      test('omits pdf fields when pdf data is incomplete', () {
-        final map = StudyNoteModel(
-          noteId: tStudyNoteId,
-          name: tStudyNoteName,
-          description: tStudyNoteDescription,
-          gradeId: tGradeId,
-          isPublished: true,
-          pdfStoragePath: tStudyNotePdfStoragePath,
-        ).toCreateMap();
-
-        expect(map.containsKey(FirestoreFields.pdfStoragePath), isFalse);
-        expect(map.containsKey(FirestoreFields.pdfFileName), isFalse);
-        expect(map.containsKey(FirestoreFields.pdfFileSize), isFalse);
+        expect(map[FirestoreFields.pdfFileName], isEmpty);
+        expect(map[FirestoreFields.pdfFileSize], 0);
+        expect(map[FirestoreFields.pdfStoragePath], isEmpty);
       });
 
       test('trims string values', () {
         final map = StudyNoteModel.fromEntity(
-          tStudyNoteEntity.copyWith(
+          StudyNoteEntity(
+            noteId: tStudyNoteId,
             name: '  $tStudyNoteName  ',
             description: '  $tStudyNoteDescription  ',
+            gradeId: '  $tGradeId  ',
+            isPublished: true,
+            pdfFileName: '  $tStudyNotePdfFileName  ',
+            pdfFileSize: tStudyNotePdfFileSize,
+            pdfStoragePath: '  $tStudyNotePdfStoragePath  ',
           ),
         ).toCreateMap();
 
         expect(map[FirestoreFields.name], tStudyNoteName);
         expect(map[FirestoreFields.description], tStudyNoteDescription);
+        expect(map[FirestoreFields.gradeId], tGradeId);
+        expect(map[FirestoreFields.pdfFileName], tStudyNotePdfFileName);
+        expect(map[FirestoreFields.pdfStoragePath], tStudyNotePdfStoragePath);
       });
     });
 
@@ -220,41 +249,20 @@ void main() {
         expect(map[FirestoreFields.pdfStoragePath], tStudyNotePdfStoragePath);
       });
 
-      test('does not touch pdf fields when the note has no pdf', () {
+      test('writes empty pdf fields when the note has no pdf', () {
         final map = StudyNoteModel.fromEntity(
           tStudyNoteEntityWithoutPdf,
         ).toUpdateMap();
 
-        expect(map.containsKey(FirestoreFields.pdfFileName), isFalse);
-        expect(map.containsKey(FirestoreFields.pdfFileSize), isFalse);
-        expect(map.containsKey(FirestoreFields.pdfStoragePath), isFalse);
+        expect(map[FirestoreFields.pdfFileName], isEmpty);
+        expect(map[FirestoreFields.pdfFileSize], 0);
+        expect(map[FirestoreFields.pdfStoragePath], isEmpty);
       });
 
-      test('marks pdf fields for deletion when removePdf is true', () {
-        final map = tStudyNoteModel.toUpdateMap(removePdf: true);
+      test('writes the free access flag', () {
+        final map = tStudyNoteModel.toUpdateMap();
 
-        expect(map[FirestoreFields.pdfFileName], FieldValue.delete());
-        expect(map[FirestoreFields.pdfFileSize], FieldValue.delete());
-        expect(map[FirestoreFields.pdfStoragePath], FieldValue.delete());
-      });
-    });
-
-    group('entity helpers', () {
-      test('hasPdfFile reflects the pdf storage path', () {
-        expect(tStudyNoteEntity.hasPdfFile, isTrue);
-        expect(tStudyNoteEntityWithoutPdf.hasPdfFile, isFalse);
-      });
-
-      test('copyWith keeps pdf fields unless clearPdf is true', () {
-        final kept = tStudyNoteEntity.copyWith(name: 'New name');
-
-        expect(kept.pdfStoragePath, tStudyNotePdfStoragePath);
-
-        final cleared = tStudyNoteEntity.copyWith(clearPdf: true);
-
-        expect(cleared.pdfFileName, isNull);
-        expect(cleared.pdfFileSize, isNull);
-        expect(cleared.pdfStoragePath, isNull);
+        expect(map[FirestoreFields.isFree], isTrue);
       });
     });
   });

@@ -17,12 +17,12 @@ class FirebaseStudentsRemoteDataSource implements StudentsRemoteDataSource {
 
   @override
   Future<List<StudentModel>> getStudents({String? gradeId}) {
-    return _execute<List<StudentModel>>(() async {
+    return _execute(() async {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await _firestoreService.getCollection(
-        collectionPath: FirestoreCollections.students,
-        queryBuilder: _getGradeQuery(gradeId),
-      );
+            collectionPath: FirestoreCollections.students,
+            queryBuilder: _getGradeQuery(gradeId),
+          );
 
       return _mapStudents(snapshot);
     });
@@ -30,12 +30,12 @@ class FirebaseStudentsRemoteDataSource implements StudentsRemoteDataSource {
 
   @override
   Future<StudentModel> getStudentById({required String studentId}) {
-    return _execute<StudentModel>(() async {
+    return _execute(() async {
       final DocumentSnapshot<Map<String, dynamic>> snapshot =
           await _firestoreService.getDocument(
-        collectionPath: FirestoreCollections.students,
-        documentId: studentId,
-      );
+            collectionPath: FirestoreCollections.students,
+            documentId: studentId,
+          );
 
       final Map<String, dynamic>? studentData = snapshot.data();
 
@@ -58,7 +58,7 @@ class FirebaseStudentsRemoteDataSource implements StudentsRemoteDataSource {
 
   @override
   Stream<List<StudentModel>> streamStudents({String? gradeId}) {
-    return _executeStream<List<StudentModel>>(() {
+    return _executeStream(() {
       return _firestoreService
           .streamCollection(
             collectionPath: FirestoreCollections.students,
@@ -70,7 +70,7 @@ class FirebaseStudentsRemoteDataSource implements StudentsRemoteDataSource {
 
   @override
   Future<void> createStudent({required StudentModel student}) {
-    return _execute<void>(() async {
+    return _execute(() async {
       await _firestoreService.postData(
         collectionPath: FirestoreCollections.students,
         documentId: student.studentId,
@@ -81,7 +81,7 @@ class FirebaseStudentsRemoteDataSource implements StudentsRemoteDataSource {
 
   @override
   Future<void> updateStudent({required StudentModel student}) {
-    return _execute<void>(() async {
+    return _execute(() async {
       await _firestoreService.patchData(
         collectionPath: FirestoreCollections.students,
         documentId: student.studentId,
@@ -92,7 +92,7 @@ class FirebaseStudentsRemoteDataSource implements StudentsRemoteDataSource {
 
   @override
   Future<void> deleteStudent({required String studentId}) {
-    return _execute<void>(() async {
+    return _execute(() async {
       await _firestoreService.deleteData(
         collectionPath: FirestoreCollections.students,
         documentId: studentId,

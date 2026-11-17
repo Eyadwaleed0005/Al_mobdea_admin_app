@@ -4,9 +4,8 @@ import 'package:al_mobdea_admin/features/lessons/domain/repositories/lessons_rep
 import 'package:dartz/dartz.dart';
 
 class StreamLessonsUseCase {
-  const StreamLessonsUseCase({
-    required LessonsRepository repository,
-  }) : _repository = repository;
+  const StreamLessonsUseCase({required LessonsRepository repository})
+    : _repository = repository;
 
   final LessonsRepository _repository;
 

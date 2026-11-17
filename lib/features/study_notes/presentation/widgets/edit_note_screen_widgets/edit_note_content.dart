@@ -7,6 +7,7 @@ import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/edit_not
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/add_note_description_field.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/add_note_options_section.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/add_note_title_field.dart';
+import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/study_note_access_type_switch.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/edit_note_screen_widgets/edit_note_pdf_picker.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/edit_note_screen_widgets/note_last_update_card.dart';
 import 'package:flutter/material.dart';
@@ -139,9 +140,18 @@ class _EditNoteContentState extends State<EditNoteContent> {
             verticalSpace(20),
             AppAnimations.formFieldEntrance(
               order: 3,
+              child: StudyNoteAccessTypeSwitch(
+                isFree: state.isFree,
+                enabled: !state.isActionInProgress,
+                onChanged: cubit.changeFreeStatus,
+              ),
+            ),
+            verticalSpace(20),
+            AppAnimations.formFieldEntrance(
+              order: 4,
               child: EditNotePdfPicker(
-                existingFileName: note.pdfFileName ?? '',
-                existingFileSize: note.pdfFileSize ?? 0,
+                existingFileName: note.pdfFileName,
+                existingFileSize: note.pdfFileSize,
                 replacementPdf: state.replacementPdf,
                 onReplacementSelected: cubit.selectReplacementPdf,
                 onReplacementRemoved: cubit.removeReplacementPdf,

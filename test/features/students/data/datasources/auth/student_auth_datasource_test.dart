@@ -102,7 +102,7 @@ void main() {
     test('calls the updateStudentPassword callable', () async {
       when(() => callableResult.data).thenReturn(<String, dynamic>{});
       when(
-        () => callable.call<Map<String, dynamic>>(any()),
+        () => callable.call<Object?>(any()),
       ).thenAnswer((_) async => callableResult);
 
       await dataSource.updateStudentPassword(
@@ -122,7 +122,7 @@ void main() {
     test('calls the updateStudentEmail callable', () async {
       when(() => callableResult.data).thenReturn(<String, dynamic>{});
       when(
-        () => callable.call<Map<String, dynamic>>(any()),
+        () => callable.call<Object?>(any()),
       ).thenAnswer((_) async => callableResult);
 
       await dataSource.updateStudentEmail(
@@ -142,7 +142,7 @@ void main() {
     test('calls the updateStudentAccountStatus callable', () async {
       when(() => callableResult.data).thenReturn(<String, dynamic>{});
       when(
-        () => callable.call<Map<String, dynamic>>(any()),
+        () => callable.call<Object?>(any()),
       ).thenAnswer((_) async => callableResult);
 
       await dataSource.updateStudentAccountStatus(
@@ -162,7 +162,7 @@ void main() {
     test('calls the deleteStudentAccount callable', () async {
       when(() => callableResult.data).thenReturn(<String, dynamic>{});
       when(
-        () => callable.call<Map<String, dynamic>>(any()),
+        () => callable.call<void>(any()),
       ).thenAnswer((_) async => callableResult);
 
       await dataSource.deleteStudentAccount(studentId: tStudentId);
@@ -178,7 +178,7 @@ void main() {
       'maps FirebaseFunctionsException into FirebaseRemoteException',
       () async {
         when(
-          () => callable.call<Map<String, dynamic>>(any()),
+          () => callable.call<void>(any()),
         ).thenThrow(
           FirebaseFunctionsException(
             message: 'not found',

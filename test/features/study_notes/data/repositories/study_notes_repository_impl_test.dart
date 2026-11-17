@@ -118,7 +118,7 @@ void main() {
   });
 
   group('createStudyNote', () {
-    test('returns Right(unit) on success without a pdf', () async {
+    test('returns Right(unit) on success', () async {
       when(
         () => remoteDataSource.createStudyNote(
           note: any(named: 'note'),
@@ -128,13 +128,14 @@ void main() {
 
       final result = await repository.createStudyNote(
         note: tStudyNoteEntityWithoutPdf,
+        localPdfFilePath: tStudyNoteLocalPdfFilePath,
       );
 
       expect(result, equals(const Right<AppErrorModel, Unit>(unit)));
       verify(
         () => remoteDataSource.createStudyNote(
           note: any(named: 'note'),
-          localPdfFilePath: null,
+          localPdfFilePath: tStudyNoteLocalPdfFilePath,
         ),
       ).called(1);
     });
@@ -173,7 +174,10 @@ void main() {
         ),
       ).thenThrow(tRemoteException);
 
-      final result = await repository.createStudyNote(note: tStudyNoteEntity);
+      final result = await repository.createStudyNote(
+        note: tStudyNoteEntity,
+        localPdfFilePath: tStudyNoteLocalPdfFilePath,
+      );
 
       expect(result.isLeft(), isTrue);
     });
@@ -185,7 +189,6 @@ void main() {
         () => remoteDataSource.updateStudyNote(
           note: any(named: 'note'),
           replacementPdfFilePath: any(named: 'replacementPdfFilePath'),
-          removeExistingPdf: any(named: 'removeExistingPdf'),
         ),
       ).thenAnswer((_) async {});
 
@@ -198,31 +201,27 @@ void main() {
         () => remoteDataSource.updateStudyNote(
           note: any(named: 'note'),
           replacementPdfFilePath: null,
-          removeExistingPdf: false,
         ),
       ).called(1);
     });
 
-    test('forwards removeExistingPdf and replacement pdf path', () async {
+    test('forwards the replacement pdf path', () async {
       when(
         () => remoteDataSource.updateStudyNote(
           note: any(named: 'note'),
           replacementPdfFilePath: any(named: 'replacementPdfFilePath'),
-          removeExistingPdf: any(named: 'removeExistingPdf'),
         ),
       ).thenAnswer((_) async {});
 
       await repository.updateStudyNote(
         note: tStudyNoteEntity,
         replacementPdfFilePath: tStudyNoteLocalPdfFilePath,
-        removeExistingPdf: true,
       );
 
       verify(
         () => remoteDataSource.updateStudyNote(
           note: any(named: 'note'),
           replacementPdfFilePath: tStudyNoteLocalPdfFilePath,
-          removeExistingPdf: true,
         ),
       ).called(1);
     });
@@ -232,7 +231,6 @@ void main() {
         () => remoteDataSource.updateStudyNote(
           note: any(named: 'note'),
           replacementPdfFilePath: any(named: 'replacementPdfFilePath'),
-          removeExistingPdf: any(named: 'removeExistingPdf'),
         ),
       ).thenThrow(tRemoteException);
 

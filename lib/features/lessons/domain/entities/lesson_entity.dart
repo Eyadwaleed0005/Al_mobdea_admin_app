@@ -5,6 +5,7 @@ class LessonEntity {
     required this.title,
     required this.subtitle,
     required this.isPublished,
+    this.isFree = true,
     this.youtubeUrl,
     this.pdfFileName,
     this.pdfFileSize,
@@ -20,6 +21,7 @@ class LessonEntity {
   final int? pdfFileSize;
   final String? pdfStoragePath;
   final bool isPublished;
+  final bool isFree;
 
   bool get hasYoutubeVideo {
     return youtubeUrl?.trim().isNotEmpty ?? false;
@@ -27,53 +29,6 @@ class LessonEntity {
 
   bool get hasPdfFile {
     return pdfStoragePath?.trim().isNotEmpty ?? false;
-  }
-
-  static String countSubtitle(List<LessonEntity> lessons) {
-    return _countLabel(lessons.length);
-  }
-
-  static String summarySubtitle(List<LessonEntity> lessons) {
-    if (lessons.isEmpty) {
-      return 'لا توجد دروس حتى الآن';
-    }
-
-    final total = lessons.length;
-    final published = lessons.where((lesson) => lesson.isPublished).length;
-    final drafts = total - published;
-    final countLabel = countSubtitle(lessons);
-
-    if (published == total) {
-      return '$countLabel • جميعها منشورة';
-    }
-
-    if (drafts == total) {
-      return '$countLabel • جميعها مسودات';
-    }
-
-    return '$countLabel'
-        ' • منشورة: ${_arabicNumber(published)}'
-        ' • مسودات: ${_arabicNumber(drafts)}';
-  }
-
-  static String _countLabel(int count) {
-    if (count == 0) return '٠ دروس';
-    if (count == 1) return 'درس واحد';
-    if (count == 2) return 'درسان';
-
-    final remainder = count % 100;
-    final noun = remainder >= 3 && remainder <= 10 ? 'دروس' : 'درسًا';
-
-    return '${_arabicNumber(count)} $noun';
-  }
-
-  static String _arabicNumber(int number) {
-    const digits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-
-    return number.toString().split('').map((character) {
-      final digit = int.tryParse(character);
-      return digit == null ? character : digits[digit];
-    }).join();
   }
 
   LessonEntity copyWith({
@@ -86,6 +41,7 @@ class LessonEntity {
     int? pdfFileSize,
     String? pdfStoragePath,
     bool? isPublished,
+    bool? isFree,
     bool clearYoutubeUrl = false,
     bool clearPdf = false,
   }) {
@@ -99,6 +55,7 @@ class LessonEntity {
       pdfFileSize: clearPdf ? null : pdfFileSize ?? this.pdfFileSize,
       pdfStoragePath: clearPdf ? null : pdfStoragePath ?? this.pdfStoragePath,
       isPublished: isPublished ?? this.isPublished,
+      isFree: isFree ?? this.isFree,
     );
   }
 }

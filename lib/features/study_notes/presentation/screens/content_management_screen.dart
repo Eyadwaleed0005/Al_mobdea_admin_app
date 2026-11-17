@@ -5,7 +5,7 @@ import 'package:al_mobdea_admin/core/widgets/app_network_aware_content.dart';
 import 'package:al_mobdea_admin/core/widgets/background/background_student_layout.dart';
 import 'package:al_mobdea_admin/core/widgets/custom_header_bar.dart';
 import 'package:al_mobdea_admin/features/lessons/domain/use_cases/stream_lessons_use_case.dart';
-import 'package:al_mobdea_admin/features/study_notes/domain/use_cases/stream_study_notes_use_case.dart';
+import 'package:al_mobdea_admin/features/study_notes/domain/use_case/stream_study_notes_use_case.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/cubit/content_management_cubit.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/content_management_screen_widgets/content_management_content.dart';
 import 'package:flutter/material.dart';

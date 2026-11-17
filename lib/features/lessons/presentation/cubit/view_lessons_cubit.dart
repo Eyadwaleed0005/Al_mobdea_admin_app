@@ -108,9 +108,8 @@ class ViewLessonsCubit extends Cubit<ViewLessonsState> {
   Future<void> retry() => initialize();
 
   void _watchGrades() {
-    _gradesSubscription = _streamGradesUseCase(
-      activeOnly: true,
-    ).listen(_onGradesResult);
+    _gradesSubscription = _streamGradesUseCase(activeOnly: true)
+        .listen(_onGradesResult);
   }
 
   void _watchLessons() {

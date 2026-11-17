@@ -18,14 +18,20 @@ class AddStudentState {
 
   final AddStudentStatus status;
   final List<GradeEntity> grades;
+
   final String? selectedGradeId;
+
   final DateTime? subscriptionStartDate;
   final DateTime? subscriptionEndDate;
+
   final bool hasGeneratedPassword;
+
   final AppErrorModel? error;
   final StudentEntity? createdStudent;
 
-  bool get isSubmitting => status == AddStudentStatus.submitting;
+  bool get isSubmitting {
+    return status == AddStudentStatus.submitting;
+  }
 
   String get selectedGradeName {
     for (final grade in grades) {
@@ -33,6 +39,7 @@ class AddStudentState {
         return grade.name;
       }
     }
+
     return 'اختر الصف';
   }
 

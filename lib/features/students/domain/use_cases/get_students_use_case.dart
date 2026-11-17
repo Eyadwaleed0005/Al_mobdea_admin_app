@@ -8,8 +8,7 @@ import 'package:dartz/dartz.dart';
 class GetStudentsUseCase {
   final StudentsRepository _studentsRepository;
 
-  const GetStudentsUseCase({required StudentsRepository studentsRepository})
-    : _studentsRepository = studentsRepository;
+  const GetStudentsUseCase({required this._studentsRepository});
 
   Future<Either<AppErrorModel, List<StudentEntity>>> call({
     required StudentsFilterParams params,

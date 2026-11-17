@@ -94,6 +94,7 @@ void main() {
     expect(cubit.state.submissionStatus, AddLessonSubmissionStatus.idle);
     expect(cubit.state.grades, isEmpty);
     expect(cubit.state.isPublished, isFalse);
+    expect(cubit.state.isFree, isTrue);
     expect(cubit.state.selectedPdf, isNull);
 
     await cubit.close();
@@ -154,6 +155,7 @@ void main() {
       cubit.changeYoutubeUrl(tYoutubeUrl);
       cubit.selectGrade(' $tGradeId ');
       cubit.changePublicationStatus(true);
+      cubit.changeFreeStatus(false);
     },
     wait: const Duration(milliseconds: 100),
     expect: () => [
@@ -166,6 +168,7 @@ void main() {
       isA<AddLessonState>()
           .having((s) => s.isPublished, 'isPublished', isTrue)
           .having((s) => s.submissionStatus, 'submissionStatus', AddLessonSubmissionStatus.idle),
+      isA<AddLessonState>().having((s) => s.isFree, 'isFree', isFalse),
     ],
   );
 
@@ -309,6 +312,48 @@ void main() {
       expect(submittedLesson.isPublished, isFalse);
       expect(submittedLesson.lessonId, startsWith('lesson_'));
       expect(captured.last, tLocalPdfFilePath);
+    },
+  );
+
+  blocTest<AddLessonCubit, AddLessonState>(
+    'createLesson forwards the free access flag',
+    setUp: () {
+      stubGradesSuccess();
+      stubCreateLessonSuccess();
+    },
+    build: buildCubit,
+    act: (cubit) async {
+      await cubit.initialize();
+
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      fillValidForm(cubit);
+
+      cubit.changeFreeStatus(false);
+
+      await cubit.createLesson();
+    },
+    wait: const Duration(milliseconds: 100),
+    skip: 7,
+    expect: () => [
+      isA<AddLessonState>().having((s) => s.isSubmitting, 'isSubmitting', isTrue),
+      isA<AddLessonState>().having(
+        (s) => s.submissionSucceeded,
+        'submissionSucceeded',
+        isTrue,
+      ),
+    ],
+    verify: (_) {
+      final captured = verify(
+        () => mockCreateLessonUseCase(
+          lesson: captureAny(named: 'lesson'),
+          localPdfFilePath: captureAny(named: 'localPdfFilePath'),
+        ),
+      ).captured;
+
+      final submittedLesson = captured.first as LessonEntity;
+
+      expect(submittedLesson.isFree, isFalse);
     },
   );
 

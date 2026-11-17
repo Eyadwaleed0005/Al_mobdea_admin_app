@@ -153,13 +153,15 @@ void main() {
       expect(published.single.noteId, tStudyNoteId);
     });
 
-    test('maps a note without pdf fields', () async {
+    test('maps missing pdf fields to empty values', () async {
       await seedStudyNote(map: tStudyNoteJsonWithoutPdf());
 
       final notes = await dataSource.getStudyNotes();
 
       expect(notes, hasLength(1));
-      expect(notes.single.hasPdfFile, isFalse);
+      expect(notes.single.pdfStoragePath, isEmpty);
+      expect(notes.single.pdfFileName, isEmpty);
+      expect(notes.single.pdfFileSize, 0);
     });
   });
 
@@ -226,40 +228,13 @@ void main() {
   });
 
   group('createStudyNote', () {
-    test(
-      'creates a note without a pdf when no local file path is given',
-      () async {
-        await dataSource.createStudyNote(
-          note: StudyNoteModel.fromEntity(tStudyNoteEntityWithoutPdf),
-        );
+    test('uploads the pdf and persists its metadata', () async {
+      stubSuccessfulUpload();
 
-        final data = await fakeFirestore
-            .collection(FirestoreCollections.studyNotes)
-            .doc(tStudyNoteId)
-            .get()
-            .then((snapshot) => snapshot.data()!);
-
-        expect(data[FirestoreFields.name], tStudyNoteName);
-        expect(data[FirestoreFields.description], tStudyNoteDescription);
-        expect(data[FirestoreFields.gradeId], tGradeId);
-        expect(data[FirestoreFields.isPublished], isTrue);
-        expect(data.containsKey(FirestoreFields.pdfFileName), isFalse);
-        expect(data.containsKey(FirestoreFields.pdfFileSize), isFalse);
-        expect(data.containsKey(FirestoreFields.pdfStoragePath), isFalse);
-        expect(data[FirestoreFields.createdAt], isA<Timestamp>());
-
-        verifyNever(
-          () => storageService.uploadFile(
-            localFilePath: any(named: 'localFilePath'),
-            storagePath: any(named: 'storagePath'),
-            contentType: any(named: 'contentType'),
-          ),
-        );
-      },
-    );
-
-    test('persists model-carried pdf metadata without uploading', () async {
-      await dataSource.createStudyNote(note: tStudyNoteModel);
+      await dataSource.createStudyNote(
+        note: tStudyNoteModel,
+        localPdfFilePath: tStudyNoteLocalPdfFilePath,
+      );
 
       final data = await fakeFirestore
           .collection(FirestoreCollections.studyNotes)
@@ -267,63 +242,68 @@ void main() {
           .get()
           .then((snapshot) => snapshot.data()!);
 
+      expect(data[FirestoreFields.name], tStudyNoteName);
+      expect(data[FirestoreFields.description], tStudyNoteDescription);
+      expect(data[FirestoreFields.gradeId], tGradeId);
+      expect(data[FirestoreFields.isPublished], isTrue);
+      expect(data[FirestoreFields.isFree], isTrue);
       expect(data[FirestoreFields.pdfStoragePath], tStudyNotePdfStoragePath);
       expect(data[FirestoreFields.pdfFileName], tStudyNotePdfFileName);
       expect(data[FirestoreFields.pdfFileSize], tStudyNotePdfFileSize);
+      expect(data[FirestoreFields.createdAt], isA<Timestamp>());
 
-      verifyNever(
+      final captured = verify(
         () => storageService.uploadFile(
-          localFilePath: any(named: 'localFilePath'),
-          storagePath: any(named: 'storagePath'),
-          contentType: any(named: 'contentType'),
+          localFilePath: captureAny(named: 'localFilePath'),
+          storagePath: captureAny(named: 'storagePath'),
+          contentType: captureAny(named: 'contentType'),
+          customMetadata: captureAny(named: 'customMetadata'),
         ),
+      ).captured;
+
+      final localPath = captured[0] as String;
+      final storagePath = captured[1] as String;
+      final contentType = captured[2] as String;
+      final customMetadata = captured[3] as Map<String, String>;
+
+      expect(localPath, tStudyNoteLocalPdfFilePath);
+      expect(storagePath, startsWith('study_notes/$tStudyNoteId/'));
+      expect(contentType, 'application/pdf');
+      expect(customMetadata[StorageMetadataFields.noteId], tStudyNoteId);
+      expect(
+        customMetadata[StorageMetadataFields.originalFileName],
+        tStudyNotePdfFileName,
       );
     });
 
-    test(
-      'uploads the pdf and persists its metadata when a file is given',
-      () async {
-        stubSuccessfulUpload();
+    test('persists the paid access flag', () async {
+      stubSuccessfulUpload();
 
-        await dataSource.createStudyNote(
-          note: tStudyNoteModel,
-          localPdfFilePath: tStudyNoteLocalPdfFilePath,
-        );
+      final paidNote = StudyNoteModel(
+        noteId: tStudyNoteId,
+        name: tStudyNoteName,
+        description: tStudyNoteDescription,
+        gradeId: tGradeId,
+        isPublished: true,
+        isFree: false,
+        pdfFileName: tStudyNotePdfFileName,
+        pdfFileSize: tStudyNotePdfFileSize,
+        pdfStoragePath: tStudyNotePdfStoragePath,
+      );
 
-        final data = await fakeFirestore
-            .collection(FirestoreCollections.studyNotes)
-            .doc(tStudyNoteId)
-            .get()
-            .then((snapshot) => snapshot.data()!);
+      await dataSource.createStudyNote(
+        note: paidNote,
+        localPdfFilePath: tStudyNoteLocalPdfFilePath,
+      );
 
-        expect(data[FirestoreFields.pdfStoragePath], tStudyNotePdfStoragePath);
-        expect(data[FirestoreFields.pdfFileName], tStudyNotePdfFileName);
-        expect(data[FirestoreFields.pdfFileSize], tStudyNotePdfFileSize);
+      final data = await fakeFirestore
+          .collection(FirestoreCollections.studyNotes)
+          .doc(tStudyNoteId)
+          .get()
+          .then((snapshot) => snapshot.data()!);
 
-        final captured = verify(
-          () => storageService.uploadFile(
-            localFilePath: captureAny(named: 'localFilePath'),
-            storagePath: captureAny(named: 'storagePath'),
-            contentType: captureAny(named: 'contentType'),
-            customMetadata: captureAny(named: 'customMetadata'),
-          ),
-        ).captured;
-
-        final localPath = captured[0] as String;
-        final storagePath = captured[1] as String;
-        final contentType = captured[2] as String;
-        final customMetadata = captured[3] as Map<String, String>;
-
-        expect(localPath, tStudyNoteLocalPdfFilePath);
-        expect(storagePath, startsWith('study_notes/$tStudyNoteId/'));
-        expect(contentType, 'application/pdf');
-        expect(customMetadata[StorageMetadataFields.noteId], tStudyNoteId);
-        expect(
-          customMetadata[StorageMetadataFields.originalFileName],
-          tStudyNotePdfFileName,
-        );
-      },
-    );
+      expect(data[FirestoreFields.isFree], isFalse);
+    });
 
     test(
       'rolls the uploaded pdf back when the firestore write fails',
@@ -392,8 +372,15 @@ void main() {
     test('updates the note fields without touching the pdf', () async {
       await seedStudyNote();
 
-      final updatedNote = StudyNoteModel.fromEntity(
-        tStudyNoteEntity.copyWith(name: 'Updated name'),
+      final updatedNote = StudyNoteModel(
+        noteId: tStudyNoteId,
+        name: 'Updated name',
+        description: tStudyNoteDescription,
+        gradeId: tGradeId,
+        isPublished: true,
+        pdfFileName: tStudyNotePdfFileName,
+        pdfFileSize: tStudyNotePdfFileSize,
+        pdfStoragePath: tStudyNotePdfStoragePath,
       );
 
       await dataSource.updateStudyNote(note: updatedNote);
@@ -420,12 +407,10 @@ void main() {
       );
     });
 
-    test('supports updating a note that has no pdf', () async {
-      await seedStudyNote(map: tStudyNoteJsonWithoutPdf());
+    test('keeps the existing pdf metadata when the note carries none', () async {
+      await seedStudyNote();
 
-      final updatedNote = StudyNoteModel.fromEntity(
-        tStudyNoteEntityWithoutPdf.copyWith(description: 'New description'),
-      );
+      final updatedNote = StudyNoteModel.fromEntity(tStudyNoteEntityWithoutPdf);
 
       await dataSource.updateStudyNote(note: updatedNote);
 
@@ -435,69 +420,10 @@ void main() {
           .get()
           .then((snapshot) => snapshot.data()!);
 
-      expect(data[FirestoreFields.description], 'New description');
-      expect(data.containsKey(FirestoreFields.pdfStoragePath), isFalse);
+      expect(data[FirestoreFields.pdfStoragePath], tStudyNotePdfStoragePath);
+      expect(data[FirestoreFields.pdfFileName], tStudyNotePdfFileName);
+      expect(data[FirestoreFields.pdfFileSize], tStudyNotePdfFileSize);
     });
-
-    test('removes the existing pdf when removeExistingPdf is true', () async {
-      await seedStudyNote();
-
-      await dataSource.updateStudyNote(
-        note: StudyNoteModel.fromEntity(tStudyNoteEntity),
-        removeExistingPdf: true,
-      );
-
-      final data = await fakeFirestore
-          .collection(FirestoreCollections.studyNotes)
-          .doc(tStudyNoteId)
-          .get()
-          .then((snapshot) => snapshot.data()!);
-
-      expect(data.containsKey(FirestoreFields.pdfStoragePath), isFalse);
-      expect(data.containsKey(FirestoreFields.pdfFileName), isFalse);
-      expect(data.containsKey(FirestoreFields.pdfFileSize), isFalse);
-
-      verify(
-        () => storageService.deleteFile(storagePath: tStudyNotePdfStoragePath),
-      ).called(1);
-    });
-
-    test('keeps storage when the note had no pdf to remove', () async {
-      await seedStudyNote(map: tStudyNoteJsonWithoutPdf());
-
-      await dataSource.updateStudyNote(
-        note: StudyNoteModel.fromEntity(tStudyNoteEntityWithoutPdf),
-        removeExistingPdf: true,
-      );
-
-      verifyNever(
-        () => storageService.deleteFile(storagePath: any(named: 'storagePath')),
-      );
-    });
-
-    test(
-      'throws when removeExistingPdf and replacement pdf are both given',
-      () async {
-        await seedStudyNote();
-
-        await expectLater(
-          () => dataSource.updateStudyNote(
-            note: StudyNoteModel.fromEntity(tStudyNoteEntity),
-            replacementPdfFilePath: tStudyNoteLocalPdfFilePath,
-            removeExistingPdf: true,
-          ),
-          throwsA(isA<FirebaseRemoteException>()),
-        );
-
-        verifyNever(
-          () => storageService.uploadFile(
-            localFilePath: any(named: 'localFilePath'),
-            storagePath: any(named: 'storagePath'),
-            contentType: any(named: 'contentType'),
-          ),
-        );
-      },
-    );
 
     test('uploads a replacement pdf and deletes the old one', () async {
       await seedStudyNote();
@@ -505,10 +431,19 @@ void main() {
       const newStoragePath = 'study_notes/$tStudyNoteId/2.pdf';
       stubSuccessfulUpload(storagePath: newStoragePath, fileSize: 2048);
 
+      final updatedNote = StudyNoteModel(
+        noteId: tStudyNoteId,
+        name: tStudyNoteName,
+        description: tStudyNoteDescription,
+        gradeId: tGradeId,
+        isPublished: true,
+        pdfFileName: 'new-study-note.pdf',
+        pdfFileSize: tStudyNotePdfFileSize,
+        pdfStoragePath: tStudyNotePdfStoragePath,
+      );
+
       await dataSource.updateStudyNote(
-        note: StudyNoteModel.fromEntity(
-          tStudyNoteEntity.copyWith(pdfFileName: 'new-study-note.pdf'),
-        ),
+        note: updatedNote,
         replacementPdfFilePath: tStudyNoteLocalPdfFilePath,
       );
 
@@ -563,7 +498,7 @@ void main() {
 
         await expectLater(
           () => failingDataSource.updateStudyNote(
-            note: StudyNoteModel.fromEntity(tStudyNoteEntity),
+            note: tStudyNoteModel,
             replacementPdfFilePath: tStudyNoteLocalPdfFilePath,
           ),
           throwsA(isA<FirebaseRemoteException>()),

@@ -10,9 +10,7 @@ class DeleteStudentUseCase {
     required StudentAuthRepository studentAuthRepository,
   }) : _studentAuthRepository = studentAuthRepository;
 
-  Future<Either<AppErrorModel, Unit>> call({
-    required StudentEntity student,
-  }) {
+  Future<Either<AppErrorModel, Unit>> call({required StudentEntity student}) {
     return _studentAuthRepository.deleteStudentAccount(
       studentId: student.studentId,
     );

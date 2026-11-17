@@ -10,6 +10,7 @@ import 'package:al_mobdea_admin/features/lessons/presentation/cubit/edit_lesson_
 import 'package:al_mobdea_admin/features/lessons/presentation/cubit/edit_lesson_state.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/add_lesson_fields.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/add_lesson_options_section.dart';
+import 'package:al_mobdea_admin/features/lessons/presentation/widgets/add_lesson_screen_widgets/lesson_access_type_switch.dart';
 import 'package:al_mobdea_admin/features/lessons/presentation/widgets/edit_lesson_screen_widgets/edit_lesson_pdf_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -147,6 +148,15 @@ class _EditLessonContentState extends State<EditLessonContent> {
             verticalSpace(20),
             AppAnimations.formFieldEntrance(
               order: 3,
+              child: LessonAccessTypeSwitch(
+                isFree: state.isFree,
+                enabled: fieldsEnabled,
+                onChanged: cubit.changeFreeStatus,
+              ),
+            ),
+            verticalSpace(20),
+            AppAnimations.formFieldEntrance(
+              order: 4,
               child: AddLessonYoutubeUrlField(
                 controller: _youtubeUrlController,
                 onChanged: cubit.changeYoutubeUrl,
@@ -155,7 +165,7 @@ class _EditLessonContentState extends State<EditLessonContent> {
             ),
             verticalSpace(20),
             AppAnimations.formFieldEntrance(
-              order: 4,
+              order: 5,
               child: IgnorePointer(
                 ignoring: !fieldsEnabled,
                 child: AnimatedOpacity(
@@ -175,7 +185,7 @@ class _EditLessonContentState extends State<EditLessonContent> {
             ),
             verticalSpace(20),
             AppAnimations.formFieldEntrance(
-              order: 5,
+              order: 6,
               child: BlocBuilder<LessonExamsCubit, LessonExamsState>(
                 buildWhen: (previous, current) {
                   return previous.pageStatus != current.pageStatus ||

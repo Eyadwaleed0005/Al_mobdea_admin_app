@@ -13,7 +13,6 @@ import 'package:al_mobdea_admin/features/lessons/domain/use_cases/update_lesson_
 import 'package:get_it/get_it.dart';
 
 void registerLessonsDependencies(GetIt getIt) {
-  // Data Sources
   getIt.registerLazySingleton<LessonsRemoteDataSource>(
     () => FirebaseLessonsRemoteDataSource(
       firestoreService: getIt<FirestoreService>(),
@@ -21,47 +20,33 @@ void registerLessonsDependencies(GetIt getIt) {
     ),
   );
 
-  // Repository
   getIt.registerLazySingleton<LessonsRepository>(
     () => LessonsRepositoryImpl(
       remoteDataSource: getIt<LessonsRemoteDataSource>(),
     ),
   );
 
-  // Use Cases
   getIt.registerLazySingleton<GetLessonsUseCase>(
-    () => GetLessonsUseCase(
-      repository: getIt<LessonsRepository>(),
-    ),
+    () => GetLessonsUseCase(repository: getIt<LessonsRepository>()),
   );
 
   getIt.registerLazySingleton<GetLessonByIdUseCase>(
-    () => GetLessonByIdUseCase(
-      repository: getIt<LessonsRepository>(),
-    ),
+    () => GetLessonByIdUseCase(repository: getIt<LessonsRepository>()),
   );
 
   getIt.registerLazySingleton<StreamLessonsUseCase>(
-    () => StreamLessonsUseCase(
-      repository: getIt<LessonsRepository>(),
-    ),
+    () => StreamLessonsUseCase(repository: getIt<LessonsRepository>()),
   );
 
   getIt.registerLazySingleton<CreateLessonUseCase>(
-    () => CreateLessonUseCase(
-      repository: getIt<LessonsRepository>(),
-    ),
+    () => CreateLessonUseCase(repository: getIt<LessonsRepository>()),
   );
 
   getIt.registerLazySingleton<UpdateLessonUseCase>(
-    () => UpdateLessonUseCase(
-      repository: getIt<LessonsRepository>(),
-    ),
+    () => UpdateLessonUseCase(repository: getIt<LessonsRepository>()),
   );
 
   getIt.registerLazySingleton<DeleteLessonUseCase>(
-    () => DeleteLessonUseCase(
-      repository: getIt<LessonsRepository>(),
-    ),
+    () => DeleteLessonUseCase(repository: getIt<LessonsRepository>()),
   );
 }

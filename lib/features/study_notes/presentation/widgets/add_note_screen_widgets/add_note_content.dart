@@ -8,6 +8,7 @@ import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_no
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/add_note_options_section.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/add_note_pdf_picker.dart';
 import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/add_note_title_field.dart';
+import 'package:al_mobdea_admin/features/study_notes/presentation/widgets/add_note_screen_widgets/study_note_access_type_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -104,6 +105,17 @@ class _AddNoteContentState extends State<AddNoteContent> {
 
             AppAnimations.formFieldEntrance(
               order: 3,
+              child: StudyNoteAccessTypeSwitch(
+                isFree: state.isFree,
+                enabled: !state.isSubmitting,
+                onChanged: cubit.changeFreeStatus,
+              ),
+            ),
+
+            verticalSpace(20),
+
+            AppAnimations.formFieldEntrance(
+              order: 4,
               child: AddNotePdfPicker(
                 onFileSelected: (file) {
                   final path = file.path?.trim();

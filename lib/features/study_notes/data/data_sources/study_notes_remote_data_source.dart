@@ -15,13 +15,12 @@ abstract class StudyNotesRemoteDataSource {
 
   Future<void> createStudyNote({
     required StudyNoteModel note,
-    String? localPdfFilePath,
+    required String localPdfFilePath,
   });
 
   Future<void> updateStudyNote({
     required StudyNoteModel note,
     String? replacementPdfFilePath,
-    bool removeExistingPdf = false,
   });
 
   Future<void> deleteStudyNote({required String noteId});
